@@ -1,4 +1,4 @@
-from src.model import Nation 
+from model import Nation 
 
 class Logic:
     def __init__(self):

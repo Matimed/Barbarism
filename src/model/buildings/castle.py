@@ -1,4 +1,4 @@
-from src.model.buildings import Building
+from model.buildings import Building
 
 class Castle(Building):
     def __init__(self):
