@@ -1,4 +1,6 @@
-from model import Nation 
+from events import GlobalEvent as ev
+from model import Nation
+from model import Landlord 
 
 class Logic:
     def __init__(self):
@@ -10,9 +12,16 @@ class Logic:
         """ Generates the different nations 
             that will be used in the game.
         """
-
-        nations = []
+        # We hardcoded... this should have a larger list of Nation and 
+        # a better way to assing a Landlord to each one.
+        nations = [ 
+            Nation(Landlord(input('Input landlord name: ')))
+            ]
         
-        # For now we hardcoded the nation.
-        nations.append(Nation()) 
         return nations
+
+    
+    def notify(self, events):
+        for event in list(events):
+            if event.type == ev.GAME_START:
+                pass

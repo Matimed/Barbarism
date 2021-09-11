@@ -20,12 +20,12 @@ class SceneManager:
                 events.remove(event) # The scenes don't need this events.
 
             if event.type == ev.END_SCENE:
-                if event.scene == self.scenes['game']:
+                if event.scene == self.scenes['menu']:
                     self._set_current_scene(self.scenes['game'])
-                
+
                 events.remove(event)
 
-        self.current_scene.actualizar(events)
+        self.current_scene.notify(events)
 
 
     def _set_current_scene(self, scene):
