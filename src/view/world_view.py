@@ -12,6 +12,12 @@ class WorldView(AbstractGroup):
         self._draw_cells(surface)
 
 
+    def update(self):
+        for row in self.cells:
+            for cell in row:
+                cell.update()
+
+
     def _generate_cells(self, positions):
         """ Generates a CellSprite for each Position 
             in positions (two-dimensional Position array) 
@@ -31,8 +37,8 @@ class WorldView(AbstractGroup):
         return cells
 
 
-    def _change_cell_biome(self, biomes):
-        """ Recives a dict of cell biome with a Position as key
+    def _asign_biomes(self, biomes):
+        """ Recives a dict of cell biomes with a Position as key
             and change the image of each CellSprite in self.cells
             to the correct biome.
         """

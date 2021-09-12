@@ -16,5 +16,6 @@ class Game(Scene):
                 self.world = WorldView(event.positions)
 
         if (self.world != None):
+            self.world.update()
             self.world.draw(Scene.window_sur)
             Scene.window.update()
