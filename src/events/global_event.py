@@ -9,3 +9,6 @@ class GlobalEvent(Event):
     GAME_START = pygame.event.custom_type()
     BACK_MENU = pygame.event.custom_type()
     END_SCENE = pygame.event.custom_type(), 'scene (Scene)'
+
+    # In the future this event will also have to send a dict of biomes.
+    WORLD_GENERATED = pygame.event.custom_type(), 'positions (2D Position array)'

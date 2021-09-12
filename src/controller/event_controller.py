@@ -24,6 +24,9 @@ class EventController:
             if event.type == ev.END_SCENE:
                 view_events.append(event)
 
+            if event.type == ev.WORLD_GENERATED:
+                view_events.append(event)
+
         self.logic.notify(model_events)
         self.scene_manager.notify(view_events)
         
