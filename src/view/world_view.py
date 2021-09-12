@@ -6,7 +6,7 @@ class WorldView(AbstractGroup):
     def __init__(self, positions, origin = (0,0)):
         self.cells = self._generate_cells(positions)
         self.origin = origin
-    
+
 
     def draw(self, surface):
         self._draw_cells(surface)
@@ -41,23 +41,15 @@ class WorldView(AbstractGroup):
 
 
     def _draw_cells(self, surface):
-        cells = self.cells
+        """ Draws all the cells in order into a surface."""
+        
+        cell_origin = self.origin
+        
+        for y ,row in enumerate(self.cells):
+            for cell in row:
+                cell.rect.topleft = cell_origin
+                cell_origin = cell.rect.topright
 
-        first_cell = cells[0][0]
-        first_cell.rect.topleft = self.origin
-        for row in range(len(cells)):
-            if row != 0:
-                current_cell = cells[row][0]
-                previous_cell = cells[row - 1][0]
+                cell.draw(surface)
 
-                current_cell.rect.midtop = previous_cell.rect.midbottom
-                current_cell.draw(surface)
-
-            for column in range(row):
-                if column != 0:
-                    current_cell = cells[row][column]
-                    previous_cell = cells[row][column - 1]
-
-                    current_cell.rect.midleft = previous_cell.rect.midright
-                    current_cell.draw(surface)
-
+            cell_origin = self.cells[y][0].rect.bottomleft
