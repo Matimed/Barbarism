@@ -23,11 +23,11 @@ class World:
 
         positions = []
         
-        for row in range(order):
+        for y in range(order):
             row_positions = []
             
-            for column in range(order):
-                row_positions.append(Position(row,column))
+            for x in range(order):
+                row_positions.append(Position(x,y))
             
             positions.append(row_positions)
 
