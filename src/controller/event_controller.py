@@ -1,5 +1,5 @@
 import pygame
-from events import GlobalEvent
+from events import GlobalEvent as ev
 
 
 class EventController:
@@ -13,10 +13,20 @@ class EventController:
         view_events = []
 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+            if event.type == ev.EXIT:
                 pygame.quit()
                 exit()
 
-        self.logic.update(model_events)
-        self.scene_manager.update(view_events)
+            if event.type == ev.GAME_START:
+                view_events.append(event)
+                model_events.append(event)
+
+            if event.type == ev.END_SCENE:
+                view_events.append(event)
+
+            if event.type == ev.WORLD_GENERATED:
+                view_events.append(event)
+
+        self.logic.notify(model_events)
+        self.scene_manager.notify(view_events)
         

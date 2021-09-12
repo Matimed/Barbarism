@@ -9,20 +9,22 @@ class Window:
     def __init__(self):
         pygame.display.set_caption('Barbarisim')
         
-        self.scale = 3 # Escala por defecto.
+        self.max_resolution = (
+            pygame.display.Info().current_w,
+            pygame.display.Info().current_h
+        ) # Obtains the resolution of the screen.
+        
 
         # Minimum resolution by default.
         self.native_resolution = (480, 270)
+
+        self.scale = 2 # Default scale.
 
         # Current resolution.
         self.resolution = self.get_resolution(self.scale)
 
         self.window_sur = pygame.display.set_mode(self.resolution)
 
-        self.max_resolution = (
-            pygame.display.Info().current_w,
-            pygame.display.Info().current_h
-        ) # Obtains the resolution of the screen.
 
         self.background = None
         self.set_background((0,0,0))
@@ -37,7 +39,7 @@ class Window:
         """ Update the display and draw the background"""
 
         pygame.display.update()
-        self.window_sur.blit(self.background)
+        self.window_sur.blit(self.background, (0,0))
 
 
     def get_resolution(self, scale):
@@ -48,8 +50,8 @@ class Window:
         """
 
         resolution = [
-            self.native_resolution[0] * scale, 
-            self.native_resolution[1] * scale
+            int(self.native_resolution[0] * scale), 
+            int(self.native_resolution[1] * scale)
             ]
         
         return resolution

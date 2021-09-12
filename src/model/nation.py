@@ -1,4 +1,9 @@
+
+
 class Nation:
+    
+    world = None
+
     def __init__(self, landlord):
         self.landlord = landlord
         self.charactor_posiition = {}

@@ -57,7 +57,7 @@ class Position:
 
     def _format_verification(self, x, y):
         assert type(x) == int, "'x' must be an int."
-        assert type(y) == str, "'y' must be an int."
+        assert type(y) == int, "'y' must be an int."
 
 
     def __repr__(self):
