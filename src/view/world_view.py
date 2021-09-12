@@ -43,13 +43,11 @@ class WorldView(AbstractGroup):
     def _draw_cells(self, surface):
         """ Draws all the cells in order into a surface."""
         
-        cell_origin = self.origin
-        
-        for y ,row in enumerate(self.cells):
+        previous_point = (self.origin)
+        for row in self.cells:
             for cell in row:
-                cell.rect.topleft = cell_origin
-                cell_origin = cell.rect.topright
-
+                cell.rect.topleft = previous_point
+                previous_point = cell.rect.topright
                 cell.draw(surface)
-
-            cell_origin = self.cells[y][0].rect.bottomleft
+            
+            previous_point = row[0].rect.bottomleft
