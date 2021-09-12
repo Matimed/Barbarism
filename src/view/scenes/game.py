@@ -17,3 +17,4 @@ class Game(Scene):
 
         if (self.world != None):
             self.world.draw(Scene.window_sur)
+            Scene.window.update()

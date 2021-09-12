@@ -37,7 +37,7 @@ class Window:
         """ Update the display and draw the background"""
 
         pygame.display.update()
-        self.window_sur.blit(self.background)
+        self.window_sur.blit(self.background, (0,0))
 
 
     def get_resolution(self, scale):
