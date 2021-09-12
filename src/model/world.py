@@ -17,19 +17,28 @@ class World:
 
     
     def _generate_positions(self, order):
-        matrix = []
-        for x in range(1, order):
-            row_list = []
-            
-            for y in range(1, order):
-                row_list.append(Position(x,y))
-            
-            matrix.append(row_list)
+        """ Generates a two-dimensional array 
+            of Position type objects of the given size (order).
+        """
 
-        return matrix
+        positions = []
+        
+        for row in range(order):
+            row_positions = []
+            
+            for column in range(order):
+                row_positions.append(Position(row,column))
+            
+            positions.append(row_positions)
+
+        return positions
 
     
     def _generate_cells(self, positions):
+        """ Recives a two-dimensional array of Position type objects and
+            generate a dict of Cell type objects with a position as key.
+        """
+        
         cells = {}
         for row in positions:
             for position in row:
@@ -37,3 +46,16 @@ class World:
                 cells[position] = Plain()
         
         return cells
+
+
+    def get_positions(self):
+        return self.positions
+
+    
+    def get_biomes(self):
+        """Return a dict of biomes with Positions
+            as keys based on self.cells."""
+
+        raise NotImplementedError
+    
+    
