@@ -1,5 +1,8 @@
+import pygame
 from pygame.sprite import Sprite
+from position import Position
 from view.references import CELL
+from events import GlobalEvent as ev
 
 
 class CellSprite(Sprite):
@@ -17,3 +20,14 @@ class CellSprite(Sprite):
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
+
+
+    def update(self):
+        
+        if self.rect.collidepoint(pygame.mouse.get_pos()): 
+            if pygame.mouse.get_pressed()[0]:
+
+                cell_pressed = pygame.event.Event(
+                    ev.CELL_PRESSED.val, position = self.position
+                )
+                pygame.event.post(cell_pressed)
