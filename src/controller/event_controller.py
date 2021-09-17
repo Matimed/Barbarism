@@ -13,6 +13,10 @@ class EventController:
 
 
     def iterate_events(self):
+        """ Goes though all the events on pygame and decides 
+            who to sent it to: the view or the model
+        """ 
+        
         model_events = []
         view_events = []
 
