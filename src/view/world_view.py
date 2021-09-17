@@ -47,11 +47,18 @@ class WorldView(AbstractGroup):
 
 
     def _draw_cells(self, surface):
-        """ Draws all the cells in order into a surface."""
+        """ Draws all the cells in order into a surface.
+        """
         
         previous_point = (self.origin)
         for row in self.cells:
             for cell in row:
+
+                # We know that we are breaking OOP paradim
+                # when we access an argument directly but 
+                # this is neccesary because pygame does not have 
+                # a suitable method of accessing the rect attributes.
+
                 cell.rect.topleft = previous_point
                 previous_point = cell.rect.topright
                 cell.draw(surface)
