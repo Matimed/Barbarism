@@ -3,6 +3,10 @@ from position import Position
 
 
 class World:
+    """ Class that represents the physical space where 
+        are all the characters and buildings of the game
+    """
+
     def __init__(self, order = 11):
         self.positions = self._generate_positions(order)
         self.cells = self._generate_cells(self.positions)
@@ -53,8 +57,9 @@ class World:
 
     
     def get_biomes(self):
-        """Return a dict of biomes with Positions
-            as keys based on self.cells."""
+        """ Return a dict of biomes with Positions
+            as keys based on self.cells.
+        """
 
         raise NotImplementedError
     
