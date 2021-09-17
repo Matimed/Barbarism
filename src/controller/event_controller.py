@@ -3,6 +3,10 @@ from events import GlobalEvent as ev
 
 
 class EventController:
+    """ Iterates the pygame events and decide how to filter 
+        these between the logic and the scene_manager
+    """
+
     def __init__(self, logic, scene_manager):
         self.logic = logic
         self.scene_manager = scene_manager

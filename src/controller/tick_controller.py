@@ -2,6 +2,10 @@ import pygame
 
 
 class TickController:
+    """ Has the iteration of the game that
+        runs at 60 frames per second
+    """
+    
     def __init__(self, event_controller):
         self.event_controller = event_controller
         
