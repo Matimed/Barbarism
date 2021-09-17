@@ -1,5 +1,6 @@
 class Main:
-    """ Initializes the game and execute it."""
+    """ Initializes the game and execute it.
+    """
     
     def __init__(self):
         scene_manager = SceneManager()

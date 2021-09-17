@@ -1,6 +1,15 @@
 
 
 class Charactor:
+    """ Abstract class that represents a person 
+        or any other entity acting in a game.
+    """
+
+    # The choose of the word "Charactor" instead of "Character" 
+    # is intentional to avoid any ambiguity because the word
+    # Character can also mean "a single letter".
+
+    
     def __init__(self):
         self.path = []
         self.speed = 2

@@ -31,12 +31,15 @@ class Window:
 
     
     def get_surface(self):
-        """ Obtains the display surface."""
+        """ Obtains the display surface.
+        """
+        
         return self.window_sur
 
     
     def update(self):
-        """ Update the display and draw the background"""
+        """ Update the display and draw the background.
+        """
 
         pygame.display.update()
         self.window_sur.blit(self.background, (0,0))
@@ -96,6 +99,7 @@ class Window:
 
 
     def _reset_background(self):
-        """ Scale the background according to the screen resolution."""
+        """ Scale the background according to the screen resolution.
+        """
 
         self.background = pygame.transform.scale(self.background, (self.resolution))

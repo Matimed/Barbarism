@@ -3,12 +3,20 @@ from events import GlobalEvent as ev
 
 
 class EventController:
+    """ Iterates the pygame events and decide how to filter 
+        these between the logic and the scene_manager
+    """
+
     def __init__(self, logic, scene_manager):
         self.logic = logic
         self.scene_manager = scene_manager
 
 
     def iterate_events(self):
+        """ Goes though all the events on pygame and decides 
+            who to sent it to: the view or the model
+        """ 
+        
         model_events = []
         view_events = []
 
