@@ -14,7 +14,7 @@ class EventDispatcher:
     def add(self, eventcls, listener):
         """ Suscribes a listener to an specific Event class.
 
-            Recibes:
+            Recives:
                 eventcls:<Event.__class__>
                 listener:<WeakBoundMethod>
         """
