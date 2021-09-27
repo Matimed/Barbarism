@@ -3,19 +3,15 @@ from view.sprites.cell_sprite import CellSprite
 
 
 class WorldView(AbstractGroup):
-    def __init__(self, positions, origin = (0,0)):
+    def __init__(self, event_dispatcher, positions, origin = (0,0)):
+        CellSprite.set_event_dispatcher(event_dispatcher)
+        
         self.cells = self._generate_cells(positions)
         self.origin = origin
 
 
     def draw(self, surface):
         self._draw_cells(surface)
-
-
-    def update(self):
-        for row in self.cells:
-            for cell in row:
-                cell.update()
 
 
     def _generate_cells(self, positions):
