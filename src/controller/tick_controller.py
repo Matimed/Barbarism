@@ -1,4 +1,5 @@
-import pygame
+import pygame as pg
+from events import Tick
 
 
 class TickController:
@@ -6,14 +7,13 @@ class TickController:
         runs at 60 frames per second
     """
     
-    def __init__(self, event_controller):
-        self.event_controller = event_controller
-        
+    def __init__(self, event_dispatcher):
+        self.ed = event_dispatcher
         self.fps = 60
-        self.clock = pygame.time.Clock()
+        self.clock = pg.time.Clock()
 
 
     def run(self):
         while True:
-            self.event_controller.iterate_events()
+            self.ed.post(Tick())
             self.clock.tick(60)
