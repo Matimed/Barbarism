@@ -1,6 +1,9 @@
 
 
-class WorldGenerated:
+from events.event import Event
+
+
+class WorldGenerated(Event):
     def __init__(self, positions):
         self.positions = positions
 

@@ -33,7 +33,7 @@ class EventDispatcher:
         """
 
         try:
-            for listener in self.listeners[event.__class__]:
+            for listener in self.listeners[event.get_class()]:
                 listener(event)
 
         except KeyError: #Event argument never added.

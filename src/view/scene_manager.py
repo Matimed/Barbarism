@@ -19,7 +19,7 @@ class SceneManager:
             'game' : Game
         }
     
-        self.current_scene = self.scenes['menu']()
+        self._set_current_scene(self.scenes['menu'])
 
     
     def back_menu(self, event):
