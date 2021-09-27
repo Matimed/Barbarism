@@ -1,5 +1,3 @@
-import pygame
-from weak_bound_method import WeakBoundMethod as Wbm
 from events import Tick
 from view.scenes import Scene
 from events import EndScene
@@ -8,7 +6,7 @@ from events import EndScene
 class MainMenu(Scene):
     def __init__(self):
         super().__init__()
-        Scene.get_event_dispatcher().add(Tick, Wbm(self.update))
+        Scene.get_event_dispatcher().add(Tick, self.update)
 
 
     def update(self, event):

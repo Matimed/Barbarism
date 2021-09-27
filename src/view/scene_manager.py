@@ -4,7 +4,6 @@ from events import EndScene
 from events import BackMenu
 from events import GameStart
 from view.scenes.scene import Scene
-from weak_bound_method import WeakBoundMethod as Wbm
 
 
 class SceneManager:
@@ -12,8 +11,8 @@ class SceneManager:
         self.ed = event_dispatcher
         Scene.ed = self.ed
 
-        self.ed.add(BackMenu, Wbm(self.back_menu))
-        self.ed.add(EndScene, Wbm(self.end_scene))
+        self.ed.add(BackMenu, self.back_menu)
+        self.ed.add(EndScene, self.end_scene)
 
         self.scenes = {
             'menu' : MainMenu,

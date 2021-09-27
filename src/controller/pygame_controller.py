@@ -1,12 +1,12 @@
 from events import Tick
-from weak_bound_method import WeakBoundMethod as Wbm
 import pygame
+from events import CellPressed
 
 
 class PygameController:
     def __init__(self, event_dispatcher):
         self.ed = event_dispatcher
-        self.ed.add(Tick, Wbm(self.iterate_events))
+        self.ed.add(Tick, self.iterate_events)
 
     
     def iterate_events(self, event):
@@ -14,3 +14,4 @@ class PygameController:
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+

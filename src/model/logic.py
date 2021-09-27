@@ -9,7 +9,7 @@ from weak_bound_method import WeakBoundMethod as Wbm
 class Logic:
     def __init__(self, event_dispatcher):
         self.ed = event_dispatcher
-        self.ed.add(GameStart, Wbm(self.game_start))
+        self.ed.add(GameStart, self.game_start)
 
         self.nations = self._generate_nations()
         self.turn = self.nations[0]

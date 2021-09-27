@@ -1,4 +1,4 @@
-
+from weak_bound_method import WeakBoundMethod as Wbm
 
 class EventDispatcher:
     """ Handles the sending of events 
@@ -16,9 +16,10 @@ class EventDispatcher:
 
             Recives:
                 eventcls:<Event.__class__>
-                listener:<WeakBoundMethod>
+                listener:<BoundMethod>
         """
 
+        listener = Wbm(listener)
         # If the event is not in the dictionary, 
         # it is added and subscribed to by the listener.
         self.listeners.setdefault(eventcls, list()).append(listener)

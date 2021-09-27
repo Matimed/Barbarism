@@ -1,4 +1,3 @@
-from weak_bound_method import WeakBoundMethod as Wbm
 from view.scenes import Scene
 from view.world_view import WorldView
 from events import WorldGenerated
@@ -10,8 +9,8 @@ class Game(Scene):
         super().__init__()
         self.world = None
         ed = Scene.get_event_dispatcher()
-        ed.add(Tick, Wbm(self.update))
-        ed.add(WorldGenerated, Wbm(self.generates_world_view))
+        ed.add(Tick,self.update)
+        ed.add(WorldGenerated, self.generates_world_view)
 
 
     def generates_world_view(self, event):
