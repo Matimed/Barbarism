@@ -1,11 +1,20 @@
-import pygame
 from view.scenes import MainMenu
 from view.scenes import Game
-from events import GlobalEvent as ev
+from events import EndScene
+from events import BackMenu
+from events import GameStart
+from view.scenes.scene import Scene
+from weak_bound_method import WeakBoundMethod as Wbm
 
 
 class SceneManager:
-    def __init__(self):
+    def __init__(self, event_dispatcher):
+        self.ed = event_dispatcher
+        Scene.ed = self.ed
+
+        self.ed.add(BackMenu, Wbm(self.back_menu))
+        self.ed.add(EndScene, Wbm(self.end_scene))
+
         self.scenes = {
             'menu' : MainMenu,
             'game' : Game
@@ -13,22 +22,17 @@ class SceneManager:
     
         self.current_scene = self.scenes['menu']()
 
+    
+    def back_menu(self, event):
+        self._set_current_scene(self.scenes['menu'])
 
-    def notify(self, events):
-        for event in list(events):
-            if event.type == ev.BACK_MENU:
-                self._set_current_scene(self.scenes['menu'])
-                events.remove(event) # The scenes don't need this events.
 
-            if event.type == ev.END_SCENE:
-                if event.scene == self.scenes['menu']:
-                    self._set_current_scene(self.scenes['game'])
-                    game_start = pygame.event.Event(ev.GAME_START.val)
-                    pygame.event.post(game_start)
+    def end_scene(self, event):
+        scene = event.get_scene()
 
-                events.remove(event)
-
-        self.current_scene.notify(events)
+        if scene == self.scenes['menu']:
+            self._set_current_scene(self.scenes['game'])
+            self.ed.post(GameStart())
 
 
     def _set_current_scene(self, scene):
