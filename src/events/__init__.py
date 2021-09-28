@@ -5,3 +5,4 @@ from events.tick import Tick
 from events.game_start import GameStart
 from events.world_generated import WorldGenerated
 from events.cell_pressed import CellPressed
+from events.quit import Quit
