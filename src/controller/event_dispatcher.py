@@ -1,5 +1,6 @@
 from weak_bound_method import WeakBoundMethod as Wbm
 
+
 class EventDispatcher:
     """ Handles the sending of events 
         and their subscription
@@ -20,6 +21,7 @@ class EventDispatcher:
         """
 
         listener = Wbm(listener)
+
         # If the event is not in the dictionary, 
         # it is added and subscribed to by the listener.
         self.listeners.setdefault(eventcls, list()).append(listener)
