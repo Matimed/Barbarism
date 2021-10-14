@@ -32,7 +32,7 @@ class Position:
         try:
             other_get_position = other.get_position
         except AttributeError:
-            raise NotImplementedError()
+            return False
 
         return self.get_position() == other_get_position()
 

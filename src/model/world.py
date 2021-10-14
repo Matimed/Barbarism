@@ -1,5 +1,5 @@
 from model.cells.plain import Plain
-from position import Position
+from lib.position import Position
 
 
 class World:
