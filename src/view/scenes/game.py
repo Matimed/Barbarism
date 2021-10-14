@@ -13,6 +13,8 @@ class Game(Scene):
 
 
     def generates_world_view(self, event):
+        from src.view import WorldView
+        
         self.world = WorldView(
             self.get_event_dispatcher(),
             event.get_positions()
