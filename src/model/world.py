@@ -1,5 +1,6 @@
 from src.model.cells import Plain
 from lib.position import Position
+from lib.abstract_data_types import Matrix
 
 
 class World:
@@ -21,11 +22,11 @@ class World:
 
     
     def _generate_positions(self, order):
-        """ Generates a two-dimensional array 
-            of Position type objects of the given size (order).
+        """ Generates a Matrix of Position type objects 
+            based on the given size (order).
         """
 
-        positions = []
+        positions = Matrix()
 
         for y in range(order):
             row_positions = []
@@ -33,21 +34,20 @@ class World:
             for x in range(order):
                 row_positions.append(Position(x,y))
             
-            positions.append(row_positions)
+            positions.append_row(row_positions)
 
         return positions
 
     
     def _generate_cells(self, positions):
-        """ Recives a two-dimensional array of Position type objects and
+        """ Recives a Matrix of Position type objects and
             generate a dict of Cell type objects with a position as key.
         """
         
         cells = {}
-        for row in positions:
-            for position in row:
-                # Cells should be random and not all Plain.
-                cells[position] = Plain()
+
+        for i in positions:
+            cells[i] = Plain()
 
         return cells
 
