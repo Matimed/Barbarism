@@ -1,6 +1,4 @@
-
-
-from events.event import Event
+from src.events import Event
 
 
 class WorldGenerated(Event):

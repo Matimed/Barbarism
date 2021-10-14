@@ -1,11 +1,10 @@
 import pygame as pg
-from pygame.sprite import Sprite
-from events import Tick
-from events import CellPressed
-from view.references import CELL
+from src.events import Tick
+from src.events import CellPressed
+from src.view.references import CELL
 
 
-class CellSprite(Sprite):
+class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
 
     @staticmethod

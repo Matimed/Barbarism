@@ -1,9 +1,9 @@
-from view.scenes import MainMenu
-from view.scenes import Game
-from events import EndScene
-from events import BackMenu
-from events import GameStart
-from view.scenes.scene import Scene
+from src.view.scenes import Scene
+from src.view.scenes import MainMenu
+from src.view.scenes import Game
+from src.events import EndScene
+from src.events import BackMenu
+from src.events import GameStart
 
 
 class SceneManager:
@@ -18,7 +18,8 @@ class SceneManager:
             'menu' : MainMenu,
             'game' : Game
         }
-    
+        self.current_scene = None
+
         self._set_current_scene(self.scenes['menu'])
 
     

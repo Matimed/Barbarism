@@ -1,4 +1,4 @@
-from model.charactors import Passive
+from src.model.charactors import Passive
 
 
 class Worker(Passive):

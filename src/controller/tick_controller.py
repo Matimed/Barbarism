@@ -1,5 +1,5 @@
+from src.events import Tick
 import pygame as pg
-from events import Tick
 
 
 class TickController:

@@ -1,7 +1,6 @@
-from view.scenes import Scene
-from view.world_view import WorldView
-from events import WorldGenerated
-from events import Tick
+from src.events import Tick
+from src.events import WorldGenerated
+from src.view.scenes import Scene
 
 
 class Game(Scene):

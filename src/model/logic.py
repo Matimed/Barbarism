@@ -1,9 +1,9 @@
-from model import Nation
-from model import Landlord
-from model import World 
-from events import GameStart
-from events import WorldGenerated
-from weak_bound_method import WeakBoundMethod as Wbm
+from src.model import Nation
+from src.model import Landlord
+from src.model import World 
+from src.events import GameStart
+from src.events import WorldGenerated
+from lib.weak_bound_method import WeakBoundMethod as Wbm
 
 
 class Logic:

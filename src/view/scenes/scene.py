@@ -1,4 +1,4 @@
-from view import Window
+from src.view import Window
 
 
 class Scene:

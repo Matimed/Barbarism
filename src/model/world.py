@@ -1,4 +1,4 @@
-from model.cells.plain import Plain
+from src.model.cells import Plain
 from lib.position import Position
 
 
@@ -26,7 +26,7 @@ class World:
         """
 
         positions = []
-        
+
         for y in range(order):
             row_positions = []
             
@@ -48,7 +48,7 @@ class World:
             for position in row:
                 # Cells should be random and not all Plain.
                 cells[position] = Plain()
-        
+
         return cells
 
 

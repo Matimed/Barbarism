@@ -1,4 +1,4 @@
-from charactors import Charactor
+from src.model.charactors import Charactor
 
 
 class Passive(Charactor):

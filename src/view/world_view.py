@@ -1,5 +1,5 @@
 from pygame.sprite import AbstractGroup
-from view.sprites.cell_sprite import CellSprite
+from src.view.sprites import CellSprite
 
 
 class WorldView(AbstractGroup):
