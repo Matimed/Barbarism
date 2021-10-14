@@ -18,8 +18,7 @@ class CellSprite(pg.sprite.Sprite):
 
 
     def __init__(self, position):
-        self.get_event_dispatcher().add(Tick, self.update)
-
+        
         # Later we should use different images for each type of biome.
         self.biome = [CELL['plain']]
         self.image = self.biome[0]
