@@ -13,6 +13,27 @@ class World:
         self.cells = self._generate_cells(self.positions)
 
 
+    def get_positions(self):
+        return self.positions
+
+    
+    def get_biomes(self):
+        """ Return a dict of biomes with Positions
+            as keys based on self.cells.
+        """
+
+        raise NotImplementedError
+
+
+    def generate_chunks(self, size:int):
+        """ Returns a Matrix of Chunk objects 
+            based on a given size (for each individual Chunk).
+        """
+
+
+        NotImplementedError()
+
+
     def create_route(self, origin, destination):
         """ Given two Position returns the fastest way
             to get from the origin to the destination point.
@@ -52,15 +73,4 @@ class World:
         return cells
 
 
-    def get_positions(self):
-        return self.positions
 
-    
-    def get_biomes(self):
-        """ Return a dict of biomes with Positions
-            as keys based on self.cells.
-        """
-
-        raise NotImplementedError
-    
-    

@@ -8,9 +8,22 @@ class WorldView(AbstractGroup):
         
         self.world = world
         self.window = window
+        self.world.generate_chunks(self.get_chunk_size())
 
         self.cells = self._generate_cells(world.get_positions())
         self.origin = origin
+
+
+    def get_chunk_size(self) -> int:
+        """ Returns the number of cells that fit in a chunk.
+        """
+        
+        max_resolution = self.window.get_resolution()
+        cell_min_size = CellSprite.get_min_size()
+        cells_max_width = max_resolution[0] // cell_min_size
+        cells_max_height = max_resolution[1] // cell_min_size
+
+        return max(cells_max_width, cells_max_height)
 
 
     def _generate_cells(self, positions):
@@ -40,7 +53,6 @@ class WorldView(AbstractGroup):
         """
 
         self.__draw_cells(surface)
-
 
 
     def __draw_cells(self, surface):
