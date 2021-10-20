@@ -1,5 +1,5 @@
-from events import Tick
-from events import Quit
+from src.events import Tick
+from src.events import Quit
 import pygame as pg
 
 

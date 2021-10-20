@@ -1,6 +1,6 @@
-from events import Tick
-from view.scenes import Scene
-from events import EndScene
+from src.events import Tick
+from src.events import EndScene
+from src.view.scenes import Scene
 
 
 class MainMenu(Scene):

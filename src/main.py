@@ -1,12 +1,18 @@
+import pygame as pg
+from src.controller import TickController
+from src.controller import EventDispatcher
+from src.events import Quit
+from src.controller import PygameController
+from src.model import Logic
+from src.view import SceneManager
 
 
 class Main:
     """ Initializes the game and execute it.
     """
     
-    def __init__(self):
+    def __init__(self):        
         ed = EventDispatcher()
-
         ed.add(Quit, self.exit)
 
         self.tick_controller = TickController(ed)
@@ -14,6 +20,7 @@ class Main:
         self.scene_manager = SceneManager(ed)
         self.logic = Logic(ed)
 
+        self.run()
 
     def exit(self, event):
         pg.quit()
@@ -22,19 +29,5 @@ class Main:
 
     def run(self):
         self.tick_controller.run()
-
-    
-if __name__ == '__main__':
-    import pygame as pg
-    pg.init()
-    from controller import EventDispatcher
-    from controller import TickController
-    from controller import PygameController
-    from events import Quit
-    from view import SceneManager
-    from model import Logic
-    
-    main = Main()
-    main.run()
 
 

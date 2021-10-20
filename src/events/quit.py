@@ -1,4 +1,4 @@
-from events import Event
+from src.events import Event
 
 
 class Quit(Event):

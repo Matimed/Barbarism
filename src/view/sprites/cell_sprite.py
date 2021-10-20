@@ -1,11 +1,10 @@
 import pygame as pg
-from pygame.sprite import Sprite
-from events import Tick
-from events import CellPressed
-from view.references import CELL
+from src.events import Tick
+from src.events import CellPressed
+from src.view.references import CELL
 
 
-class CellSprite(Sprite):
+class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
 
     @staticmethod
@@ -19,8 +18,7 @@ class CellSprite(Sprite):
 
 
     def __init__(self, position):
-        self.get_event_dispatcher().add(Tick, self.update)
-
+        
         # Later we should use different images for each type of biome.
         self.biome = [CELL['plain']]
         self.image = self.biome[0]

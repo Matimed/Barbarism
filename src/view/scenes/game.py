@@ -1,7 +1,6 @@
-from view.scenes import Scene
-from view.world_view import WorldView
-from events import WorldGenerated
-from events import Tick
+from src.events import Tick
+from src.events import WorldGenerated
+from src.view.scenes import Scene
 
 
 class Game(Scene):
@@ -14,6 +13,8 @@ class Game(Scene):
 
 
     def generates_world_view(self, event):
+        from src.view import WorldView
+        
         self.world = WorldView(
             self.get_event_dispatcher(),
             event.get_positions()

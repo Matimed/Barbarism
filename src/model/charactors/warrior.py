@@ -1,4 +1,4 @@
-from model.charactors import Aggressive
+from src.model.charactors import Aggressive
 
 
 class Warrior(Aggressive):

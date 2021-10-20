@@ -1,4 +1,4 @@
-from weak_bound_method import WeakBoundMethod as Wbm
+from lib.weak_bound_method import WeakBoundMethod as Wbm
 
 
 class EventDispatcher:

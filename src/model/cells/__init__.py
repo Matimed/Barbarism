@@ -1,2 +1,2 @@
-from model.cells.cell import Cell
-from model.cells.plain import Plain
+from src.model.cells.cell import Cell
+from src.model.cells.plain import Plain

@@ -1,5 +1,5 @@
 from pygame.sprite import AbstractGroup
-from view.sprites.cell_sprite import CellSprite
+from src.view.sprites import CellSprite
 
 
 class WorldView(AbstractGroup):
@@ -10,25 +10,15 @@ class WorldView(AbstractGroup):
         self.origin = origin
 
 
-    def draw(self, surface):
-        self._draw_cells(surface)
-
-
     def _generate_cells(self, positions):
         """ Generates a CellSprite for each Position 
-            in positions (two-dimensional Position array) 
-            and returns a two-dimensional CellSprite array.
+            in positions (Matrix of Position objects) 
+            and returns a Matrix of CellSprite objects.
         """
 
-        cells = []
-        for row in positions:
-            rowlist = []
-
-            for position in row:
-                cell = CellSprite(position)
-                rowlist.append(cell)
-            
-            cells.append(rowlist)
+        cells = positions.copy()
+        for position in cells:
+            cells.set_element(cells.index(position), CellSprite(position))
 
         return cells
 
@@ -42,12 +32,20 @@ class WorldView(AbstractGroup):
         raise NotImplementedError
 
 
-    def _draw_cells(self, surface):
+    def draw(self, surface):
+        """
+        """
+
+        self.__draw_cells(surface)
+
+
+
+    def __draw_cells(self, surface):
         """ Draws all the cells in order into a surface.
         """
         
         previous_point = (self.origin)
-        for row in self.cells:
+        for row in self.cells.iter_rows():
             for cell in row:
 
                 # We know that we are breaking OOP paradim
