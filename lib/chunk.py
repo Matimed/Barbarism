@@ -7,7 +7,7 @@ class Chunk:
         render the world in separate parts.
     """
 
-    def __init__(self, positions, index):
+    def __init__(self, positions:Matrix, index:tuple[int, int]):
         self.positions = positions
         self.index = index
 

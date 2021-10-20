@@ -6,6 +6,8 @@ from src.view.references import CELL
 
 class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
+    min_size = 20
+    
 
     @staticmethod
     def set_event_dispatcher(event_dispatcher):
@@ -15,6 +17,11 @@ class CellSprite(pg.sprite.Sprite):
     @classmethod
     def get_event_dispatcher(cls):
         return cls.ed
+
+    
+    @classmethod
+    def get_min_size(cls):
+        return cls.min_size
 
 
     def __init__(self, position):
