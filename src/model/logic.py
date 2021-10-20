@@ -19,7 +19,7 @@ class Logic:
         world = World()
         self.world = world
         Nation.world = world
-        self.ed.post(WorldGenerated(world.get_positions()))
+        self.ed.post(WorldGenerated(world))
 
 
     def _generate_nations(self):

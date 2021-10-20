@@ -6,7 +6,7 @@ from src.view.scenes import Scene
 class Game(Scene):
     def __init__(self):
         super().__init__()
-        self.world = None
+        self.world_view = None
         ed = Scene.get_event_dispatcher()
         ed.add(Tick,self.update)
         ed.add(WorldGenerated, self.generates_world_view)
@@ -15,13 +15,14 @@ class Game(Scene):
     def generates_world_view(self, event):
         from src.view import WorldView
         
-        self.world = WorldView(
+        self.world_view = WorldView(
             self.get_event_dispatcher(),
-            event.get_positions()
+            event.get_world(),
+            Scene().get_window()
             )
 
 
     def update(self, event):
-        if (self.world != None):
-            self.world.draw(Scene.get_window_sur())
+        if (self.world_view != None):
+            self.world_view.draw(Scene.get_window_sur())
             Scene.get_window().update()

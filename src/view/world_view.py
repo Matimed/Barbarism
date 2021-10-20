@@ -3,10 +3,13 @@ from src.view.sprites import CellSprite
 
 
 class WorldView(AbstractGroup):
-    def __init__(self, event_dispatcher, positions, origin = (0,0)):
+    def __init__(self, event_dispatcher, world, window, origin = (0,0)):
         CellSprite.set_event_dispatcher(event_dispatcher)
         
-        self.cells = self._generate_cells(positions)
+        self.world = world
+        self.window = window
+
+        self.cells = self._generate_cells(world.get_positions())
         self.origin = origin
 
 
