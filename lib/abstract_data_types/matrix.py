@@ -27,9 +27,9 @@ class Matrix:
         """
 
         assert len(index) == 2, \
-            "The index must be a tuple of one position in x and one in y."
+            "The index must be a tuple of one position in y and one in x."
 
-        assert index[0] < self.length()[1] and index[1] < self.length()[0], \
+        assert index[0] < self.length()[0] and index[1] < self.length()[1], \
             "Index out of range."
 
         return self.rows[index[0]][index[1]]
@@ -40,9 +40,9 @@ class Matrix:
         """
 
         assert len(index) == 2, \
-            "The index must be a tuple of one position in x and one in y."
+            "The index must be a tuple of one position in y and one in x."
 
-        assert index[0] < self.length()[1] and index[1] < self.length()[0], \
+        assert index[0] < self.length()[0] and index[1] < self.length()[1], \
             "Index out of range."
 
         self.rows[index[0]][index[1]] = element
@@ -214,4 +214,5 @@ class Matrix:
             rows.append(' '.join(map(str, row)))
         
         return ' \n'.join(rows)
+
 

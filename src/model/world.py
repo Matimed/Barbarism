@@ -32,7 +32,7 @@ class World:
             row_positions = []
             
             for x in range(order):
-                row_positions.append(Position(x,y))
+                row_positions.append(Position(y, x))
             
             positions.append_row(row_positions)
 
