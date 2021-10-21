@@ -21,7 +21,6 @@ class Matrix:
                 self.append_row(row)
 
 
-
     def get_element(self, index: tuple):
         """ Returns the element found at the given index. 
         """
@@ -59,6 +58,52 @@ class Matrix:
                 return  (row_index, row.index(element))
 
         return False
+
+
+    def split(self, quantity:int):
+        """ Divides the matrix into the requested number of smaller matrices
+            ensuring they are all the same size. (The matrix must be able 
+            to be divided by the quantity without leaving a remainder).
+            Returns a Matrix composed of smaller Matrix.
+        """
+ 
+
+        total = (self.length()[0]*self.length()[1]) //quantity
+
+        y_divisors = self._get_divisors(self.length()[0])
+        x_divisors = self._get_divisors(self.length()[1])
+        posible_lengths=[]
+
+        for y_div in  y_divisors:
+            for x_div in x_divisors:
+                if y_div * x_div == total:
+                    posible_lengths.append((y_div, x_div))
+                    break
+
+        assert len(posible_lengths)!= 0, (
+            "It is impossible to divide the matrix "
+            "into the ordered quantity of parts.")
+
+        new_length = self._get_squarest_length(posible_lengths)
+        grand_matrix = Matrix()
+
+        for row in range(0, self.length()[0],new_length[0]) :
+            matrix_row = []
+
+            for column in range(0, self.length()[1],new_length[1]):
+
+                small_matrix = Matrix()
+                for y in range(new_length[0]):
+                    new_row=[]
+                    for x in range(new_length[1]):
+                        new_row.append(self.get_element((row+y,column+x)))
+                    small_matrix.append_row(new_row)
+
+                matrix_row.append(small_matrix)
+
+            grand_matrix.append_row(matrix_row)
+
+        return grand_matrix
 
 
     def get_next_index(self, index:tuple):
@@ -135,7 +180,7 @@ class Matrix:
         return Matrix(rows)
 
 
-    def length(self) -> tuple:
+    def length(self) -> tuple[int,int]:
         """ Returns a tuple that represent the size of the matrix 
             (number of rows, number of columns).
         """
@@ -214,5 +259,35 @@ class Matrix:
             rows.append(' '.join(map(str, row)))
         
         return ' \n'.join(rows)
+
+
+    def _get_divisors(self, number):
+        """ Returns a list of all natural divisors of a given number.
+        """
+
+        divisors = [1]
+        for i in range(2, int(number**(1/2))+1):
+            if number%i == 0:
+                divisors.append(i)
+                divisors.append(number//i)
+        divisors.append(number)
+
+        return list(set(divisors))
+
+
+    def _get_squarest_length(self, lengths):
+        """ Receive a list of tuples and decide which of them 
+            forms the most square-like figure. 
+        """
+
+        remainders = []
+        for length in lengths:
+            remainder = abs(length[0] - length[1])
+            if remainder == 0:
+                return length
+            else:
+                remainders.append(remainder)
+                
+        return lengths[remainders.index(min(remainders))]
 
 
