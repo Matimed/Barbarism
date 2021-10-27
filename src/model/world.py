@@ -53,6 +53,22 @@ class World:
         self.chunks = chunks
 
 
+    def get_adjacent_chunks(self, chunk) -> list:
+        """ Returns the list of Chunk objects 
+            adjacent to the one given by parameter.
+        """
+
+        return self.chunks.get_adjacencies(self.chunks.index(chunk))
+
+
+    def get_adjacent_positions(self, position) -> list:
+        """ Returns the list of Position objects 
+            adjacent to the one given by parameter.
+        """
+
+        return self.positions.get_adjacencies(self.positions.index(position))
+
+
     def create_route(self, origin, destination):
         """ Given two Position returns the fastest way
             to get from the origin to the destination point.
