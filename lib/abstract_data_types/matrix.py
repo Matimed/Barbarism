@@ -123,6 +123,30 @@ class Matrix:
             return (index[0], index[1] + 1)
 
 
+    def get_adjacencies(self, index:tuple):
+        """ Returns all the elements contiguous to the one 
+            of the given index.
+        """
+
+        elements = []
+        
+        min_index = [0,0]
+        for i in range(len(index)):
+            if index[i]!= 0: min_index[i]= index[i]-1
+            else: min_index[i]= index[i]
+
+
+        for row in range (min_index[0], (index[0]+2)):
+            for column in range(min_index[1], (index[1]+2)):
+                if index == (row, column):
+                    continue
+                try:
+                    elements.append(self.rows[row][column])
+                except IndexError:
+                    continue
+        return elements
+
+
     def append_row(self, row: list):
         """ Receives a list of elements and places it 
             under the last row of the matrix.
@@ -289,5 +313,4 @@ class Matrix:
                 remainders.append(remainder)
                 
         return lengths[remainders.index(min(remainders))]
-
 
