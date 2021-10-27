@@ -1,6 +1,7 @@
 from src.model.cells import Plain
 from lib.position import Position
 from lib.abstract_data_types import Matrix
+from lib.chunk import Chunk
 
 
 class World:
@@ -8,9 +9,11 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, order = 11):
+    def __init__(self, order = 100):
+        self.order = order
         self.positions = self._generate_positions(order)
         self.cells = self._generate_cells(self.positions)
+        self.chunks = None
 
 
     def get_positions(self):
@@ -25,13 +28,29 @@ class World:
         raise NotImplementedError
 
 
-    def generate_chunks(self, size:int):
-        """ Returns a Matrix of Chunk objects 
-            based on a given size (for each individual Chunk).
+    def generate_chunks(self, min_size:int):
+        """ Returns a Matrix of Chunk objects based on a given size 
+            (the minimum number of cells that can fit in a Chunk).
         """
 
+        size = min_size
+        while True:
+            if not (self.order%size):
+                break
+            size +=1
 
-        NotImplementedError()
+        splited_positions = self.positions.split(self.order/size)
+        chunks = Matrix()
+
+        for y, row in splited_positions.iter_rows():
+            chunk_row = []
+            for x, positions in row:
+                chunk= Chunk(positions,(y,x))
+                chunk_row.append(chunk)
+
+            chunks.append_row(chunk_row)
+
+        self.chunks = chunks
 
 
     def create_route(self, origin, destination):
