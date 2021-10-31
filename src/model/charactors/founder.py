@@ -1,4 +1,4 @@
-from model.charactors import Passive
+from src.model.charactors import Passive
 
 
 class Founder(Passive):
@@ -7,6 +7,6 @@ class Founder(Passive):
     """
     
     def __init__(self):
-        super.__init__()
+        super()
 
     
