@@ -2,6 +2,7 @@ from src.model.cells import Plain
 from lib.position import Position
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
+from random import choice
 
 
 class World:
@@ -108,4 +109,8 @@ class World:
         return cells
 
 
+    def generate_spawn_chunk(self):
+        """ Returns a position where to place a charactor.
+        """
 
+        return self.chunks.get_element((0,0))
