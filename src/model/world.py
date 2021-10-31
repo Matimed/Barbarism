@@ -28,7 +28,7 @@ class World:
         raise NotImplementedError
 
 
-    def generate_chunks(self, min_size:int):
+    def _generate_chunks(self, min_size:int):
         """ Returns a Matrix of Chunk objects based on a given size 
             (the minimum number of cells that can fit in a Chunk).
         """
@@ -42,15 +42,15 @@ class World:
         splited_positions = self.positions.split(self.order/size)
         chunks = Matrix()
 
-        for y, row in splited_positions.iter_rows():
+        for y, row in enumerate(splited_positions.iter_rows()):
             chunk_row = []
-            for x, positions in row:
-                chunk= Chunk(positions,(y,x))
+            for x, position in enumerate(row):
+                chunk= Chunk(position,(y,x))
                 chunk_row.append(chunk)
 
             chunks.append_row(chunk_row)
 
-        self.chunks = chunks
+        return chunks
 
 
     def get_adjacent_chunks(self, chunk) -> list:
