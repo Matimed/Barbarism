@@ -56,3 +56,15 @@ class Chunk:
 
         else: 
             return False
+
+
+    def length(self):
+        return self.positions.length()
+
+
+    def __iter__(self):
+        return self.positions.__iter__()
+
+
+    def copy_matrix(self):
+        return self.positions.copy()
