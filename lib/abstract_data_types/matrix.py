@@ -193,6 +193,23 @@ class Matrix:
         return column
 
 
+    def get_row(self, index) -> list:
+        """ Returns the row that is in the given index.
+        """
+
+        return self.rows[index]
+
+
+    def get_column(self, index) -> list:
+        """ Returns the column that is in the given index.
+        """
+
+        column = []
+        for row in self.rows:
+            column.append(row[index])
+        return column
+
+
     def copy(self):
         """ Returns a new Matrix object that have the same values of this one.
         """
@@ -212,7 +229,7 @@ class Matrix:
         rows = len(self.rows)
         columns = len(self.rows[-1])
         return (rows,columns)
-    
+
 
     def insert_row(self, index: int, row: list):
         """ Inserts a given row (list of elements) 
