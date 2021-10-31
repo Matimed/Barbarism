@@ -11,9 +11,9 @@ class World:
 
     def __init__(self, order = 100):
         self.order = order
-        self.positions = self._generate_positions(order)
-        self.cells = self._generate_cells(self.positions)
-        self.chunks = None
+        self.positions: Matrix = self._generate_positions(order)
+        self.cells: dict = self._generate_cells(self.positions)
+        self.chunks: Matrix = self._generate_chunks(6)
 
 
     def get_positions(self):
