@@ -29,7 +29,7 @@ class Logic:
         # We hardcoded... this should have a larger list of Nation and 
         # a better way to assing a Landlord to each one.
         nations = [ 
-            Nation(Landlord(input('Input landlord name: ')))
+            Nation(Landlord('Player'))
             ]
         
         return nations
