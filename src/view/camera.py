@@ -1,8 +1,13 @@
+from src.view.sprites import CellSprite
+from src.events import Tick
 from lib.abstract_data_types import Matrix
 
 
 class Camera:
     def __init__(self, event_dispatcher, window, world_view):
+        self.ed = event_dispatcher
+        self.ed.add(Tick, self.draw)
+
         self.window = window
 
         self.world_view = world_view
@@ -17,6 +22,36 @@ class Camera:
         self.min_length = (5,3)
         self.max_length = self._calculate_length(CellSprite.get_min_size())
 
+
+
+    def draw(self, event):
+        """ Loops through the Matrix of visible cells and draw them. 
+        """
+
+        previous_point = self.origin
+
+        for row in self.visible_cells.iter_rows():
+            for cell in row:
+
+                # We know that we are breaking OOP paradim
+                # when we access an argument directly but 
+                # this is neccesary because pygame does not have 
+                # a suitable method of accessing the rect attributes.
+                cell.rect.topleft = previous_point
+                previous_point = cell.rect.topright
+                cell.draw(self.window.get_surface())
+            
+            previous_point = row[0].rect.bottomleft
+
+
+    def point(self, chunk, position):
+        """ Receives a Position and its Chunk and centers them on screen.
+        """
+
+        self.set_visible_chunks(chunk)
+        actual_length = self._calculate_length(CellSprite.get_actual_size())
+        cells = self.world_view.get_cells_around(chunk, position, actual_length)
+        self.set_visible_cells(cells)
 
 
     def set_visible_chunks(self, chunks):
