@@ -62,6 +62,14 @@ class Chunk:
         return self.positions.length()
 
 
+
+    def get_random_position(self):
+        """ Returns a random position.
+        """
+
+        return self.positions.random()
+
+
     def __iter__(self):
         return self.positions.__iter__()
 

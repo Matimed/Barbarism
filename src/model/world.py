@@ -14,7 +14,7 @@ class World:
         self.order = order
         self.positions: Matrix = self._generate_positions(order)
         self.cells: dict = self._generate_cells(self.positions)
-        self.chunks: Matrix = self._generate_chunks(6)
+        self.chunks: Matrix = self._generate_chunks(10)
 
 
     def get_positions(self):
@@ -109,8 +109,12 @@ class World:
         return cells
 
 
-    def generate_spawn_chunk(self):
-        """ Returns a position where to place a charactor.
+    def generate_spawn_point(self) -> tuple[Chunk, Position]:
+        """ Returns a Chunk and a Position on that 
+            chunk where to place a charactor.
         """
 
-        return self.chunks.get_element((0,0))
+        # In the future a more complex spawn method will be implemented.
+        chunk = self.chunks.random()
+        return (chunk, chunk.get_random_position())
+        

@@ -1,5 +1,6 @@
 from typing import Any
 from typing import Union
+import random
 
 
 class Matrix:
@@ -28,8 +29,8 @@ class Matrix:
         assert len(index) == 2, \
             "The index must be a tuple of one position in y and one in x."
 
-        assert index[0] < self.length()[0] and index[1] < self.length()[1], \
-            "Index out of range."
+        assert (index[0] < self.length()[0] and index[1] < self.length()[1] 
+            and index[0] >= 0 and index[1] >= 0), "Index out of range."
 
         return self.rows[index[0]][index[1]]
 
@@ -266,6 +267,13 @@ class Matrix:
         """
         
         return iter(self.rows)
+
+
+    def random(self):
+        """ Returns a random element from the Matrix.
+        """
+
+        return random.choice(random.choice(self.rows))
 
 
     def __iter__(self):
