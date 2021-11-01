@@ -8,6 +8,7 @@ class Game(Scene):
     def __init__(self):
         super().__init__()
         self.world_view = None
+        self.camera  = None
 
         ed = Scene.get_event_dispatcher()
         ed.add(WorldGenerated, self.generates_world_view)
@@ -15,6 +16,7 @@ class Game(Scene):
 
     def generates_world_view(self, event):
         from src.view import WorldView
+        from src.view import Camera
 
         world = event.get_world()
 
@@ -28,3 +30,10 @@ class Game(Scene):
             Founder(),
             world.generate_spawn_chunk()
             )
+
+        self.camera = Camera(
+            Scene.ed,
+            Scene.window,
+            self.world_view
+            )
+        
