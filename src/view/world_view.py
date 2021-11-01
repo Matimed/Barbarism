@@ -13,30 +13,33 @@ class WorldView:
 
         self.window = window
 
-        self.renderized_objects = {}
+        self.renderized_objects = dict()
         self.renderized_chunks = Graph()
 
+        CellSprite.set_size(CellSprite.get_min_size())
+        CellSprite.set_event_dispatcher(event_dispatcher)
 
-    def add_render_chunks(self, subscriber, chunk):
-        """ Adds a chunk with his respective 
-            subscriber to the renderized_chunks graph
+
+    def render_chunk(self, subscriber, chunk):
+        """ Receives a Chunk and its subscriber(any object) and render it.
         """
 
         self.renderized_chunks.add_edge((subscriber, chunk))
-        self.set_renderized_cells(chunk)
+        self._render_cells(chunk)
 
 
     def render_adjacent_chunks(self, subscriber, chunk):
-        """ Receives a chunk and link the subscriber with 
-            all the chunks adjacent to it.
+        """ Receives a Chunk and its subscriber (any object)
+            and render the Chunk and all its neighbors.
         """
 
-        for chunk in self.world_model.get_adjacent_chunks(chunk):
-            self.add_render_chunks(subscriber, chunk)
+        self.render_chunk(subscriber, chunk)
+        for node in self.world_model.get_adjacent_chunks(chunk):
+            self.render_chunk(subscriber, node)
 
 
     def remove_chunks(self, chunks: list):
-        """ Removes a chunk from the renderized_chunks
+        """ Removes a chunk from the    renderized_chunks
             Graph and the renderized_objects dictionary.
         """
 
@@ -44,11 +47,30 @@ class WorldView:
             self.renderized_chunks.remove_node(chunk)
             self.renderized_objects.pop(chunk)
 
-    
-    def set_renderized_cells(self, chunk):
-        """ Adds to the renderized_cells dictionary the passed chunk 
-            as key and associates it with a Matrix of Cell_sprite objects.
-        """        
+
+    def get_renderized_objects(self, chunk) -> list:
+        """ Returns the list of renderized objects for a given Chunk.
+        """
+
+        return self.renderized_objects[chunk]
+
+
+    def get_cells_around(self, chunk, position, area:tuple[int,int]):
+        """ Recives a position and its chunk and returns a Matrix with
+            all the CellSprites found around it in the given area 
+            The area must be a tuple of the length of the expected matrix.
+        """
+
+        assert chunk.has(position), \
+            "The position doesn't match with the chunk."
+
+        # raise NotImplementedError
+
+
+    def _render_cells(self, chunk):
+        """ Receive a Chunk and render the suitable CellSprite objects Matrix.
+        """
+
 
         renderized_cells = Matrix()
 
@@ -62,4 +84,9 @@ class WorldView:
 
             renderized_cells.append_row(cell_row)
 
-        self.renderized_objects[chunk] = renderized_cells
+        if self.renderized_objects.get(chunk):
+            self.renderized_objects[chunk][0] = renderized_cells
+        else:
+            self.renderized_objects[chunk] = list()
+            self.renderized_objects[chunk].append(renderized_cells)
+
