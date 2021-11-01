@@ -26,23 +26,33 @@ class Chunk:
 
     
     def greater_than(self, chunk) -> tuple[bool, bool]:
+        """ Compares the index with another chunk to know
+            which one is prior to the other and returns a tuple 
+            that indicates True if the current chunk is grather
+            than the one passed by parameter.
+        """
+
         assert self.index != chunk.get_index(), \
             "Cannot compare with the same chunk."
 
-        x = self.index[0] > chunk.get_index()[0]
-        y = self.index[1] > chunk.get_index()[1]
+        y = self.index[0] > chunk.get_index()[0]
+        x = self.index[1] > chunk.get_index()[1]
 
-        return (x, y)
+        return (y, x)
 
     
     def get_index(self) -> tuple[int, int]:
-        """
+        """ Returns the chunk index.
         """
 
         return self.index
 
     
-    def get_row(self, index: int) -> tuple:
+    def get_row(self, index: int) -> list:
+        """ If it has the row of the requested index it is returned 
+            and if not, it returns False. 
+        """
+
         if not (index >= self.position.length[0] or index <= 0):
             return self.positions.get_row(index)
 
@@ -50,7 +60,31 @@ class Chunk:
             return False
 
 
+    def has(self, position) -> bool:
+        """ Returns a boolean that indicates 
+            if the position is in the Chunk.
+        """
+
+        return bool(self.positions.index(position)) 
+
+
+    def get_element(self, index: int) -> tuple:
+        """ If it has the element of the requested index it is returned 
+            and if not, it returns False. 
+        """
+
+        if not (index >= self.position.length[0] or index <= 0):
+            return self.positions.get_element(index)
+        
+        else:
+            return False
+
+
     def get_column(self, index: int) -> tuple:
+        """ If it has the column of the requested index it is returned 
+            and if not, it returns False. 
+        """
+
         if not (index >= self.position.length[1] or index <= 0):
             return self.positions.get_column(index)
 
@@ -58,9 +92,19 @@ class Chunk:
             return False
 
 
-    def length(self):
+    def length(self)-> tuple[int, int]:
+        """ Returns a tuple that represent the size of the chunk 
+            (number of rows, number of columns).
+        """
+
         return self.positions.length()
 
+
+    def copy_matrix(self) -> Matrix:
+        """ Returns a copy of the positions Matrix that contains.
+        """
+
+        return self.positions.copy()
 
 
     def get_random_position(self):
