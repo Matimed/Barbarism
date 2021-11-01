@@ -6,30 +6,68 @@ from src.view.references import CELL
 
 class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
-    min_size = 20
-    
+    min_size = 50
 
+    # Later we should use different images for each type of biome.
+    biomes = [CELL['plain']]
+    
+   
     @staticmethod
     def set_event_dispatcher(event_dispatcher):
         CellSprite.ed = event_dispatcher
 
 
     @classmethod
+    def set_size(cls, height:int):
+        """ Scales all the images to the given size.
+        """
+
+        assert height >= cls.min_size, "Size must be larger than minimum."
+
+        for i, surface in enumerate(cls.biomes):
+            native_weight = surface.get_size()[0]
+            native_height = surface.get_size()[1]
+
+            scale = height / native_height
+            new_surfce = pg.transform.scale(
+                surface, (int(native_weight * scale), 
+                int(native_height  * scale)))
+
+            cls.biomes[i]= new_surfce
+
+
+    @classmethod
     def get_event_dispatcher(cls):
         return cls.ed
 
-    
+
     @classmethod
-    def get_min_size(cls):
+    def get_min_size(cls) -> int:
         return cls.min_size
 
 
+    @classmethod
+    def get_actual_size(cls) -> int:
+        """ Returns the current height of the surface.
+        """
+
+        return cls.biomes[0].get_size()[0]
+
+
+    @classmethod
+    def get_biomes(cls) -> list:
+        """ Returns the list of biomes (Surfaces).
+        """
+
+        return cls.biomes
+
+
     def __init__(self, position):
-        
-        # Later we should use different images for each type of biome.
-        self.biome = [CELL['plain']]
-        self.image = self.biome[0]
+        self.biome = 0
+        self.image = CellSprite.get_biomes()[self.biome]
         self.rect = self.image.get_rect()
+
+        CellSprite.get_event_dispatcher().add(Tick, self.update)
 
         # The cell is only interested in knowing its position
         # to be able to launch it as data for an event.
@@ -37,10 +75,26 @@ class CellSprite(pg.sprite.Sprite):
 
 
     def draw(self, surface):
+        """ Receives a surface and is drawn on it.
+        """
+
         surface.blit(self.image, self.rect)
 
 
     def update(self, event):
+        """ Updates the cell state on every Tick.
+        """
+
         if self.rect.collidepoint(pg.mouse.get_pos()): 
             if pg.mouse.get_pressed()[0]:
                 self.get_event_dispatcher().post(CellPressed(self.position))
+
+
+    def refresh(self):
+        """ Replace its Image and Rect with new ones 
+            in order to update its information (e.g. size).
+        """
+        
+        self.image = CellSprite.get_biomes()[self.biome]
+        self.rect = self.image.get_rect()
+
