@@ -12,6 +12,7 @@ class Game(Scene):
 
         ed = Scene.get_event_dispatcher()
         ed.add(WorldGenerated, self.generates_world_view)
+        ed.add(Tick, Scene.window.update)
 
 
     def generates_world_view(self, event):

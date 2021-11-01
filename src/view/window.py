@@ -1,4 +1,4 @@
-import pygame
+import pygame as pg
 
 
 class Window:
@@ -7,11 +7,11 @@ class Window:
     """
 
     def __init__(self):
-        pygame.display.set_caption('Barbarisim')
+        pg.display.set_caption('Barbarisim')
         
         self.max_resolution = (
-            pygame.display.Info().current_w,
-            pygame.display.Info().current_h
+            pg.display.Info().current_w,
+            pg.display.Info().current_h
         ) # Obtains the resolution of the screen.
         
 
@@ -23,7 +23,7 @@ class Window:
         # Current resolution.
         self.resolution = self.create_resolution(self.scale)
 
-        self.window_sur = pygame.display.set_mode(self.resolution)
+        self.window_sur = pg.display.set_mode(self.resolution)
 
 
         self.background = None
@@ -37,11 +37,11 @@ class Window:
         return self.window_sur
 
     
-    def update(self):
+    def update(self, event):
         """ Update the display and draw the background.
         """
 
-        pygame.display.update()
+        pg.display.update()
         self.window_sur.blit(self.background, (0,0))
 
 
@@ -80,7 +80,7 @@ class Window:
         self.scale = scale
         self.resolution = self.create_resolution(scale)
 
-        self.window_sur = pygame.display.set_mode(self.resolution, flags)
+        self.window_sur = pg.display.set_mode(self.resolution, flags)
 
         self._reset_background() # The background must adapt to the new resolution.
 
@@ -99,7 +99,7 @@ class Window:
                 color:<tuple>
         """
 
-        background_sur = pygame.Surface(self.resolution)
+        background_sur = pg.Surface(self.resolution)
         background_sur.fill(color)
         
         self.background = background_sur
@@ -109,4 +109,4 @@ class Window:
         """ Scale the background according to the screen resolution.
         """
 
-        self.background = pygame.transform.scale(self.background, (self.resolution))
+        self.background = pg.transform.scale(self.background, (self.resolution))
