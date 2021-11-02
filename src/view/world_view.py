@@ -61,8 +61,21 @@ class WorldView:
             The area must be a tuple of the length of the expected matrix.
         """
 
-        assert chunk.has(position), \
-            "The position doesn't match with the chunk."
+
+    def _find_collection(self, collection:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
+        """ Returns a list of composed tuples of Chunk and position
+            with the row/column after/before the one passed by parameter.
+        """
+        
+        new_collection = []
+        for element in collection:
+            index  = list(element[1].get_index())
+            index[axis] += difference
+            new_collection.append(self.world_model.get_position(index))
+        
+        return new_collection
+
+
 
         # raise NotImplementedError
 
