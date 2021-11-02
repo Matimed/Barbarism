@@ -276,6 +276,39 @@ class Matrix:
         return random.choice(random.choice(self.rows))
 
 
+    def get_first_index(self):
+        """ Returns the index of the first element 
+            of the Matrix that isn't False.
+        """
+
+        for element in self:
+            if element:
+                return self.index(element)
+
+
+    def get_last_index(self):
+        """ Returns the index of the last element 
+            of the Matrix that isn't False.
+        """
+
+        for row in range(self.length()[0], 0, -1):
+            for column in range(self.length()[1], 0, -1):
+                if self.get_element((row-1,column-1)):
+                    return (row-1,column-1)
+
+
+    def is_complete(self):
+        """ It returns False if there is any empty element in the matrix,
+            otherwise it returns true.
+        """
+
+        for element in self:
+            if not element:
+                return False
+        
+        return True
+
+
     def __iter__(self):
         """ Returns a restarted iterator.
         """
