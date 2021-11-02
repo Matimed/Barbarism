@@ -3,6 +3,8 @@ from src.view.sprites import CellSprite
 from src.events import Tick
 from lib.abstract_data_types import Matrix
 from lib.abstract_data_types import Graph
+from lib.chunk import Chunk
+from lib.position import Position
 
 
 class WorldView:
@@ -76,8 +78,88 @@ class WorldView:
         return new_collection
 
 
+    def _find_previous_columns(self, positions:Matrix) -> Matrix:
+        """ Overwrites the matrix until all columns before the first 
+            are replaced by values other than False.
+        """
 
-        # raise NotImplementedError
+        while positions.get_first_index()[1] != 0:
+            first_column = positions.get_column(positions.get_first_index()[1])
+            first_column = list(filter(bool,first_column))
+            previous_column =  self._find_collection(first_column, 1, -1)
+
+
+            index = list(positions.index(first_column[0]))
+            index[1] -= 1
+            
+            for element in previous_column:
+                positions.set_element(index, element)
+                index[0] += 1
+        
+        return positions
+
+
+    def _find_previous_rows(self, positions:Matrix) -> Matrix:
+        """ Overwrites the matrix until all rows before the first 
+            are replaced by values other than False.
+        """
+
+        while positions.get_first_index()[0] != 0:
+            first_row = positions.get_row(positions.get_first_index()[0])
+            first_row = list(filter(bool,first_row))
+            previous_row =  self._find_collection(first_row, 0, -1)
+
+            index = list(positions.index(first_row[0]))
+            index[0] -= 1
+            
+            for element in previous_row:
+                positions.set_element(index, element)
+                index[1] += 1
+        
+        return positions
+
+
+    def _find_next_columns(self, positions:Matrix) -> Matrix:
+        """ Overwrites the matrix until all columns after the last 
+            are replaced by values other than False.
+        """
+
+        while positions.get_last_index()[1] != positions.length()[1]-1:
+            last_column = positions.get_row(positions.get_last_index()[0])
+            last_column = list(filter(bool,last_column))
+            next_column =  self._find_collection(last_column, 1, 1)
+
+
+            index = list(positions.get_first_index())
+            index[1] = positions.index(last_column[0])[1] + 1
+            
+            for element in next_column:
+                positions.set_element(index, element)
+                index[0] += 1
+        
+        return positions
+
+
+    def _find_next_rows(self, positions:Matrix) -> Matrix:
+        """ Overwrites the matrix until all rows after the last 
+            are replaced by values other than False.
+        """
+
+
+        while positions.get_last_index()[0] != (positions.length()[0]-1):
+            last_row = positions.get_row(positions.get_last_index()[0])
+            last_row = list(filter(bool,last_row))
+            next_row =  self._find_collection(last_row, 0, 1)
+
+
+            index = list(positions.get_first_index())
+            index[0] = positions.index(last_row[0])[0] + 1
+            
+            for element in next_row:
+                positions.set_element(index, element)
+                index[1] += 1
+        
+        return positions
 
 
     def _render_cells(self, chunk):
