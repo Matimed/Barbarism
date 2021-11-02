@@ -64,6 +64,26 @@ class WorldView:
         """
 
 
+    def _calculate_origin(self, center:Position, area: tuple[int,int]) -> tuple[Chunk, Position]:
+        
+        origin = list(center.get_index())
+        limit = list(self.world_model.get_limit().get_index())
+
+        y_distance = (area[0]-1)//2
+        x_distance = (area[1]-1)//2
+            
+        origin[0] -=  y_distance
+        origin[1] -=  x_distance
+
+        while origin[0] < 0: origin[0] += 1
+        while origin[1] < 0: origin[1] +=1
+
+        while (area[0]+ origin[0]) > limit[0]: origin[0] -= 1
+        while (area[1]+ origin[1]) > limit[1]: origin[1] -= 1
+
+        return self.world_model.get_position(origin)
+
+
     def _find_collection(self, collection:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
         """ Returns a list of composed tuples of Chunk and position
             with the row/column after/before the one passed by parameter.
