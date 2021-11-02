@@ -17,19 +17,34 @@ class World:
         self.chunks: Matrix = self._generate_chunks(10)
 
 
-    def get_position(self, index: tuple[int,int]):
-        position = self.positions.get_element(index)
+    def get_position(self, position_index):
+        position = self.positions.get_element(position_index)
+
         for chunk in self.chunks:
             if chunk.has(position): break
 
         return (chunk, position)
 
 
+    def get_position_by_chunk(self, position_index, chunk_index):
+        """ Returns the fragment and position 
+            object that match the given indices.
+        """
+        
+        position = self.positions.get_element(position_index)
+        chunk = self.chunks.get_element(chunk_index)
+        
+        if chunk.has(position):
+            return (chunk, position)
+        
+        else: raise KeyError(f"The position: {position}, it is't in chunk: {chunk}")
+
+
     def get_biomes(self):
         """ Return a dict of biomes with Positions
             as keys based on self.cells.
         """
-
+        
         raise NotImplementedError
 
 
