@@ -41,11 +41,15 @@ class Chunk:
         return (y, x)
 
     
-    def get_index(self) -> tuple[int, int]:
+    def get_chunk_index(self) -> tuple[int, int]:
         """ Returns the chunk index.
         """
 
         return self.index
+
+
+    def index(self, position):
+        return self.positions.index(position)
 
     
     def get_row(self, index: int) -> list:
@@ -107,33 +111,26 @@ class Chunk:
         return self.positions.copy()
 
 
-    def verify_area(self, position, area:tuple[int,int]) -> Matrix:
-        """ Receives a Position and returns a Matrix that indicates 
-            if the Chunk has the positions around it in the given area, 
-            indicating it with a boolean in each position.
-            The area must be a tuple of the length of the expected matrix.
+    def verify_area(self, origin:Position, area: tuple[int,int]) -> Matrix:
+        """ Receives a center position and returns an Matrix that indicates
+            if the fragment has the positions around it in the given area,
+            indicating if it is found with a tuple of the Chunk and Position
+            founded, and False otherwise. The area must be a tuple 
+            of the expected array length.
         """
 
-        assert self.has(position), \
+        assert self.has(origin), \
             "The position doesn't belong to the chunk."
 
-        
-        y_distance = (area[0]-1)//2
-        x_distance = (area[1]-1)//2
-        
-        origin = list(self.positions.index(position))
-        origin[0] = origin[0] - y_distance
-        origin[1] = origin[1] - x_distance
-
+        origin = list(self.positions.index(origin))
         verify_matrix = Matrix()
         for row in range (origin[0], area[0]+origin[0]):
             verify_row = []
             for column in range(origin[1], area[1]+origin[1]):
                 try:
-                    self.positions.get_element((row,column))
-                    verify_row.append((True,row,column))
-                except:
-                    verify_row.append((False,row,column))
+                    verify_row.append((self, self.positions.get_element((row,column))))
+                except AssertionError:
+                    verify_row.append(False)
             verify_matrix.append_row(verify_row)
 
         return verify_matrix
