@@ -57,11 +57,33 @@ class WorldView:
         return self.renderized_objects[chunk]
 
 
-    def get_cells_around(self, chunk, position, area:tuple[int,int]):
-        """ Recives a position and its chunk and returns a Matrix with
-            all the CellSprites found around it in the given area 
+    def get_cells_around(self, center:Position, area:tuple[int,int]) -> (set[Chunk], Matrix):
+        """ Recives a center position and returns a Matrix with
+            all the CellSprites found around it 
+            in the given area and the list of chunks they are in.
             The area must be a tuple of the length of the expected matrix.
         """
+
+        chunk, origin = self._calculate_origin(center, area)
+
+        area_in_chunk = chunk.verify_area(origin, area)
+
+
+        if not (area_in_chunk.is_complete()):
+            area_in_chunk = self._find_next_rows(area_in_chunk)
+
+            if not (area_in_chunk.is_complete()):
+                area_in_chunk = self._find_next_columns(area_in_chunk)
+
+                if not (area_in_chunk.is_complete()):
+                    area_in_chunk = self._find_previous_columns(area_in_chunk)
+
+                    if not (area_in_chunk.is_complete()):
+                        area_in_chunk = self._find_previous_rows(area_in_chunk)
+
+        chunks = set([chunk[0] for chunk in area_in_chunk])
+
+        raise NotImplementedError
 
 
     def _calculate_origin(self, center:Position, area: tuple[int,int]) -> tuple[Chunk, Position]:

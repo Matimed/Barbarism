@@ -50,7 +50,7 @@ class Camera:
 
         self.set_visible_chunks(chunk)
         actual_length = self._calculate_length(CellSprite.get_actual_size())
-        cells = self.world_view.get_cells_around(chunk, position, actual_length)
+        chunks, cells = self.world_view.get_cells_around(position, actual_length)
         self.set_visible_cells(cells)
 
 
@@ -98,4 +98,3 @@ class Camera:
         resolution = self.window.get_resolution()
 
         return (resolution[0] // cells_size, resolution[1] // cells_size)
-
