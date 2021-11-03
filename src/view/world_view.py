@@ -243,7 +243,6 @@ class WorldView:
             cell_row = []
             for x, position in enumerate(row):
                 cell_sprite = CellSprite(position)
-                self.ed.add(Tick, cell_sprite.update)
 
                 cell_row.append(cell_sprite)
 
