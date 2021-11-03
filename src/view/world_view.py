@@ -218,7 +218,7 @@ class WorldView:
 
 
         while positions.get_last_index()[0] != (positions.length()[0]-1):
-            last_row = positions.get_row(positions.get_last_index()[0])
+            last_row = positions.get_row(positions.get_last_index()[1])
             last_row = list(filter(bool,last_row))
             next_row =  self._find_parallel_collection(last_row, 1, 1)
 
