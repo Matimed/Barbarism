@@ -141,7 +141,7 @@ class WorldView:
             position_index  = list(element[1].get_index())
             position_index[axis] += difference
 
-            chunk_index = list(element[0].get_chunk_index())
+            chunk_index = list(element[0].get_index())
             chunk_index[axis] += difference
             
             new_collection.append(self.world_model.get_position_by_chunk(position_index, chunk_index))
@@ -157,7 +157,7 @@ class WorldView:
         while positions.get_first_index()[1] != 0:
             first_column = positions.get_column(positions.get_first_index()[1])
             first_column = list(filter(bool,first_column))
-            previous_column =  self._find_collection(first_column, 1, -1)
+            previous_column =  self._find_parallel_collection(first_column, 1, -1)
 
 
             index = list(positions.index(first_column[0]))
@@ -178,7 +178,7 @@ class WorldView:
         while positions.get_first_index()[0] != 0:
             first_row = positions.get_row(positions.get_first_index()[0])
             first_row = list(filter(bool,first_row))
-            previous_row =  self._find_collection(first_row, 0, -1)
+            previous_row =  self._find_parallel_collection(first_row, 0, -1)
 
             index = list(positions.index(first_row[0]))
             index[0] -= 1
@@ -198,7 +198,7 @@ class WorldView:
         while positions.get_last_index()[1] != positions.length()[1]-1:
             last_column = positions.get_row(positions.get_last_index()[1])
             last_column = list(filter(bool,last_column))
-            next_column =  self._find_collection(last_column, 1, 1)
+            next_column =  self._find_parallel_collection(last_column, 0, 1)
 
 
             index = list(positions.get_first_index())
@@ -220,7 +220,7 @@ class WorldView:
         while positions.get_last_index()[0] != (positions.length()[0]-1):
             last_row = positions.get_row(positions.get_last_index()[0])
             last_row = list(filter(bool,last_row))
-            next_row =  self._find_collection(last_row, 0, 1)
+            next_row =  self._find_parallel_collection(last_row, 1, 1)
 
 
             index = list(positions.get_first_index())
