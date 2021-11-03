@@ -41,14 +41,14 @@ class Chunk:
         return (y, x)
 
     
-    def get_chunk_index(self) -> tuple[int, int]:
+    def get_index(self) -> tuple[int, int]:
         """ Returns the chunk index.
         """
 
         return self.index
 
 
-    def index(self, position):
+    def get_position_index(self, position):
         return self.positions.index(position)
 
     

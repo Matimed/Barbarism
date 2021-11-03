@@ -57,17 +57,18 @@ class WorldView:
         return self.renderized_objects[chunk]
 
 
-    def get_cells_around(self, center:Position, area:tuple[int,int]) -> (set[Chunk], Matrix):
+    def get_positions_around(self, center:Position, area:tuple[int,int]) -> (Matrix):
         """ Recives a center position and returns a Matrix with
-            all the CellSprites found around it 
-            in the given area and the list of chunks they are in.
-            The area must be a tuple of the length of the expected matrix.
+            tuples that indicates the positions and chunks in which 
+            Chunk they are found in the given area.  The area must be 
+            a tuple of the length of the expected matrix.
+
+            Returns:
+                area_in_chunk:  Matrix[tuple[Chunk, Position]]
         """
 
         chunk, origin = self._calculate_origin(center, area)
-
         area_in_chunk = chunk.verify_area(origin, area)
-
 
         if not (area_in_chunk.is_complete()):
             area_in_chunk = self._find_next_rows(area_in_chunk)
@@ -81,9 +82,33 @@ class WorldView:
                     if not (area_in_chunk.is_complete()):
                         area_in_chunk = self._find_previous_rows(area_in_chunk)
 
-        chunks = set([chunk[0] for chunk in area_in_chunk])
 
-        raise NotImplementedError
+        return area_in_chunk
+
+
+    def get_cells(self, positions:Matrix) -> Matrix:
+        """ It receives a Matrix of tuples that indicates 
+            the positions and chunks in which they are found and 
+            returns a Matrix of CellSprite objects with all 
+            the requested positions.
+
+            Recives:
+                positions:  Matrix[tuple[Chunk, Position]]
+        """
+
+        chunks = set([element[0] for element in positions])
+        cells = positions.copy()
+        for chunk in chunks:
+
+            cells_in_chunk = self.renderized_objects[chunk][0]
+            for element in positions:
+                if element[0] == chunk:
+                    position_index = chunk.get_position_index(element[1])
+                    cell = cells_in_chunk.get_element(position_index)
+                    cell_index  = positions.index(element)
+                    cells.set_element(cell_index, cell)
+
+        return cells
 
 
     def _calculate_origin(self, center:Position, area: tuple[int,int]) -> tuple[Chunk, Position]:
@@ -106,7 +131,7 @@ class WorldView:
         return self.world_model.get_position(origin)
 
 
-    def _find_collection(self, collection:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
+    def _find_parallel_collection(self, collection:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
         """ Returns a list of composed tuples of Chunk and position
             with the row/column after/before the one passed by parameter.
         """
@@ -171,7 +196,7 @@ class WorldView:
         """
 
         while positions.get_last_index()[1] != positions.length()[1]-1:
-            last_column = positions.get_row(positions.get_last_index()[0])
+            last_column = positions.get_row(positions.get_last_index()[1])
             last_column = list(filter(bool,last_column))
             next_column =  self._find_collection(last_column, 1, 1)
 
@@ -211,7 +236,6 @@ class WorldView:
     def _render_cells(self, chunk):
         """ Receive a Chunk and render the suitable CellSprite objects Matrix.
         """
-
 
         renderized_cells = Matrix()
 

@@ -50,8 +50,12 @@ class Camera:
 
         self.set_visible_chunks(chunk)
         actual_length = self._calculate_length(CellSprite.get_actual_size())
-        chunks, cells = self.world_view.get_cells_around(position, actual_length)
-        self.set_visible_cells(cells)
+
+        positions = self.world_view.get_positions_around(position, actual_length)
+        chunks = set([chunk[0] for chunk in positions])
+        for chunk in chunks:
+            self.world_view.render_adjacent_chunks(self, chunk)
+        self.set_visible_cells(self.world_view.get_cells(positions))
 
 
     def set_visible_chunks(self, chunks):
