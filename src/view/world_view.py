@@ -196,9 +196,9 @@ class WorldView:
         """
 
         while positions.get_last_index()[1] != positions.length()[1]-1:
-            last_column = positions.get_row(positions.get_last_index()[1])
+            last_column = positions.get_column(positions.get_last_index()[1])
             last_column = list(filter(bool,last_column))
-            next_column =  self._find_parallel_collection(last_column, 0, 1)
+            next_column =  self._find_parallel_collection(last_column, 1, 1)
 
 
             index = list(positions.get_first_index())
@@ -218,9 +218,9 @@ class WorldView:
 
 
         while positions.get_last_index()[0] != (positions.length()[0]-1):
-            last_row = positions.get_row(positions.get_last_index()[1])
+            last_row = positions.get_row(positions.get_last_index()[0])
             last_row = list(filter(bool,last_row))
-            next_row =  self._find_parallel_collection(last_row, 1, 1)
+            next_row =  self._find_parallel_collection(last_row, 0, 1)
 
 
             index = list(positions.get_first_index())
