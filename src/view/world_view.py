@@ -249,9 +249,7 @@ class WorldView:
 
             renderized_cells.append_row(cell_row)
 
-        if self.renderized_objects.get(chunk):
-            self.renderized_objects[chunk][0] = renderized_cells
-        else:
-            self.renderized_objects[chunk] = list()
-            self.renderized_objects[chunk].append(renderized_cells)
+        self.renderized_objects.setdefault(
+            chunk, list()
+            ).append(renderized_cells)
 
