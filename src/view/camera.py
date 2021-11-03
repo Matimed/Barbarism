@@ -13,15 +13,13 @@ class Camera:
         self.world_view = world_view
 
         self.visible_cells = Matrix()
-        self.visible_chunks = list()
-
+        self.visible_chunks = set()
 
         self.origin = (0,0)
 
         # Minimum harcoded size for the cells matrix. 
         self.min_length = (5,3)
         self.max_length = self._calculate_length(CellSprite.get_min_size())
-
 
 
     def draw(self, event):
@@ -48,13 +46,13 @@ class Camera:
         """ Receives a Position and its Chunk and centers them on screen.
         """
 
-        self.set_visible_chunks(chunk)
         actual_length = self._calculate_length(CellSprite.get_actual_size())
 
         positions = self.world_view.get_positions_around(position, actual_length)
         chunks = set([chunk[0] for chunk in positions])
         for chunk in chunks:
             self.world_view.render_adjacent_chunks(self, chunk)
+        self.set_visible_chunks(chunks)
         self.set_visible_cells(self.world_view.get_cells(positions))
 
 
@@ -82,11 +80,11 @@ class Camera:
 
         resolution = self.window.get_resolution()
         cell_size = CellSprite.get_actual_size()
-        lenght = self.visible_cells.length()
+        length = self.visible_cells.length()
 
         margins = (
-            resolution[0] - (lenght[0] * cell_size),
-            resolution[1] - (lenght[1] * cell_size)
+            resolution[0] - (length[1] * cell_size),
+            resolution[1] - (length[0] * cell_size)
             )
 
         origin = (margins[0] // 2, margins[1] // 2)        
@@ -94,11 +92,12 @@ class Camera:
         return origin
 
 
-    def _calculate_length(self, cells_size:int ) -> tuple[tuple, tuple]:
+    def _calculate_length(self, cells_size:int ) -> tuple[int, int]:
         """ Returns the length that the visible_cells should have,
             based on the given size of the CellSprites.
         """
 
         resolution = self.window.get_resolution()
 
-        return (resolution[0] // cells_size, resolution[1] // cells_size)
+        return (resolution[1] // cells_size, resolution[0] // cells_size)
+

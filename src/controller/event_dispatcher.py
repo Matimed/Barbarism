@@ -33,10 +33,8 @@ class EventDispatcher:
                 Recives:
                     event:<Event>
         """
-    
-        try:
+
+        if self.listeners.get(event.get_class(), False):
             for listener in self.listeners[event.get_class()]:
                 listener(event)
 
-        except KeyError:
-            raise KeyError('Event argument never added.')

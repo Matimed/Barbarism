@@ -141,11 +141,14 @@ class WorldView:
             position_index  = list(element[1].get_index())
             position_index[axis] += difference
 
-            chunk_index = list(element[0].get_index())
-            chunk_index[axis] += difference
-            
-            new_collection.append(self.world_model.get_position_by_chunk(position_index, chunk_index))
-        
+            position = self.world_model.get_position_by_chunk(position_index, element[0].get_index())
+            if not position:
+                chunk_index = list(element[0].get_index())
+                chunk_index[axis] += difference
+                position = self.world_model.get_position_by_chunk(position_index,chunk_index)
+
+            new_collection.append(position)
+
         return new_collection
 
 

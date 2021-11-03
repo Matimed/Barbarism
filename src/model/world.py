@@ -37,7 +37,7 @@ class World:
         if chunk.has(position):
             return (chunk, position)
         
-        else: raise KeyError(f"The position: {position}, it is't in chunk: {chunk}")
+        else: return False
 
 
     def get_biomes(self):
