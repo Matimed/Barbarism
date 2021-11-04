@@ -10,3 +10,4 @@ from src.events.cell_pressed import CellPressed
 from src.events.pygame_events.tick import Tick
 from src.events.pygame_events.click import Click
 from src.events.pygame_events.quit import Quit
+from src.events.pygame_events.wheel import Wheel

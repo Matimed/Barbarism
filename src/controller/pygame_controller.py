@@ -1,6 +1,7 @@
 from src.events import Tick
 from src.events import Quit
 from src.events import Click
+from src.events import Wheel
 import pygame as pg
 
 
@@ -21,3 +22,6 @@ class PygameController:
 
             if event.type == pg.MOUSEBUTTONUP:
                 self.ed.post(Click(event.pos, event.button))
+
+            if event.type == pg.MOUSEWHEEL:
+                self.ed.post(Wheel(event.y))
