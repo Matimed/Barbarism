@@ -331,8 +331,12 @@ class Matrix:
 
         # One is subtracted from the length 
         # because the index starts counting from (0,0).
-        iteration_max = (self.length()[0] -1 ,self.length()[1] - 1)
-
+        
+        try: 
+            iteration_max = (self.length()[0] -1 ,self.length()[1] - 1)
+        except: 
+            raise StopIteration()
+        
         if self.iteration_index == iteration_max:
             raise StopIteration
 
@@ -379,4 +383,3 @@ class Matrix:
                 remainders.append(remainder)
                 
         return lengths[remainders.index(min(remainders))]
-
