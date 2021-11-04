@@ -309,6 +309,14 @@ class Matrix:
         return True
 
 
+    def __bool__(self):
+        """ It returns False if there is any empty element in the matrix,
+            otherwise it returns true.
+        """
+
+        return bool(list(filter(bool,self.iter_rows())))
+
+
     def __iter__(self):
         """ Returns a restarted iterator.
         """
