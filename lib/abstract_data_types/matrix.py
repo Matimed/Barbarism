@@ -211,6 +211,13 @@ class Matrix:
         return column
 
 
+    def get_center(self):
+        """ Returns the element in the center of it self.
+        """
+
+        return self.get_element((self.length()[0] // 2, self.length()[1] // 2))
+
+
     def copy(self):
         """ Returns a new Matrix object that have the same values of this one.
         """
