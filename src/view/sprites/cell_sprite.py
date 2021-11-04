@@ -8,8 +8,13 @@ class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
     min_size = 50
 
+
     # Later we should use different images for each type of biome.
-    biomes = [CELL['plain']]
+    native_biomes = [CELL['plain']]
+    biomes = native_biomes.copy()
+    
+    # native_biomes keep the original size in order to 
+    # not to lose image quality.
     
    
     @staticmethod
@@ -24,16 +29,9 @@ class CellSprite(pg.sprite.Sprite):
 
         assert height >= cls.min_size, "Size must be larger than minimum."
 
-        for i, surface in enumerate(cls.biomes):
-            native_weight = surface.get_size()[0]
-            native_height = surface.get_size()[1]
-
-            scale = height / native_height
-            new_surfce = pg.transform.scale(
-                surface, (int(native_weight * scale), 
-                int(native_height  * scale)))
-
-            cls.biomes[i]= new_surfce
+        for i, surface in enumerate(cls.native_biomes):
+            new_surface = pg.transform.scale(surface,(height,height))
+            cls.biomes[i]= new_surface
 
 
     @classmethod

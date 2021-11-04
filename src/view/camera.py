@@ -52,7 +52,7 @@ class Camera:
         """
 
         cell_sized = (
-            CellSprite.get_actual_size() + (event.get_movement() * 50)
+            CellSprite.get_actual_size() + (event.get_movement() * 2)
             )
 
         if cell_sized > CellSprite.get_min_size():
