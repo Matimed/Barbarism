@@ -147,6 +147,9 @@ class WorldView:
                 chunk_index[axis] += difference
                 position = self.world_model.get_position_by_chunk(position_index,chunk_index)
 
+                if not position: return False
+            
+
             new_collection.append(position)
 
         return new_collection
