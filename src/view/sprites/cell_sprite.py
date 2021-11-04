@@ -104,3 +104,6 @@ class CellSprite(pg.sprite.Sprite):
         
         self.image = CellSprite.get_biomes()[self.biome]
         self.rect = self.image.get_rect()
+
+    
+    def get_position(self): return self.position
