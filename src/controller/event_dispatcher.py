@@ -25,7 +25,12 @@ class EventDispatcher:
         # If the event is not in the dictionary, 
         # it is added and subscribed to by the listener.
         self.listeners.setdefault(eventcls, list()).append(listener)
-        
+
+    
+    def remove(self, eventcls, listener):
+        key = eventcls.__name__
+        self._listeners[key].remove(listener)
+
 
     def post(self, event):
         """ Sends an event instance to their suscribers.
@@ -37,4 +42,3 @@ class EventDispatcher:
         if self.listeners.get(event.get_class(), False):
             for listener in self.listeners[event.get_class()]:
                 listener(event)
-
