@@ -67,7 +67,7 @@ class CellSprite(pg.sprite.Sprite):
         self.image = CellSprite.get_biomes()[self.biome]
         self.rect = self.image.get_rect()
 
-        CellSprite.get_event_dispatcher().add(Tick, self.update)
+        CellSprite.get_event_dispatcher().add(Tick, self.routine_update)
 
         # The cell is only interested in knowing its position
         # to be able to launch it as data for an event.
@@ -81,13 +81,20 @@ class CellSprite(pg.sprite.Sprite):
         surface.blit(self.image, self.rect)
 
 
-    def update(self, event):
+    def routine_update(self, event):
         """ Updates the cell state on every Tick.
         """
 
-        if self.rect.collidepoint(pg.mouse.get_pos()): 
-            if pg.mouse.get_pressed()[0]:
-                self.get_event_dispatcher().post(CellPressed(self.position))
+        pass
+
+
+    def handle_collisions(self, event):
+        """ Checks if the mouse has clicked on it and reacts.
+        """
+
+        if self.rect.collidepoint(event.get_pos()) and event.get_button() == 1:
+            self.get_event_dispatcher().post(CellPressed(self.position))
+            print(self.position)
 
 
     def refresh(self):
@@ -97,4 +104,3 @@ class CellSprite(pg.sprite.Sprite):
         
         self.image = CellSprite.get_biomes()[self.biome]
         self.rect = self.image.get_rect()
-
