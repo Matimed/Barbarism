@@ -1,6 +1,7 @@
 from src.view.sprites import CellSprite
 from src.events import Tick
 from lib.abstract_data_types import Matrix
+from src.events import Click
 
 
 class Camera:
@@ -64,9 +65,16 @@ class Camera:
 
 
     def set_visible_cells(self, cells):
-        """ Replace the Matrix of visible cells for a new one 
-            and recalculates the origin point.
+        """ Replace the Matrix of visible cells for a new one,
+            recalculates the origin point and subscribes the 
+            cells to the Click event.
         """
+        
+        for cell in self.visible_cells:
+            self.ed.remove(CellPressed, cell)
+        
+        for cell in cells:
+            self.ed.add(Click, cell.handle_collisions)
 
         self.visible_cells = cells
         self.origin = self._get_new_origin()
