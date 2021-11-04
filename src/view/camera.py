@@ -1,5 +1,7 @@
 from src.view.sprites import CellSprite
 from src.events import Tick
+from src.events import Wheel
+from src.events import CellPressed
 from lib.abstract_data_types import Matrix
 from src.events import Click
 
@@ -8,6 +10,7 @@ class Camera:
     def __init__(self, event_dispatcher, window, world_view):
         self.ed = event_dispatcher
         self.ed.add(Tick, self.draw)
+        self.ed.add(Wheel, self.zoom)
 
         self.window = window
 
@@ -42,7 +45,60 @@ class Camera:
             
             previous_point = row[0][1].rect.bottomleft
             
-            previous_point = row[0].rect.bottomleft
+
+    def zoom(self, event):
+        """ Receive the Wheel event and create the illusion of getting
+            closer to the map by changing the CellSprites size and quantity.
+        """
+
+        cell_sized = (
+            CellSprite.get_actual_size() + (event.get_movement() * 50)
+            )
+
+        if cell_sized > CellSprite.get_min_size():
+            CellSprite.set_size(cell_sized)
+
+            if event.get_movement() == 1:
+                if not (self.visible_cells.length()[0] <= 4 or self.visible_cells.length()[1] <= 4): 
+                    self.zoom_in(self._calculate_length(CellSprite.get_actual_size()))
+
+
+    def zoom_in(self, desired_size):
+        """ Deletes cells of the visible_cells Matrix until the quatity of 
+            cells be equal to the desired size passed by argument.
+            Also desubscribes the deleted cells from the Click event.
+        """
+
+        actual_size = self.visible_cells.length()
+        
+        switch = 0 # switch value can be 0 or -1
+        for x in range(actual_size[0] - desired_size[0]):
+            row = self.visible_cells.pop_row(switch)
+
+            for element in row:
+                self.ed.remove(Click, element[1].handle_collisions)
+
+            switch = (not (switch + 1)) - 1
+
+        for x in range(actual_size[1] - desired_size[1]):
+            column = self.visible_cells.pop_column(switch)
+
+            for element in column:
+                self.ed.remove(Click, element[1].handle_collisions)
+
+            switch = (not (switch + 1)) - 1
+        
+        self.refresh_cells()
+        self.origin = self._get_new_origin()
+
+
+    def refresh_cells(self):
+        """ Executes the refresh method of all cells in the visible 
+            cells Matrix in order to change they size.
+        """
+
+        for cell in self.visible_cells:
+            cell[1].refresh()
 
 
     def point(self, chunk, position):
