@@ -28,8 +28,9 @@ class EventDispatcher:
 
     
     def remove(self, eventcls, listener):
-        key = eventcls.__name__
-        self._listeners[key].remove(listener)
+        for l in self.listeners[eventcls]:
+            if l == listener:
+                self.listeners[eventcls].remove(l)
 
 
     def post(self, event):
