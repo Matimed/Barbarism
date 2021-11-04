@@ -1,5 +1,6 @@
 from src.events import Tick
 from src.events import Quit
+from src.events import Click
 import pygame as pg
 
 
@@ -17,3 +18,6 @@ class PygameController:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.ed.post(Quit())
+
+            if event.type == pg.MOUSEBUTTONUP:
+                self.ed.post(Click(event.pos, event.button))
