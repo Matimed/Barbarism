@@ -36,9 +36,11 @@ class Camera:
                 # when we access an argument directly but 
                 # this is neccesary because pygame does not have 
                 # a suitable method of accessing the rect attributes.
-                cell.rect.topleft = previous_point
-                previous_point = cell.rect.topright
-                cell.draw(self.window.get_surface())
+                cell[1].rect.topleft = previous_point
+                previous_point = cell[1].rect.topright
+                cell[1].draw(self.window.get_surface())
+            
+            previous_point = row[0][1].rect.bottomleft
             
             previous_point = row[0].rect.bottomleft
 
@@ -53,6 +55,7 @@ class Camera:
         chunks = set([chunk[0] for chunk in positions])
         for chunk in chunks:
             self.world_view.render_adjacent_chunks(self, chunk)
+
         self.set_visible_chunks(chunks)
         self.set_visible_cells(self.world_view.get_cells(positions))
 
@@ -71,10 +74,10 @@ class Camera:
         """
         
         for cell in self.visible_cells:
-            self.ed.remove(CellPressed, cell)
+            self.ed.remove(Click, cell[1].handle_collisions)
         
         for cell in cells:
-            self.ed.add(Click, cell.handle_collisions)
+            self.ed.add(Click, cell[1].handle_collisions)
 
         self.visible_cells = cells
         self.origin = self._get_new_origin()
@@ -100,7 +103,7 @@ class Camera:
         return origin
 
 
-    def _calculate_length(self, cells_size:int ) -> tuple[int, int]:
+    def _calculate_length(self, cells_size:int) -> tuple[int, int]:
         """ Returns the length that the visible_cells should have,
             based on the given size of the CellSprites.
         """

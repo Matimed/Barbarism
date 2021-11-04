@@ -106,7 +106,7 @@ class WorldView:
                     position_index = chunk.get_position_index(element[1])
                     cell = cells_in_chunk.get_element(position_index)
                     cell_index  = positions.index(element)
-                    cells.set_element(cell_index, cell)
+                    cells.set_element(cell_index, [chunk, cell])
 
         return cells
 
