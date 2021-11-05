@@ -59,7 +59,7 @@ class Camera:
             CellSprite.set_size(cell_sized)
 
             if event.get_movement() == 1:
-                if not (self.visible_cells.length()[0] <= 4 or self.visible_cells.length()[1] <= 4): 
+                if not (self.visible_cells.length()[0] <= self.min_length[0] or self.visible_cells.length()[1] <= self.min_length[1]): 
                     self.zoom_in(self._calculate_length(CellSprite.get_actual_size()))
 
 
@@ -71,22 +71,22 @@ class Camera:
 
         actual_size = self.visible_cells.length()
         
-        switch = 0 # switch value can be 0 or -1
+        switch = 0
         for x in range(actual_size[0] - desired_size[0]):
-            row = self.visible_cells.pop_row(switch)
+            row = self.visible_cells.pop_row(-(switch))
 
             for element in row:
                 self.ed.remove(Click, element[1].handle_collisions)
 
-            switch = (not (switch + 1)) - 1
+            switch = not switch
 
         for x in range(actual_size[1] - desired_size[1]):
-            column = self.visible_cells.pop_column(switch)
+            column = self.visible_cells.pop_column(-switch)
 
             for element in column:
                 self.ed.remove(Click, element[1].handle_collisions)
 
-            switch = (not (switch + 1)) - 1
+            switch = not switch
         
         self.refresh_cells()
         self.origin = self._get_new_origin()
