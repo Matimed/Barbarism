@@ -71,16 +71,16 @@ class WorldView:
         area_in_chunk = chunk.verify_area(origin, area)
 
         if not (area_in_chunk.is_complete()):
-            area_in_chunk = self._find_next_rows(area_in_chunk)
+            area_in_chunk = self.find_next_collection(0, area_in_chunk)
 
             if not (area_in_chunk.is_complete()):
-                area_in_chunk = self._find_next_columns(area_in_chunk)
+                area_in_chunk = self.find_next_collection(1, area_in_chunk)
 
                 if not (area_in_chunk.is_complete()):
-                    area_in_chunk = self._find_previous_columns(area_in_chunk)
+                    area_in_chunk = self.find_previous_collection(1, area_in_chunk)
 
                     if not (area_in_chunk.is_complete()):
-                        area_in_chunk = self._find_previous_rows(area_in_chunk)
+                        area_in_chunk = self.find_previous_collection(0, area_in_chunk)
 
 
         return area_in_chunk
@@ -155,86 +155,58 @@ class WorldView:
         return new_collection
 
 
-    def _find_previous_columns(self, positions:Matrix) -> Matrix:
-        """ Overwrites the matrix until all columns before the first 
+    def find_previous_collection(self, axis: bool, positions: Matrix) -> Matrix:
+        """ Overwrites the matrix until all columns/rows before the first 
             are replaced by values other than False.
         """
 
-        while positions.get_first_index()[1] != 0:
-            first_column = positions.get_column(positions.get_first_index()[1])
-            first_column = list(filter(bool,first_column))
-            previous_column =  self._find_parallel_collection(first_column, 1, -1)
+        while positions.get_first_index()[axis] != 0:
+            if axis == 1:
+                first_collection = positions.get_column(positions.get_first_index()[axis])
 
+            elif axis == 0:
+                first_collection = positions.get_row(positions.get_first_index()[axis])
 
-            index = list(positions.index(first_column[0]))
-            index[1] -= 1
+            first_collection = list(filter(bool,first_collection))
+            previous_collection =  self._find_parallel_collection(first_collection, axis, -1)
             
-            for element in previous_column:
+            if not previous_collection: return False
+        
+            index = list(positions.index(first_collection[0]))
+            index[axis] -= 1
+
+            for element in previous_collection:
                 positions.set_element(index, element)
-                index[0] += 1
+                index[not axis] += 1
         
         return positions
 
 
-    def _find_previous_rows(self, positions:Matrix) -> Matrix:
-        """ Overwrites the matrix until all rows before the first 
+    def find_next_collection(self, axis: bool, positions: Matrix) -> Matrix:
+        """ Overwrites the matrix until all columns/rows after the last 
             are replaced by values other than False.
         """
 
-        while positions.get_first_index()[0] != 0:
-            first_row = positions.get_row(positions.get_first_index()[0])
-            first_row = list(filter(bool,first_row))
-            previous_row =  self._find_parallel_collection(first_row, 0, -1)
+        while positions.get_last_index()[axis] != positions.length()[axis]-1:
+            last_collection = None
 
-            index = list(positions.index(first_row[0]))
-            index[0] -= 1
-            
-            for element in previous_row:
-                positions.set_element(index, element)
-                index[1] += 1
-        
-        return positions
+            if axis:
+                last_collection = positions.get_column(positions.get_last_index()[axis])
 
+            else:
+                last_collection = positions.get_row(positions.get_last_index()[axis])
 
-    def _find_next_columns(self, positions:Matrix) -> Matrix:
-        """ Overwrites the matrix until all columns after the last 
-            are replaced by values other than False.
-        """
+            last_collection = list(filter(bool,last_collection))
+            next_collection =  self._find_parallel_collection(last_collection, axis, 1)
 
-        while positions.get_last_index()[1] != positions.length()[1]-1:
-            last_column = positions.get_column(positions.get_last_index()[1])
-            last_column = list(filter(bool,last_column))
-            next_column =  self._find_parallel_collection(last_column, 1, 1)
-
+            if not next_collection: return False
 
             index = list(positions.get_first_index())
-            index[1] = positions.index(last_column[0])[1] + 1
+            index[axis] = positions.index(last_collection[0])[axis] + 1
             
-            for element in next_column:
+            for element in next_collection:
                 positions.set_element(index, element)
-                index[0] += 1
-        
-        return positions
-
-
-    def _find_next_rows(self, positions:Matrix) -> Matrix:
-        """ Overwrites the matrix until all rows after the last 
-            are replaced by values other than False.
-        """
-
-
-        while positions.get_last_index()[0] != (positions.length()[0]-1):
-            last_row = positions.get_row(positions.get_last_index()[0])
-            last_row = list(filter(bool,last_row))
-            next_row =  self._find_parallel_collection(last_row, 0, 1)
-
-
-            index = list(positions.get_first_index())
-            index[0] = positions.index(last_row[0])[0] + 1
-            
-            for element in next_row:
-                positions.set_element(index, element)
-                index[1] += 1
+                index[not axis] += 1
         
         return positions
 
