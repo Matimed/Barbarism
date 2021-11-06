@@ -21,6 +21,8 @@ class Camera:
 
         self.origin = (0,0)
 
+        self._switch = 0
+
         # Minimum harcoded size for the cells matrix. 
         self.min_length = (5,3)
         self.max_length = self._calculate_length(CellSprite.get_min_size())
@@ -51,16 +53,34 @@ class Camera:
             closer to the map by changing the CellSprites size and quantity.
         """
 
-        cell_sized = (
+        new_size = (
             CellSprite.get_actual_size() + (event.get_movement() * 2)
             )
 
-        if cell_sized > CellSprite.get_min_size():
-            CellSprite.set_size(cell_sized)
+        if new_size > CellSprite.get_min_size():
+            CellSprite.set_size(new_size)
 
-            if event.get_movement() == 1:
-                if not (self.visible_cells.length()[0] <= self.min_length[0] or self.visible_cells.length()[1] <= self.min_length[1]): 
-                    self.zoom_in(self._calculate_length(CellSprite.get_actual_size()))
+            desired_length = self._calculate_length(new_size)
+            actual_length = self.visible_cells.length()
+
+                
+            if (
+                event.get_movement() == 1 and 
+                actual_length[0] >= self.min_length[0] and
+                actual_length[1] >= self.min_length[1]
+                ):
+                
+                self.zoom_in(desired_length)
+
+            elif (
+                actual_length[0] <= self.max_length[0] and
+                actual_length[1] <= self.max_length[1]
+                ):
+
+                self.zoom_out(desired_length)
+            
+            self.refresh_cells()
+            self.origin = self._get_new_origin()
 
 
     def zoom_in(self, desired_size):
@@ -71,22 +91,21 @@ class Camera:
 
         actual_size = self.visible_cells.length()
         
-        switch = 0
         for x in range(actual_size[0] - desired_size[0]):
-            row = self.visible_cells.pop_row(-(switch))
+            row = self.visible_cells.pop_row(-(self._switch))
 
             for element in row:
                 self.ed.remove(Click, element[1].handle_collisions)
 
-            switch = not switch
+            self._switch = not self._switch
 
         for x in range(actual_size[1] - desired_size[1]):
-            column = self.visible_cells.pop_column(-switch)
+            column = self.visible_cells.pop_column(-self._switch)
 
             for element in column:
                 self.ed.remove(Click, element[1].handle_collisions)
 
-            switch = not switch
+            self._switch = not self._switch
         
         self.refresh_cells()
         self.origin = self._get_new_origin()
