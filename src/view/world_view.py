@@ -111,6 +111,17 @@ class WorldView:
         return cells
 
 
+    def get_cells_by_list(self, positions: list):
+        cell_collection = list()
+
+        for element in positions:
+            for cell in self.renderized_objects[element[0]][0]:
+                if cell.get_position() == element[1]:
+                    cell_collection.append((element[0], cell))
+
+        return cell_collection
+
+
     def _calculate_origin(self, center:Position, area: tuple[int,int]) -> tuple[Chunk, Position]:
         
         origin = list(center.get_index())
