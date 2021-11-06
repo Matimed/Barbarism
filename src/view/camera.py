@@ -76,7 +76,7 @@ class Camera:
                 actual_length[0] <= self.max_length[0] and
                 actual_length[1] <= self.max_length[1]
                 ):
-
+                
                 self.zoom_out(desired_length)
             
             self.refresh_cells()
@@ -106,9 +106,49 @@ class Camera:
                 self.ed.remove(Click, element[1].handle_collisions)
 
             self._switch = not self._switch
-        
-        self.refresh_cells()
-        self.origin = self._get_new_origin()
+            
+
+    def zoom_out(self, desired_size):
+        actual_size = self.visible_cells.length()
+        for axis in [0,1]:
+            for x in range(desired_size[axis] - actual_size[axis]):
+
+                new_collection = None
+                while bool(new_collection) == False:
+                    if axis:
+                        cells = self.visible_cells.get_column(-self._switch)
+                    else:
+                        cells = self.visible_cells.get_row(-self._switch)
+
+                    collection = [
+                        (element[0], element[1].get_position()) for element in cells
+                        ]
+
+                    if self._switch:
+                        new_collection = self.world_view._find_parallel_collection(collection, not axis, 1)
+                    else:
+                        new_collection = self.world_view._find_parallel_collection(collection, not axis, -1)
+
+                    if new_collection == None: self._switch = not self._switch
+
+
+                cells = self.world_view.get_cells_by_list(new_collection)
+                for cell in cells:
+                    self.ed.add(Click, cell[1].handle_collisions)
+
+                if axis:
+                    if self._switch:
+                        self.visible_cells.append_column(cells)
+                    else:
+                        self.visible_cells.insert_column(-self._switch, cells)
+
+                else:
+                    if self._switch:
+                        self.visible_cells.append_row(cells)
+                    else:
+                        self.visible_cells.insert_row(self._switch, cells)
+                
+                self._switch = not self._switch
 
 
     def refresh_cells(self):
