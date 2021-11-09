@@ -166,13 +166,24 @@ class Camera:
 
         actual_length = self._calculate_length(CellSprite.get_actual_size())
 
-        positions = self.world_view.get_positions_around(position, actual_length)
-        chunks = set([chunk[0] for chunk in positions])
+        
+        estimated_origin = list(position.get_index())
+
+        estimated_origin[0] -=  (actual_length[0]-1)//2
+        estimated_origin[1] -=  (actual_length[1]-1)//2
+
+        origin = self.world_view.validate_origin(estimated_origin, actual_length)
+        area_in_chunk = origin[0].verify_area(origin[1], actual_length)
+
+        cells = self.world_view.get_cells(area_in_chunk)
+        cells = self.world_view.complete_cells(cells, origin, actual_length)
+
+        chunks = set([chunk[0] for chunk in cells])
         for chunk in chunks:
             self.world_view.render_adjacent_chunks(self, chunk)
 
         self.set_visible_chunks(chunks)
-        self.set_visible_cells(self.world_view.get_cells(positions))
+        self.set_visible_cells(cells)
 
 
     def set_visible_chunks(self, chunks):

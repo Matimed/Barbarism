@@ -56,36 +56,7 @@ class WorldView:
 
         return self.renderized_objects[chunk]
 
-
-    def get_positions_around(self, center:Position, area:tuple[int,int]) -> (Matrix):
-        """ Recives a center position and returns a Matrix with
-            tuples that indicates the positions and chunks in which 
-            Chunk they are found in the given area.  The area must be 
-            a tuple of the length of the expected matrix.
-
-            Returns:
-                area_in_chunk:  Matrix[tuple[Chunk, Position]]
-        """
-
-        chunk, origin = self._calculate_origin(center, area)
-        area_in_chunk = chunk.verify_area(origin, area)
-
-        if not (area_in_chunk.is_complete()):
-            area_in_chunk = self.find_next_collection(0, area_in_chunk)
-
-            if not (area_in_chunk.is_complete()):
-                area_in_chunk = self.find_next_collection(1, area_in_chunk)
-
-                if not (area_in_chunk.is_complete()):
-                    area_in_chunk = self.find_previous_collection(1, area_in_chunk)
-
-                    if not (area_in_chunk.is_complete()):
-                        area_in_chunk = self.find_previous_collection(0, area_in_chunk)
-
-
-        return area_in_chunk
-
-
+    
     def get_cells(self, positions:Matrix) -> Matrix:
         """ It receives a Matrix of tuples that indicates 
             the positions and chunks in which they are found and 
@@ -99,7 +70,6 @@ class WorldView:
         chunks = set([element[0] for element in positions])
         cells = positions.copy()
         for chunk in chunks:
-
             cells_in_chunk = self.renderized_objects[chunk][0]
             for element in positions:
                 if element[0] == chunk:
@@ -112,38 +82,98 @@ class WorldView:
 
 
     def get_cells_by_list(self, positions: list):
+        """ Receives a list of positions (Chunk, Position) and 
+            returns the corresponding CellSprite list.
+        """
+        
         cell_collection = list()
 
         for element in positions:
-            for cell in self.renderized_objects[element[0]][0]:
+            cells = self.renderized_objects[element[0]][0]
+            for cell in cells:
                 if cell.get_position() == element[1]:
                     cell_collection.append((element[0], cell))
 
         return cell_collection
 
 
-    def _calculate_origin(self, center:Position, area: tuple[int,int]) -> tuple[Chunk, Position]:
-        """ Given a central Position and an area, 
-            returns the Position where the origin of a matrix
-            should be to cover the area around the position.
+    def validate_origin(self, origin: tuple, length: tuple) -> tuple[Chunk, Position]:
+        """ Given an origin point and a length of Matrix, 
+            it returns the closest valid Position and its Chunk 
+            (or the same one passed by parameter if it is valid).
         """
-    
-        origin = list(center.get_index())
+
         limit = list(self.world_model.get_limit().get_index())
-
-        y_distance = (area[0]-1)//2
-        x_distance = (area[1]-1)//2
-            
-        origin[0] -=  y_distance
-        origin[1] -=  x_distance
-
         while origin[0] < 0: origin[0] += 1
         while origin[1] < 0: origin[1] +=1
 
-        while (area[0]+ origin[0]) > limit[0]: origin[0] -= 1
-        while (area[1]+ origin[1]) > limit[1]: origin[1] -= 1
+        while (origin[0] + length[0]) > limit[0]: origin[0] -= 1
+        while (origin[1] + length[1]) > limit[1]: origin[1] -= 1
 
         return self.world_model.get_position(origin)
+
+
+    def complete_cells(self, cells: Matrix, origin: Position, desired_length: tuple):
+        """ It receives a Matrix of cells (Chunk, CellSprite), 
+            a Position of origin and a desired length and 
+            returns a Matrix of the given length 
+            that contains all the remaining cells.
+        """
+
+        while cells.length() != desired_length:
+            first_position = cells.get_element((0,0))[1].get_position()
+            if first_position != origin[1]:
+                
+                if  first_position.get_index()[0] < origin[1].get_index()[0]:
+
+                    collection = list()
+                    for element in cells.get_row(0):
+                        collection.append((element[0], element[1].get_position()))
+
+                    new_positions = self._find_parallel_collection(collection, 0, -1)
+                    new_cells = self.get_cells_by_list(new_positions)
+                    
+                    cells.insert_row(0, new_cells)
+                    continue
+                
+                elif first_position.get_index()[1] < origin[1].get_index()[1]:
+
+                    collection = list()
+                    for element in cells.get_column(0):
+                        collection.append((element[0], element[1].get_position()))
+
+                    new_positions = self._find_parallel_collection(collection, 1, -1)
+                    new_cells = self.get_cells_by_list(new_positions)
+                    
+                    cells.insert_column(0, new_cells)
+                    continue
+
+            elif cells.length()[0] < desired_length[0]:
+
+                collection = list()
+                for element in cells.get_row(cells.get_last_index()[0]):
+                    collection.append((element[0], element[1].get_position()))
+
+                new_positions = self._find_parallel_collection(collection, 0, 1)
+                new_cells = self.get_cells_by_list(new_positions)
+
+                cells.append_row(new_cells)
+                continue
+
+            elif cells.length()[1] < desired_length[1]:
+
+                collection = list()
+                for element in cells.get_column(cells.get_last_index()[1]):
+                    collection.append((element[0], element[1].get_position()))
+
+                new_positions = self._find_parallel_collection(collection, 1, 1)
+                new_cells = self.get_cells_by_list(new_positions)
+                
+                cells.append_column(new_cells)
+                continue
+
+
+        return cells
 
 
     def _find_parallel_collection(self, collection:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
@@ -168,62 +198,6 @@ class WorldView:
             new_collection.append(position)
 
         return new_collection
-
-
-    def find_previous_collection(self, axis: bool, positions: Matrix) -> Matrix:
-        """ Overwrites the matrix until all columns/rows before the first 
-            are replaced by values other than False.
-        """
-
-        while positions.get_first_index()[axis] != 0:
-            if axis == 1:
-                first_collection = positions.get_column(positions.get_first_index()[axis])
-
-            elif axis == 0:
-                first_collection = positions.get_row(positions.get_first_index()[axis])
-
-            first_collection = list(filter(bool,first_collection))
-            previous_collection =  self._find_parallel_collection(first_collection, axis, -1)
-            
-            if not previous_collection: return False
-        
-            index = list(positions.index(first_collection[0]))
-            index[axis] -= 1
-
-            for element in previous_collection:
-                positions.set_element(index, element)
-                index[not axis] += 1
-        
-        return positions
-
-
-    def find_next_collection(self, axis: bool, positions: Matrix) -> Matrix:
-        """ Overwrites the matrix until all columns/rows after the last 
-            are replaced by values other than False.
-        """
-
-        while positions.get_last_index()[axis] != positions.length()[axis]-1:
-            last_collection = None
-
-            if axis:
-                last_collection = positions.get_column(positions.get_last_index()[axis])
-
-            else:
-                last_collection = positions.get_row(positions.get_last_index()[axis])
-
-            last_collection = list(filter(bool,last_collection))
-            next_collection =  self._find_parallel_collection(last_collection, axis, 1)
-
-            if not next_collection: return False
-
-            index = list(positions.get_first_index())
-            index[axis] = positions.index(last_collection[0])[axis] + 1
-            
-            for element in next_collection:
-                positions.set_element(index, element)
-                index[not axis] += 1
-        
-        return positions
 
 
     def _render_cells(self, chunk):

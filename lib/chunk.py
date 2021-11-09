@@ -112,11 +112,9 @@ class Chunk:
 
 
     def verify_area(self, origin:Position, area: tuple[int,int]) -> Matrix:
-        """ Receives a center position and returns an Matrix that indicates
-            if the fragment has the positions around it in the given area,
-            indicating if it is found with a tuple of the Chunk and Position
-            founded, and False otherwise. The area must be a tuple 
-            of the expected array length.
+        """ Receives a center position and returns a Matrix that contains
+            all the positions around that are in the Chunk.
+            The area must be a tuple of the expected array length.
         """
 
         assert self.has(origin), \
@@ -130,7 +128,7 @@ class Chunk:
                 try:
                     verify_row.append((self, self.positions.get_element((row,column))))
                 except AssertionError:
-                    verify_row.append(False)
+                    continue
             verify_matrix.append_row(verify_row)
 
         return verify_matrix
