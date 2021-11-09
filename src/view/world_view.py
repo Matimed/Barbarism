@@ -123,7 +123,11 @@ class WorldView:
 
 
     def _calculate_origin(self, center:Position, area: tuple[int,int]) -> tuple[Chunk, Position]:
-        
+        """ Given a central Position and an area, 
+            returns the Position where the origin of a matrix
+            should be to cover the area around the position.
+        """
+    
         origin = list(center.get_index())
         limit = list(self.world_model.get_limit().get_index())
 

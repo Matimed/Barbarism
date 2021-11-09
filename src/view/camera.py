@@ -24,7 +24,7 @@ class Camera:
         self._switch = 0
 
         # Minimum harcoded size for the cells matrix. 
-        self.min_length = (5,3)
+        self.min_length = (3,5)
         self.max_length = self._calculate_length(CellSprite.get_min_size())
 
 
@@ -58,25 +58,25 @@ class Camera:
             )
 
         if new_size > CellSprite.get_min_size():
-            CellSprite.set_size(new_size)
-
             desired_length = self._calculate_length(new_size)
-            actual_length = self.visible_cells.length()
 
                 
             if (
                 event.get_movement() == 1 and 
-                actual_length[0] >= self.min_length[0] and
-                actual_length[1] >= self.min_length[1]
+                desired_length[0] >= self.min_length[0] and
+                desired_length[1] >= self.min_length[1]
                 ):
                 
+                CellSprite.set_size(new_size)
                 self.zoom_in(desired_length)
 
             elif (
-                actual_length[0] <= self.max_length[0] and
-                actual_length[1] <= self.max_length[1]
+                event.get_movement() == -1 and
+                desired_length[0] <= self.max_length[0] and
+                desired_length[1] <= self.max_length[1]
                 ):
                 
+                CellSprite.set_size(new_size)
                 self.zoom_out(desired_length)
             
             self.refresh_cells()
@@ -91,7 +91,7 @@ class Camera:
 
         actual_size = self.visible_cells.length()
         
-        for x in range(actual_size[0] - desired_size[0]):
+        for i in range(actual_size[0] - desired_size[0]):
             row = self.visible_cells.pop_row(-(self._switch))
 
             for element in row:
@@ -99,19 +99,19 @@ class Camera:
 
             self._switch = not self._switch
 
-        for x in range(actual_size[1] - desired_size[1]):
+        for i in range(actual_size[1] - desired_size[1]):
             column = self.visible_cells.pop_column(-self._switch)
 
             for element in column:
                 self.ed.remove(Click, element[1].handle_collisions)
 
             self._switch = not self._switch
-            
+
 
     def zoom_out(self, desired_size):
         actual_size = self.visible_cells.length()
         for axis in [0,1]:
-            for x in range(desired_size[axis] - actual_size[axis]):
+            for i in range(desired_size[axis] - actual_size[axis]):
 
                 new_collection = None
                 while bool(new_collection) == False:
