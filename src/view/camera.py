@@ -108,47 +108,29 @@ class Camera:
             self._switch = not self._switch
 
 
-    def zoom_out(self, desired_size):
-        actual_size = self.visible_cells.length()
-        for axis in [0,1]:
-            for i in range(desired_size[axis] - actual_size[axis]):
+    def zoom_out(self, desired_length):
+        """ Adds cells of the visible_cells Matrix until the quatity of 
+            cells be equal to the desired size passed by argument.
+            Also subscribes the cells to the Click event.
+        """
 
-                new_collection = None
-                while bool(new_collection) == False:
-                    if axis:
-                        cells = self.visible_cells.get_column(-self._switch)
-                    else:
-                        cells = self.visible_cells.get_row(-self._switch)
+        actual_length = self.visible_cells.length()
+        
+        first_position = self.visible_cells.get_element((0,0))[1].get_position()
+        estimated_origin = list(first_position.get_index())
 
-                    collection = [
-                        (element[0], element[1].get_position()) for element in cells
-                        ]
+        if self._switch and actual_length != desired_length:            
 
-                    if self._switch:
-                        new_collection = self.world_view._find_parallel_collection(collection, not axis, 1)
-                    else:
-                        new_collection = self.world_view._find_parallel_collection(collection, not axis, -1)
+            if actual_length[0] < desired_length[0]: estimated_origin[0] -= 1
+            if actual_length[1] < desired_length[1]: estimated_origin[1] -= 1
 
-                    if new_collection == None: self._switch = not self._switch
-
-
-                cells = self.world_view.get_cells_by_list(new_collection)
-                for cell in cells:
-                    self.ed.add(Click, cell[1].handle_collisions)
-
-                if axis:
-                    if self._switch:
-                        self.visible_cells.append_column(cells)
-                    else:
-                        self.visible_cells.insert_column(-self._switch, cells)
-
-                else:
-                    if self._switch:
-                        self.visible_cells.append_row(cells)
-                    else:
-                        self.visible_cells.insert_row(self._switch, cells)
-                
-                self._switch = not self._switch
+            self._switch = not self._switch
+                        
+        origin = self.world_view.validate_origin(estimated_origin, desired_length)
+        
+        self.visible_cells = self.world_view.complete_cells(
+            self.visible_cells, origin, desired_length
+            )
 
 
     def refresh_cells(self):
