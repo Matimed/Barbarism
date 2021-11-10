@@ -54,9 +54,9 @@ class Camera:
         """
 
         new_size = (
-            CellSprite.get_actual_size() + (event.get_movement() * 2)
+            CellSprite.get_actual_size() + (event.get_movement() * (CellSprite.get_actual_size() //10))
             )
-
+        
         if new_size > CellSprite.get_min_size():
             desired_length = self._calculate_length(new_size)
 
