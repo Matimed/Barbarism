@@ -124,7 +124,7 @@ class WorldView:
             first_position = cells.get_element((0,0))[1].get_position()
             if first_position != origin[1]:
                 
-                if  first_position.get_index()[0] < origin[1].get_index()[0]:
+                if  first_position.get_index()[0] > origin[1].get_index()[0]:
 
                     collection = list()
                     for element in cells.get_row(0):
@@ -136,7 +136,7 @@ class WorldView:
                     cells.insert_row(0, new_cells)
                     continue
                 
-                elif first_position.get_index()[1] < origin[1].get_index()[1]:
+                elif first_position.get_index()[1] > origin[1].get_index()[1]:
 
                     collection = list()
                     for element in cells.get_column(0):
