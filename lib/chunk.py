@@ -124,12 +124,16 @@ class Chunk:
         verify_matrix = Matrix()
         for row in range (origin[0], area[0]+origin[0]):
             verify_row = []
+            
             for column in range(origin[1], area[1]+origin[1]):
                 try:
                     verify_row.append((self, self.positions.get_element((row,column))))
+
                 except AssertionError:
                     continue
-            verify_matrix.append_row(verify_row)
+            
+            if verify_row: verify_matrix.append_row(verify_row)
+            
 
         return verify_matrix
 
