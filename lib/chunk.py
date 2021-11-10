@@ -12,19 +12,6 @@ class Chunk:
         self.index = index
 
     
-    def get_corner(self) -> list[Position, Position]:
-        """ Returns the position of the upper left corner and 
-            the lower right corner.
-        """
-
-        corners = list()
-
-        corners.append(self.position.get_element((0,0)))
-        corners.append(self.position.get_element(positions.length()))
-
-        return corners
-
-    
     def greater_than(self, chunk) -> tuple[bool, bool]:
         """ Compares the index with another chunk to know
             which one is prior to the other and returns a tuple 
