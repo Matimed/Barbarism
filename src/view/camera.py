@@ -11,6 +11,7 @@ class Camera:
     def __init__(self, event_dispatcher, window, world_view):
         self.ed = event_dispatcher
         self.ed.add(Tick, self.draw)
+        self.ed.add(ArrowKey, self.move)
         self.ed.add(Wheel, self.zoom)
 
         self.window = window
@@ -49,11 +50,32 @@ class Camera:
             previous_point = row[0][1].rect.bottomleft
             
 
+    def move(self, event):
+        """ Receive the ArrowKey event and according to the arrow direction
+            adds a row/column at the end and remove another at the beginning
+            to give the sensation of movement.
+        """
+
+        first_pos = self.visible_cells.get_element((0,0))[1].get_position()
+        estimated_origin = list(first_pos.get_index())
+
+        estimated_origin[0] -= event.get_y()
+        estimated_origin[1] += event.get_x()
+                        
+        actual_length = self.visible_cells.length()
+        origin = self.world.validate_origin(estimated_origin, actual_length)
+        self._change_cell_events(self.ed.remove, self.visible_cells)
+        self.world.replace_cells(self, self.visible_cells, origin)
+        self._change_cell_events(self.ed.add, self.visible_cells)
+        self.origin = self._get_new_origin()
+        self.refresh_cells()
+
+
     def zoom(self, event):
         """ Receive the Wheel event and create the illusion of getting
             closer to the map by changing the CellSprites size and quantity.
         """
-
+        
         actual_size = CellSprite.get_actual_size()
         new_size = (actual_size + (event.get_movement() * (actual_size //10)))
         
@@ -99,7 +121,7 @@ class Camera:
             column = self.visible_cells.pop_column(-self._switch)
             self._change_cell_events(self.ed.remove, column)
             self._switch = not self._switch
-
+        
         self.origin = self._get_new_origin()
         
 
@@ -128,7 +150,7 @@ class Camera:
         self._change_cell_events(self.ed.remove, self.visible_cells)
         self.world.complete_cells(
             self.visible_cells, origin, desired_length
-            )
+        )
         self._change_cell_events(self.ed.add, self.visible_cells)
         self.origin = self._get_new_origin()
 
@@ -184,7 +206,7 @@ class Camera:
         """ It receives an event method from the EventDispatcher and 
             applies it to the entire set of given cells. 
         """
-        
+
         for cell in cells:
             method(Click, cell[1].handle_collisions)
 
