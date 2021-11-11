@@ -116,37 +116,38 @@ class WorldView:
     def complete_cells(self, cells: Matrix, origin: Position, desired_length: tuple):
         """ It receives a Matrix of cells (Chunk, CellSprite), 
             a Position of origin and a desired length and 
-            returns a Matrix of the given length 
-            that contains all the remaining cells.
+            mutates the matrix to the given length and
+            containing all the remaining cells.
         """
 
         while cells.length() != desired_length:
+
             first_position = cells.get_element((0,0))[1].get_position()
             if first_position != origin[1]:
                 
                 if  first_position.get_index()[0] > origin[1].get_index()[0]:
 
-                    collection = list()
-                    for element in cells.get_row(0):
-                        collection.append((element[0], element[1].get_position()))
-
-                    new_positions = self._find_parallel_collection(collection, 0, -1)
-                    new_cells = self.get_cells_by_list(new_positions)
-                    
+                    last_cells = cells.get_row(0)
+                    new_cells = self._find_parallel_cells(last_cells, 0, -1)
                     cells.insert_row(0, new_cells)
-                    continue
                 
                 elif first_position.get_index()[1] > origin[1].get_index()[1]:
 
-                    collection = list()
-                    for element in cells.get_column(0):
-                        collection.append((element[0], element[1].get_position()))
-
-                    new_positions = self._find_parallel_collection(collection, 1, -1)
-                    new_cells = self.get_cells_by_list(new_positions)
-                    
+                    last_cells = cells.get_column(0)
+                    new_cells = self._find_parallel_cells(last_cells, 1, -1)
                     cells.insert_column(0, new_cells)
-                    continue
+
+            elif cells.length()[0] < desired_length[0]:
+                    
+                last_cells = cells.get_row(cells.get_last_index()[0])
+                new_cells = self._find_parallel_cells(last_cells, 0, 1)
+                cells.append_row(new_cells)
+
+            elif cells.length()[1] < desired_length[1]:
+
+                last_cells = cells.get_column(cells.get_last_index()[1])
+                new_cells = self._find_parallel_cells(last_cells, 1, 1)
+                cells.append_column(new_cells)
 
             elif cells.length()[0] < desired_length[0]:
 
@@ -176,28 +177,34 @@ class WorldView:
         return cells
 
 
-    def _find_parallel_collection(self, collection:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
+    def _find_parallel_cells(self, cells:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
         """ Returns a list of composed tuples of Chunk and position
             with the row/column after/before the one passed by parameter.
         """
         
-        new_collection = []
-        for element in collection:
-            position_index  = list(element[1].get_index())
+        new_positions = []
+        for element in cells:
+            position_index  = list(element[1].get_position().get_index())
             position_index[axis] += difference
 
-            position = self.world_model.get_position_by_chunk(position_index, element[0].get_index())
+            position = self.world_model.get_position_by_chunk(
+                position_index, element[0].get_index()
+            )
+
             if not position:
                 chunk_index = list(element[0].get_index())
                 chunk_index[axis] += difference
-                position = self.world_model.get_position_by_chunk(position_index,chunk_index)
+                position = self.world_model.get_position_by_chunk(
+                    position_index,chunk_index
+                )
 
                 if not position: return False
             
 
-            new_collection.append(position)
+            new_positions.append(position)
 
-        return new_collection
+
+        return self.get_cells_by_list(new_positions)
 
 
     def _render_cells(self, chunk):
