@@ -1,7 +1,7 @@
 from src.view.sprites import CellSprite
 from src.events import Tick
 from src.events import Wheel
-from src.events import CellPressed
+from src.events import ArrowKey
 from lib.abstract_data_types import Matrix
 from src.events import Click
 
