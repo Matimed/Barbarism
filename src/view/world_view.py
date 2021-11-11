@@ -149,32 +149,57 @@ class WorldView:
                 new_cells = self._find_parallel_cells(last_cells, 1, 1)
                 cells.append_column(new_cells)
 
-            elif cells.length()[0] < desired_length[0]:
+    
 
-                collection = list()
-                for element in cells.get_row(cells.get_last_index()[0]):
-                    collection.append((element[0], element[1].get_position()))
+    def replace_cells(self, subscriber, cells: Matrix, origin: Position):
+        """ It receives a Matrix of cells and mutates it
+            until the first element of this matrix is the origin.
+            It also renders the Chunks adjacent to all those it passes through
+            (for that the subscriber is needed).
+        """
 
-                new_positions = self._find_parallel_collection(collection, 0, 1)
-                new_cells = self.get_cells_by_list(new_positions)
+        origin_index = origin[1].get_index()
+        first_pos = cells.get_element((0,0))[1].get_position()
+        first_pos_index = first_pos.get_index()
+        
+        while origin_index != first_pos_index:
 
-                cells.append_row(new_cells)
-                continue
-
-            elif cells.length()[1] < desired_length[1]:
-
-                collection = list()
-                for element in cells.get_column(cells.get_last_index()[1]):
-                    collection.append((element[0], element[1].get_position()))
-
-                new_positions = self._find_parallel_collection(collection, 1, 1)
-                new_cells = self.get_cells_by_list(new_positions)
+            if  first_pos_index[0] > origin_index[0]:
                 
+                last_cells = cells.get_row(0)
+                new_cells = self._find_parallel_cells(last_cells, 0, -1)
+                cells.insert_row(0, new_cells)
+                cells.pop_row(cells.get_last_index()[0])
+
+            elif first_pos_index[1] > origin_index[1]:
+                
+                last_cells = cells.get_column(0)
+                new_cells = self._find_parallel_cells(last_cells, 1, -1)
+                cells.insert_column(0, new_cells)
+                cells.pop_column(cells.get_last_index()[1])
+
+            elif first_pos_index[0] < origin_index[0]:
+
+                last_cells = cells.get_row(cells.get_last_index()[0])
+                new_cells = self._find_parallel_cells(last_cells, 0, 1)
+                cells.append_row(new_cells)
+                cells.pop_row(cells.get_first_index()[0])
+
+            elif first_pos_index[1] < origin_index[1]:
+
+                last_cells = cells.get_column(cells.get_last_index()[1])
+                new_cells = self._find_parallel_cells(last_cells, 1, 1)
                 cells.append_column(new_cells)
-                continue
+                cells.pop_column(cells.get_first_index()[1])
 
+            else: return False
+                
+            first_pos = cells.get_element((0,0))[1].get_position()
+            first_pos_index = first_pos.get_index()
 
-        return cells
+            for chunk in new_cells:
+                self.render_adjacent_chunks(subscriber, chunk[0])
+
 
 
     def _find_parallel_cells(self, cells:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
