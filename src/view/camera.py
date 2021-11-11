@@ -4,6 +4,7 @@ from src.events import Wheel
 from src.events import ArrowKey
 from lib.abstract_data_types import Matrix
 from src.events import Click
+import itertools as it
 
 
 class Camera:
@@ -14,7 +15,7 @@ class Camera:
 
         self.window = window
 
-        self.world_view = world_view
+        self.world = world_view
 
         self.visible_cells = Matrix()
         self.visible_chunks = set()
@@ -53,9 +54,8 @@ class Camera:
             closer to the map by changing the CellSprites size and quantity.
         """
 
-        new_size = (
-            CellSprite.get_actual_size() + (event.get_movement() * (CellSprite.get_actual_size() //10))
-            )
+        actual_size = CellSprite.get_actual_size()
+        new_size = (actual_size + (event.get_movement() * (actual_size //10)))
         
         if new_size > CellSprite.get_min_size():
             desired_length = self._calculate_length(new_size)
@@ -80,7 +80,6 @@ class Camera:
                 self.zoom_out(desired_length)
             
             self.refresh_cells()
-            self.origin = self._get_new_origin()
 
 
     def zoom_in(self, desired_size):
@@ -91,22 +90,18 @@ class Camera:
 
         actual_size = self.visible_cells.length()
         
-        for i in range(actual_size[0] - desired_size[0]):
+        for _ in it.repeat(None, (actual_size[0] - desired_size[0])):
             row = self.visible_cells.pop_row(-(self._switch))
-
-            for element in row:
-                self.ed.remove(Click, element[1].handle_collisions)
-
+            self._change_cell_events(self.ed.remove, row)
             self._switch = not self._switch
 
-        for i in range(actual_size[1] - desired_size[1]):
+        for _ in it.repeat(None, (actual_size[1] - desired_size[1])):
             column = self.visible_cells.pop_column(-self._switch)
-
-            for element in column:
-                self.ed.remove(Click, element[1].handle_collisions)
-
+            self._change_cell_events(self.ed.remove, column)
             self._switch = not self._switch
 
+        self.origin = self._get_new_origin()
+        
 
     def zoom_out(self, desired_length):
         """ Adds cells of the visible_cells Matrix until the quatity of 
@@ -116,8 +111,8 @@ class Camera:
 
         actual_length = self.visible_cells.length()
         
-        first_position = self.visible_cells.get_element((0,0))[1].get_position()
-        estimated_origin = list(first_position.get_index())
+        first_pos = self.visible_cells.get_element((0,0))[1].get_position()
+        estimated_origin = list(first_pos.get_index())
 
         if self._switch and actual_length != desired_length:            
 
@@ -126,11 +121,16 @@ class Camera:
 
             self._switch = not self._switch
                         
-        origin = self.world_view.validate_origin(estimated_origin, desired_length)
+        origin = self.world.validate_origin(
+            estimated_origin, desired_length
+        )
         
-        self.visible_cells = self.world_view.complete_cells(
+        self._change_cell_events(self.ed.remove, self.visible_cells)
+        self.world.complete_cells(
             self.visible_cells, origin, desired_length
             )
+        self._change_cell_events(self.ed.add, self.visible_cells)
+        self.origin = self._get_new_origin()
 
 
     def refresh_cells(self):
@@ -146,26 +146,31 @@ class Camera:
         """ Receives a Position and its Chunk and centers them on screen.
         """
 
-        actual_length = self._calculate_length(CellSprite.get_actual_size())
+        if self.visible_cells: 
+            self._change_cell_events(self.ed.remove, self.visible_cells)
 
+
+        actual_length = self._calculate_length(CellSprite.get_actual_size())
         
         estimated_origin = list(position.get_index())
-
         estimated_origin[0] -=  (actual_length[0]-1)//2
         estimated_origin[1] -=  (actual_length[1]-1)//2
 
-        origin = self.world_view.validate_origin(estimated_origin, actual_length)
+        origin = self.world.validate_origin(estimated_origin, actual_length)
         area_in_chunk = origin[0].verify_area(origin[1], actual_length)
 
-        cells = self.world_view.get_cells(area_in_chunk)
-        cells = self.world_view.complete_cells(cells, origin, actual_length)
+        cells = self.world.get_cells(area_in_chunk)
+        self.world.complete_cells(cells, origin, actual_length)
 
         chunks = set([chunk[0] for chunk in cells])
         for chunk in chunks:
-            self.world_view.render_adjacent_chunks(self, chunk)
+            self.world.render_adjacent_chunks(self, chunk)
 
         self.set_visible_chunks(chunks)
-        self.set_visible_cells(cells)
+        self.visible_cells = cells
+        self._change_cell_events(self.ed.add, cells)
+        self.origin = self._get_new_origin()
+
 
 
     def set_visible_chunks(self, chunks):
@@ -175,20 +180,13 @@ class Camera:
         self.visible_chunks = chunks
 
 
-    def set_visible_cells(self, cells):
-        """ Replace the Matrix of visible cells for a new one,
-            recalculates the origin point and subscribes the 
-            cells to the Click event.
+    def _change_cell_events(self, method, cells):
+        """ It receives an event method from the EventDispatcher and 
+            applies it to the entire set of given cells. 
         """
         
-        for cell in self.visible_cells:
-            self.ed.remove(Click, cell[1].handle_collisions)
-        
         for cell in cells:
-            self.ed.add(Click, cell[1].handle_collisions)
-
-        self.visible_cells = cells
-        self.origin = self._get_new_origin()
+            method(Click, cell[1].handle_collisions)
 
 
     def _get_new_origin(self):

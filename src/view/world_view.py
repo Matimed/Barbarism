@@ -107,15 +107,15 @@ class WorldView:
         while origin[0] < 0: origin[0] += 1
         while origin[1] < 0: origin[1] +=1
 
-        while (origin[0] + length[0]) > limit[0]: origin[0] -= 1
-        while (origin[1] + length[1]) > limit[1]: origin[1] -= 1
+        while (origin[0] + length[0]-1) > limit[0]: origin[0] -= 1
+        while (origin[1] + length[1]-1) > limit[1]: origin[1] -= 1
 
         return self.world_model.get_position(origin)
 
 
     def complete_cells(self, cells: Matrix, origin: Position, desired_length: tuple):
         """ It receives a Matrix of cells (Chunk, CellSprite), 
-            a Position of origin and a desired length and 
+            a Position of origin and a desired length and
             mutates the matrix to the given length and
             containing all the remaining cells.
         """
@@ -126,19 +126,19 @@ class WorldView:
             if first_position != origin[1]:
                 
                 if  first_position.get_index()[0] > origin[1].get_index()[0]:
-
+                    
                     last_cells = cells.get_row(0)
                     new_cells = self._find_parallel_cells(last_cells, 0, -1)
                     cells.insert_row(0, new_cells)
                 
                 elif first_position.get_index()[1] > origin[1].get_index()[1]:
-
+                    
                     last_cells = cells.get_column(0)
                     new_cells = self._find_parallel_cells(last_cells, 1, -1)
                     cells.insert_column(0, new_cells)
 
             elif cells.length()[0] < desired_length[0]:
-                    
+
                 last_cells = cells.get_row(cells.get_last_index()[0])
                 new_cells = self._find_parallel_cells(last_cells, 0, 1)
                 cells.append_row(new_cells)
@@ -184,7 +184,7 @@ class WorldView:
                 new_cells = self._find_parallel_cells(last_cells, 0, 1)
                 cells.append_row(new_cells)
                 cells.pop_row(cells.get_first_index()[0])
-
+                
             elif first_pos_index[1] < origin_index[1]:
 
                 last_cells = cells.get_column(cells.get_last_index()[1])
@@ -193,13 +193,13 @@ class WorldView:
                 cells.pop_column(cells.get_first_index()[1])
 
             else: return False
-                
+            
             first_pos = cells.get_element((0,0))[1].get_position()
             first_pos_index = first_pos.get_index()
-
+            
             for chunk in new_cells:
                 self.render_adjacent_chunks(subscriber, chunk[0])
-
+            
 
 
     def _find_parallel_cells(self, cells:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
