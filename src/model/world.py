@@ -14,7 +14,7 @@ class World:
         self.order = order
         self.positions: Matrix = self._generate_positions(order)
         self.cells: dict = self._generate_cells(self.positions)
-        self.chunks: Matrix = self._generate_chunks(10)
+        self.chunks: Matrix = self._generate_chunks(25)
 
 
     def get_position(self, position_index):
@@ -88,11 +88,9 @@ class World:
         positions = Matrix()
 
         for y in range(order):
+
             row_positions = []
-            
-            for x in range(order):
-                row_positions.append(Position(y, x))
-            
+            for x in range(order): row_positions.append(Position(y, x))
             positions.append_row(row_positions)
 
         return positions
@@ -130,8 +128,7 @@ class World:
         
         cells = {}
 
-        for i in positions:
-            cells[i] = Plain()
+        for i in positions: cells[i] = Plain()
 
         return cells
 

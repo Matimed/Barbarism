@@ -1,5 +1,6 @@
 from typing import Any
 from typing import Union
+import itertools as it
 import random
 
 
@@ -7,6 +8,69 @@ class Matrix:
     """ Two-dimensional array that implements
         the main python built-in methods.
     """
+
+    @staticmethod
+    def factorize(number):
+        """ Returns all the factors that make up the given number.
+        """
+
+        factoring = [int(number)]
+        while True:
+
+            factorized_factors=list()
+            for factor in factoring:
+
+                residing = int(factor**(1/2))
+                for n in range(residing, 1, -1):
+
+                    if factor % n == 0:
+                        factorized_factors.extend([n, factor // n])
+                        break
+
+                else: factorized_factors.append(int(factor))
+                
+            if factoring == factorized_factors: return factoring
+
+            factoring = factorized_factors
+
+
+    @staticmethod
+    def get_divisors(number):
+        """ Returns a list of all natural divisors of a given number.
+        """
+
+        factors = list(Matrix.factorize(number))
+        combinations = set()
+
+        for i in range(0,len(factors)+1):
+            combinations = combinations.union(it.combinations(factors,i))
+        
+        divisors = set()
+        for combination in combinations:
+            product = 1
+            for element in combination:
+                product *= element
+            
+            divisors.add(product)
+
+        return sorted(divisors)
+
+
+    @staticmethod
+    def get_squarest_length(lengths):
+        """ Receive a list of tuples and decide which of them 
+            forms the most square-like figure. 
+        """
+
+        remainders = []
+        for length in lengths:
+
+            remainder = abs(length[0] - length[1])
+            if remainder == 0: return length
+            else: remainders.append(remainder)
+                
+        return lengths[remainders.index(min(remainders))]
+
 
     def __init__(self, rows = list()):
         """ Optionally receive a list of rows (which in turn are list as well) 
@@ -61,7 +125,7 @@ class Matrix:
         return False
 
 
-    def split(self, quantity:int):
+    def split (self, quantity:int):
         """ Divides the matrix into the requested number of smaller matrices
             ensuring they are all the same size. (The matrix must be able 
             to be divided by the quantity without leaving a remainder).
@@ -70,22 +134,25 @@ class Matrix:
  
 
         total = (self.length()[0]*self.length()[1]) //quantity
+        divisors = self.get_divisors(quantity)
+        y_options = [self.length()[0] // divisor for divisor in divisors]
+        x_options = [self.length()[1] // divisor for divisor in divisors]
 
-        y_divisors = self._get_divisors(self.length()[0])
-        x_divisors = self._get_divisors(self.length()[1])
         posible_lengths=[]
 
-        for y_div in  y_divisors:
-            for x_div in x_divisors:
-                if y_div * x_div == total:
-                    posible_lengths.append((y_div, x_div))
+        for y_option in  y_options:
+            for x_option in x_options:
+                if y_option * x_option == total:
+                    posible_lengths.append((y_option, x_option))
+                    x_options.remove(x_option)
                     break
 
         assert len(posible_lengths)!= 0, (
             "It is impossible to divide the matrix "
-            "into the ordered quantity of parts.")
+            "into the ordered quantity of parts."
+        )
 
-        new_length = self._get_squarest_length(posible_lengths)
+        new_length = self.get_squarest_length(posible_lengths)
         grand_matrix = Matrix()
 
         for row in range(0, self.length()[0],new_length[0]) :
@@ -361,32 +428,3 @@ class Matrix:
         
         return ' \n'.join(rows)
 
-
-    def _get_divisors(self, number):
-        """ Returns a list of all natural divisors of a given number.
-        """
-
-        divisors = [1]
-        for i in range(2, int(number**(1/2))+1):
-            if number%i == 0:
-                divisors.append(i)
-                divisors.append(number//i)
-        divisors.append(number)
-
-        return list(set(divisors))
-
-
-    def _get_squarest_length(self, lengths):
-        """ Receive a list of tuples and decide which of them 
-            forms the most square-like figure. 
-        """
-
-        remainders = []
-        for length in lengths:
-            remainder = abs(length[0] - length[1])
-            if remainder == 0:
-                return length
-            else:
-                remainders.append(remainder)
-                
-        return lengths[remainders.index(min(remainders))]
