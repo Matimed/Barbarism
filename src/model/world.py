@@ -10,11 +10,11 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, order = 100):
+    def __init__(self, order = 1500):
         self.order = order
         self.positions: Matrix = self._generate_positions(order)
+        self.chunks: Matrix = self._generate_chunks(25, order, self.positions)
         self.cells: dict = self._generate_cells(self.positions)
-        self.chunks: Matrix = self._generate_chunks(25)
 
 
     def get_position(self, position_index):
@@ -85,40 +85,24 @@ class World:
             based on the given size (order).
         """
 
-        positions = Matrix()
-
-        for y in range(order):
-
-            row_positions = []
-            for x in range(order): row_positions.append(Position(y, x))
-            positions.append_row(row_positions)
-
-        return positions
+        return Matrix(Position.create_collection((0,0), (order -1 ,order -1)))
 
 
-    def _generate_chunks(self, min_size:int):
+    def _generate_chunks(self, min_size:int, order, positions):
         """ Returns a Matrix of Chunk objects based on a given size 
             (the minimum number of cells that can fit in a Chunk).
         """
 
         size = min_size
         while True:
-            if not (self.order%size):
+            if not (order%size):
                 break
             size +=1
 
-        splited_positions = self.positions.split(self.order/size)
-        chunks = Matrix()
+        splited_positions = positions.split(order/size)
 
-        for y, row in enumerate(splited_positions.iter_rows()):
-            chunk_row = []
-            for x, position in enumerate(row):
-                chunk= Chunk(position,(y,x))
-                chunk_row.append(chunk)
-
-            chunks.append_row(chunk_row)
-
-        return chunks
+        return Matrix([[Chunk(positions, (y,x)) for x, positions in enumerate(row)]
+            for y, row in enumerate(splited_positions.iter_rows())])
 
 
     def _generate_cells(self, positions):
@@ -126,7 +110,7 @@ class World:
             generate a dict of Cell type objects with a position as key.
         """
         
-
+            
         return {position:Plain() for row in positions.iter_rows() 
             for position in row}
 
