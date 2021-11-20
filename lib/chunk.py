@@ -7,10 +7,23 @@ class Chunk:
         render the world in separate parts.
     """
 
+    _length = int()
+
+    @classmethod
+    def get_length(cls):  return cls._length
+
+
+    @classmethod
+    def set_length(cls, length):    cls._length = length
+
+
     __slots__ = ('positions', 'index')
     def __init__(self, positions:Matrix, index:tuple[int, int]):
         self.positions = positions
         self.index = index
+
+        length = self.length()
+        if length != Chunk.get_length(): Chunk.set_length(length)
 
     
     def greater_than(self, chunk) -> tuple[bool, bool]:

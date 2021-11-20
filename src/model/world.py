@@ -10,7 +10,7 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, order = 1500):
+    def __init__(self, order = 1000):
         self.order = order
         self.positions: Matrix = self._generate_positions(order)
         self.chunks: Matrix = self._generate_chunks(25, order, self.positions)
@@ -18,10 +18,17 @@ class World:
 
 
     def get_position(self, position_index):
+        """ Returns the chunk and position 
+            object that match with the given position index.
+        """
+        
         position = self.positions.get_element(position_index)
+        length = Chunk.get_length()
 
-        for chunk in self.chunks:
-            if chunk.has(position): break
+        chunk_index = (position_index[0] // (length[0]), position_index[1] // (length[1]))
+        chunk = self.chunks.get_element(chunk_index)
+
+        if not chunk.has(position): raise KeyError()
 
         return (chunk, position)
 
