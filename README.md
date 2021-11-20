@@ -15,7 +15,7 @@ _$ python3 barbarism.py_
 
 * **Arcos Juan** - [ArcosJuan](https://github.com/ArcosJuan).
 * **Atienza Gabriel** - [Atienzag04](https://github.com/atienzag04).
-* **Carazo Medley Matias** - [Matimed11](https://github.com/Matimed11).
+* **Carazo Medley Matías** - [Matimed](https://github.com/Matimed).
 
 ## Special thanks
 
