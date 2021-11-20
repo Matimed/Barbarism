@@ -82,8 +82,7 @@ class Matrix:
         # Only is used when the matrix is iterated.
         
         if rows:
-            for row in rows:
-                self.append_row(row)
+            [self.append_row(row) for row in rows]
 
 
     def get_element(self, index: tuple):
@@ -236,12 +235,10 @@ class Matrix:
             assert len(column)==self.length()[0], \
                 "The length of the column must be the same as the others."
 
-            for i, row in enumerate(self.rows):
-                row.append(column[i])
+            [row.append(column[i]) for i,row in enumerate(self.rows)]
 
         else:
-            for element in column:
-                self.rows.append([element])
+            [self.rows.append(element) for element in column]
 
 
     def pop_row(self, index = -1) -> list:
@@ -255,10 +252,7 @@ class Matrix:
         """ Removes and returns the column that is in the given index.
         """
 
-        column = []
-        for row in self.rows:
-            column.append(row.pop(index))
-        return column
+        return [row.pop(index) for row in self.rows]
 
 
     def get_row(self, index) -> list:
@@ -272,10 +266,7 @@ class Matrix:
         """ Returns the column that is in the given index.
         """
 
-        column = []
-        for row in self.rows:
-            column.append(row[index])
-        return column
+        return [row[index] for row in self.rows]
 
 
     def get_center(self):
@@ -289,11 +280,7 @@ class Matrix:
         """ Returns a new Matrix object that have the same values of this one.
         """
 
-        rows = []
-        for row in self.rows:
-            rows.append(row.copy())
-
-        return Matrix(rows)
+        return Matrix([row.copy() for row in self.rows])
 
 
     def length(self) -> tuple[int,int]:
@@ -301,9 +288,7 @@ class Matrix:
             (number of rows, number of columns).
         """
 
-        rows = len(self.rows)
-        columns = len(self.rows[-1])
-        return (rows,columns)
+        return (len(self.rows), len(self.rows[-1]))
 
 
     def insert_row(self, index: int, row: list):
@@ -329,8 +314,7 @@ class Matrix:
             assert len(column)==self.length()[0], \
                 "The length of the column must be the same as the others."
 
-            for i, row in enumerate(self.rows):
-                    row.insert(index,column[i])
+            [row.insert(index, column[i]) for i,row in enumerate(self.rows)]
         
         else: 
             self.append_column(column)

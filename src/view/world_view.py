@@ -86,15 +86,12 @@ class WorldView:
             returns the corresponding CellSprite list.
         """
         
-        cell_collection = list()
+        # We use list comprehension in this case because
+        # even if the procedure is less clear, it increases performance. 
 
-        for element in positions:
-            cells = self.renderized_objects[element[0]][0]
-            for cell in cells:
-                if cell.get_position() == element[1]:
-                    cell_collection.append((element[0], cell))
-
-        return cell_collection
+        return [(element[0],cell) for element in positions 
+            for cell in self.renderized_objects[element[0]][0] 
+            if cell.get_position() == element[1]]
 
 
     def validate_origin(self, origin: tuple, length: tuple) -> tuple[Chunk, Position]:
@@ -197,9 +194,8 @@ class WorldView:
             first_pos = cells.get_element((0,0))[1].get_position()
             first_pos_index = first_pos.get_index()
             
-            for chunk in new_cells:
-                self.render_adjacent_chunks(subscriber, chunk[0])
-            
+            [self.render_adjacent_chunks(subscriber, chunk[0]) 
+                for chunk in new_cells]
 
 
     def _find_parallel_cells(self, cells:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
@@ -236,16 +232,10 @@ class WorldView:
         """ Receive a Chunk and render the suitable CellSprite objects Matrix.
         """
 
-        renderized_cells = Matrix()
-
-        for y, row in enumerate(chunk.copy_matrix().iter_rows()):
-            cell_row = []
-            for x, position in enumerate(row):
-                cell_sprite = CellSprite(position)
-
-                cell_row.append(cell_sprite)
-
-            renderized_cells.append_row(cell_row)
+        renderized_cells = Matrix([[CellSprite(position) 
+            for position in row] for row in chunk.copy_matrix().iter_rows()])
+        
+        
 
         self.renderized_objects.setdefault(
             chunk, list()

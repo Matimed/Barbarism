@@ -126,11 +126,9 @@ class World:
             generate a dict of Cell type objects with a position as key.
         """
         
-        cells = {}
 
-        for i in positions: cells[i] = Plain()
-
-        return cells
+        return {position:Plain() for row in positions.iter_rows() 
+            for position in row}
 
 
     def generate_spawn_point(self) -> tuple[Chunk, Position]:
