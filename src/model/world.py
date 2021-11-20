@@ -1,4 +1,4 @@
-from src.model.cells import Plain
+from src.model import Cell
 from lib.position import Position
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
@@ -111,7 +111,7 @@ class World:
         """
         
             
-        return {position:Plain() for row in positions.iter_rows() 
+        return {position:Cell(friction = 1) for row in positions.iter_rows()
             for position in row}
 
 

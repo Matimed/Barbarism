@@ -1,12 +1,12 @@
 from time import time
 from functools import reduce
-from src.model.cells import Cell
+from src.model import Cell
 from lib.abstract_data_types.matrix import Matrix
 from lib.position import Position
 from lib.chunk import Chunk
 
 def generate(order):
-    with open('test/position_generation.log', 'a') as log:
+    with open('tests/position_generation.log', 'a') as log:
         print_log(file=log)
         print_log("-"*35, file=log)
         print_log ("Atempt to generate "+ str(order) + " positions:", file = log)

@@ -1,6 +1,6 @@
 import pygame as pg
 pg.init()
 
-from src import Main
+from src.main import Main
 main = Main()
 
