@@ -215,6 +215,8 @@ class WorldView:
 
             else: return False
             
+            first_position = positions.get_element((0,0))
+
             chunks |= new_chunks
             new_sprites |= self.get_cells(new_positions)
             removed_sprites |= self.get_cells(removed_positions)
