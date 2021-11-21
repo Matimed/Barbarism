@@ -82,11 +82,16 @@ class Matrix:
         """
 
         self.rows = []
-        self.iteration_index = None 
+
         # Only is used when the matrix is iterated.
+        self.iteration_index = None 
         
         if rows:
-            [self.append_row(row) for row in rows]
+            try:
+                [self.append_row(row) for row in rows]
+
+            except TypeError:
+                raise AssertionError("'rows' has to be a list of lists")
 
 
     def get_element(self, index: tuple):
@@ -94,10 +99,12 @@ class Matrix:
         """
 
         assert len(index) == 2, \
-            "The index must be a tuple of one position in y and one in x."
+            "The index must be a tuple of one position in y and one in x"
 
-        assert (index[0] < self.length()[0] and index[1] < self.length()[1] 
-            and index[0] >= 0 and index[1] >= 0), "Index out of range."
+        if (index[0] >= self.length()[0] or index[1] >= self.length()[1] 
+            or index[0] < 0 or index[1] < 0): 
+            
+            raise IndexError("matrix index out of range")
 
         return self.rows[index[0]][index[1]]
 
@@ -107,10 +114,13 @@ class Matrix:
         """
 
         assert len(index) == 2, \
-            "The index must be a tuple of one position in y and one in x."
+            "The index must be a tuple of one position in y and one in x"
 
-        assert index[0] < self.length()[0] and index[1] < self.length()[1], \
-            "Index out of range."
+        assert self.length() != (0,0),  \
+            "Empty matrices do not support element assignment"
+
+        if index[0] > self.length()[0] or index[1] > self.length()[1]:
+            raise IndexError("matrix element assignment index out of range")
 
         self.rows[index[0]][index[1]] = element
 
@@ -135,8 +145,13 @@ class Matrix:
             Returns a Matrix composed of smaller Matrix.
         """
  
+        assert self.length() != (0,0), "Cannot divide an empty matrix"
 
         total = (self.length()[0]*self.length()[1]) //quantity
+
+        assert total > 0, \
+            "The matrix cannot be splited into a such a high number of parts"
+
         divisors = self.get_divisors(quantity)
         y_options = [self.length()[0] // divisor for divisor in divisors]
         x_options = [self.length()[1] // divisor for divisor in divisors]
@@ -152,7 +167,7 @@ class Matrix:
 
         assert len(posible_lengths)!= 0, (
             "It is impossible to divide the matrix "
-            "into the ordered quantity of parts."
+            "into the ordered quantity of parts"
         )
 
         new_length = self.get_squarest_length(posible_lengths)
@@ -226,7 +241,7 @@ class Matrix:
 
         if self.rows:
             assert len(row)==self.length()[1], \
-                "The length of the row must be the same as the others."
+                "The length of the row must be the same as the others"
         
         self.rows.append(row)
 
@@ -238,7 +253,7 @@ class Matrix:
 
         if self.rows:
             assert len(column)==self.length()[0], \
-                "The length of the column must be the same as the others."
+                "The length of the column must be the same as the others"
 
             [row.append(column[i]) for i,row in enumerate(self.rows)]
 
@@ -257,6 +272,7 @@ class Matrix:
         """ Removes and returns the column that is in the given index.
         """
 
+        if self.length() == (0,0): raise IndexError("pop from empty matrix")
         return [row.pop(index) for row in self.rows]
 
 
@@ -264,20 +280,30 @@ class Matrix:
         """ Returns the row that is in the given index.
         """
 
-        return self.rows[index]
+        try:
+            return self.rows[index]
+        except IndexError:
+            raise IndexError("row index out of range")
 
 
     def get_column(self, index) -> list:
         """ Returns the column that is in the given index.
         """
 
-        return [row[index] for row in self.rows]
+        try:
+            if self.length() == (0,0): IndexError()
+            return [row[index] for row in self.rows]
+        except IndexError:
+            raise IndexError("column index out of range")
 
 
     def get_center(self):
         """ Returns the element in the center of it self.
         """
 
+        assert self.length() != (0,0), \
+            "Cannot find the center of an empty matrix"
+        
         return self.get_element((self.length()[0] // 2, self.length()[1] // 2))
 
 
@@ -293,17 +319,17 @@ class Matrix:
             (number of rows, number of columns).
         """
 
-        return (len(self.rows), len(self.rows[-1]))
-
+        if self.rows: return (len(self.rows), len(self.rows[-1]))
+        else: return (0,0)
 
     def insert_row(self, index: int, row: list):
         """ Inserts a given row (list of elements) 
             before the position of the given index.
         """
 
-        if self.rows:
+        if self.length() != (0,0):
             assert len(row)==self.length()[1], \
-                "The length of the row must be the same as the others."
+                "The length of the row must be the same as the others"
             self.rows.insert(index, row)
 
         else:
@@ -315,7 +341,7 @@ class Matrix:
             before the position of the given index.
         """
 
-        if self.rows:
+        if self.length() != (0,0):
             assert len(column)==self.length()[0], \
                 "The length of the column must be the same as the others."
 
@@ -335,6 +361,9 @@ class Matrix:
     def random(self):
         """ Returns a random element from the Matrix.
         """
+
+        assert self.length()!= (0,0), \
+            "Can't pick a random element from an empty array"
 
         return random.choice(random.choice(self.rows))
 
@@ -365,6 +394,8 @@ class Matrix:
             otherwise it returns true.
         """
 
+        if self.length() == (0,0): return False
+
         for element in self:
             if not element:
                 return False
@@ -392,11 +423,13 @@ class Matrix:
         """ Return the next element in the sequence.
         """
 
+        if self.length() == (0,0): raise StopIteration()
+
         # One is subtracted from the length 
         # because the index starts counting from (0,0).
-        
         try: 
             iteration_max = (self.length()[0] -1 ,self.length()[1] - 1)
+
         except: 
             raise StopIteration()
         
