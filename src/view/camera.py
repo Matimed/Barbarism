@@ -18,8 +18,8 @@ class Camera:
 
         self.world = world_view
 
-        self.visible_cells = Matrix()
-        self.visible_chunks = set()
+        self.visible_positions = Matrix()
+        self.visible_sprites = dict() # {Position: list[Sprite]}
 
         self.origin = (0,0)
 
@@ -31,24 +31,25 @@ class Camera:
 
 
     def draw(self, event):
-        """ Loops through the Matrix of visible cells and draw them. 
+        """ Loops through the CellSprites of visible_sprites and draw them. 
         """
 
         previous_point = self.origin
 
-        for row in self.visible_cells.iter_rows():
-            for cell in row:
+        for row in self.visible_positions.iter_rows():
+            for pos in row:
+                cell = self.visible_sprites[pos][0]
 
                 # We know that we are breaking OOP paradim
                 # when we access an argument directly but 
                 # this is neccesary because pygame does not have 
                 # a suitable method of accessing the rect attributes.
-                cell[1].rect.topleft = previous_point
-                previous_point = cell[1].rect.topright
-                cell[1].draw(self.window.get_surface())
+                cell.rect.topleft = previous_point
+                previous_point = cell.rect.topright
+                cell.draw(self.window.get_surface())
             
-            previous_point = row[0][1].rect.bottomleft
-            
+            previous_point = self.visible_sprites[row[0]][0].rect.bottomleft
+
 
     def move(self, event):
         """ Receive the ArrowKey event and according to the arrow direction
@@ -56,19 +57,33 @@ class Camera:
             to give the sensation of movement.
         """
 
-        first_pos = self.visible_cells.get_element((0,0))[1].get_position()
+        first_pos = self.visible_positions.get_element((0,0))
         estimated_origin = list(first_pos.get_index())
 
         estimated_origin[0] -= event.get_y()
         estimated_origin[1] += event.get_x()
                         
-        actual_length = self.visible_cells.length()
+        actual_length = self.visible_positions.length()
         origin = self.world.validate_origin(estimated_origin, actual_length)
-        self._change_cell_events(self.ed.remove, self.visible_cells)
-        self.world.replace_cells(self, self.visible_cells, origin)
-        self._change_cell_events(self.ed.add, self.visible_cells)
+
+        new_sprites, removed_sprites = self.world.replace_cells(
+            self, self.visible_positions, origin
+            )
+
+        self.visible_sprites |= new_sprites
+
+        self._change_cell_events(
+            self.ed.remove,
+            [sprite[0] for sprite in removed_sprites.values()]
+            )
+
+        self._change_cell_events(
+            self.ed.add,
+            [sprite[0] for sprite in new_sprites.values()]
+            )
+
         self.origin = self._get_new_origin()
-        self.refresh_cells()
+        self.refresh_sprites()
 
 
     def zoom(self, event):
@@ -101,39 +116,49 @@ class Camera:
                 CellSprite.set_size(new_size)
                 self.zoom_out(desired_length)
             
-            self.refresh_cells()
+            self.refresh_sprites()
 
 
     def zoom_in(self, desired_size):
-        """ Deletes cells of the visible_cells Matrix until the quatity of 
-            cells be equal to the desired size passed by argument.
+        """ Deletes cells of the visible_sprites dictionary until the quatity
+            of cells be equal to the desired size passed by argument.
             Also desubscribes the deleted cells from the Click event.
         """
 
-        actual_size = self.visible_cells.length()
+        actual_size = self.visible_positions.length()
         
         for _ in it.repeat(None, (actual_size[0] - desired_size[0])):
-            row = self.visible_cells.pop_row(-(self._switch))
-            self._change_cell_events(self.ed.remove, row)
+            row = self.visible_positions.pop_row(-(self._switch))
+            
+            self._change_cell_events(
+                self.ed.remove,
+                [self.visible_sprites[pos][0] for pos in row]
+                )
+
             self._switch = not self._switch
 
         for _ in it.repeat(None, (actual_size[1] - desired_size[1])):
-            column = self.visible_cells.pop_column(-self._switch)
-            self._change_cell_events(self.ed.remove, column)
+            column = self.visible_positions.pop_column(-self._switch)
+
+            self._change_cell_events(
+                self.ed.remove,
+                [self.visible_sprites[pos][0] for pos in column]
+                )
+
             self._switch = not self._switch
         
         self.origin = self._get_new_origin()
         
 
     def zoom_out(self, desired_length):
-        """ Adds cells of the visible_cells Matrix until the quatity of 
-            cells be equal to the desired size passed by argument.
+        """ Adds cells of the visible_sprites dictionary  until the quatity
+            of cells be equal to the desired size passed by argument.
             Also subscribes the cells to the Click event.
         """
 
-        actual_length = self.visible_cells.length()
+        actual_length = self.visible_positions.length()
         
-        first_pos = self.visible_cells.get_element((0,0))[1].get_position()
+        first_pos = self.visible_positions.get_element((0,0))
         estimated_origin = list(first_pos.get_index())
 
         if self._switch and actual_length != desired_length:            
@@ -147,30 +172,52 @@ class Camera:
             estimated_origin, desired_length
         )
         
-        self._change_cell_events(self.ed.remove, self.visible_cells)
-        self.world.complete_cells(
-            self.visible_cells, origin, desired_length
-        )
-        self._change_cell_events(self.ed.add, self.visible_cells)
+        cells = self.get_visible_cells()
+
+        sprites = self.world.complete_cells(
+            self, self.visible_positions, origin, desired_length
+            )
+
+        self.update_visible_sprites(sprites)
+
+        self._change_cell_events(
+            self.ed.add,
+            [sprite[0] for sprite in sprites.values()]
+            )
+
         self.origin = self._get_new_origin()
 
 
-    def refresh_cells(self):
-        """ Executes the refresh method of all cells in the visible 
-            cells Matrix in order to change they size.
+    def get_visible_cells(self):
+        return [self.visible_sprites[pos][0] for pos in self.visible_sprites]
+
+    
+    def update_visible_sprites(self, sprites: dict):
+        """ Receives: dict{Position: list[Sprite]}
         """
 
-        for cell in self.visible_cells:
-            cell[1].refresh()
+        self.visible_sprites |= sprites
+
+
+    def refresh_sprites(self):
+        """ Executes the refresh method of all sprites in the visible_sprites
+            dictionary in order to change they size.
+        """
+        
+        [[
+            sprite.refresh() 
+            for sprite in self.visible_sprites[pos]
+            ]for pos in self.visible_sprites
+        ]
 
 
     def point(self, chunk, position):
+
         """ Receives a Position and its Chunk and centers them on screen.
         """
 
-        if self.visible_cells: 
-            self._change_cell_events(self.ed.remove, self.visible_cells)
-
+        if self.visible_positions: 
+            self._change_cell_events(self.ed.remove, self.get_visible_cells())
 
         actual_length = self._calculate_length(CellSprite.get_actual_size())
         
@@ -179,27 +226,22 @@ class Camera:
         estimated_origin[1] -=  (actual_length[1]-1)//2
 
         origin = self.world.validate_origin(estimated_origin, actual_length)
-        area_in_chunk = origin[0].verify_area(origin[1], actual_length)
+        self.visible_positions = origin[0].verify_area(origin[1], actual_length)
 
-        cells = self.world.get_cells(area_in_chunk)
-        self.world.complete_cells(cells, origin, actual_length)
-
-        chunks = set([chunk[0] for chunk in cells])
-        for chunk in chunks:
-            self.world.render_adjacent_chunks(self, set([chunk]))
-
-        self.set_visible_chunks(chunks)
-        self.visible_cells = cells
-        self._change_cell_events(self.ed.add, cells)
-        self.origin = self._get_new_origin()
-
-
-
-    def set_visible_chunks(self, chunks):
-        """ Replace the list of visible chunks for a new one. 
-        """
+        new_sprites = self.world.get_cells(self.visible_positions)
         
-        self.visible_chunks = chunks
+        sprites = self.world.complete_cells(
+            self, self.visible_positions, origin, actual_length
+            )
+
+        new_sprites |= sprites
+        self.visible_sprites |= new_sprites
+
+        self._change_cell_events(
+            self.ed.add, [sprite[0] for sprite in new_sprites.values()]
+            )
+            
+        self.origin = self._get_new_origin()
 
 
     def _change_cell_events(self, method, cells):
@@ -208,7 +250,7 @@ class Camera:
         """
 
         for cell in cells:
-            method(Click, cell[1].handle_collisions)
+            method(Click, cell.handle_collisions)
 
 
     def _get_new_origin(self):
@@ -219,7 +261,7 @@ class Camera:
 
         resolution = self.window.get_resolution()
         cell_size = CellSprite.get_actual_size()
-        length = self.visible_cells.length()
+        length = self.visible_positions.length()
 
         margins = (
             resolution[0] - (length[1] * cell_size),

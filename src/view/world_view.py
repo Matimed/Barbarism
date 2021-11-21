@@ -14,7 +14,7 @@ class WorldView:
 
         self.window = window
 
-        self.renderized_objects = dict()
+        self.renderized_sprites = dict() # dic{key: position, value: object(Sprite)}
         self.renderized_chunks = Graph()
 
         CellSprite.set_size(CellSprite.get_min_size())
@@ -47,57 +47,33 @@ class WorldView:
 
 
     def remove_chunks(self, chunks: list):
-        """ Removes a chunk from the    renderized_chunks
-            Graph and the renderized_objects dictionary.
+        """ Removes a chunk from the renderized_chunks
+            Graph and the renderized_sprites dictionary.
         """
 
         for chunk in chunks:
             self.renderized_chunks.remove_node(chunk)
-            self.renderized_objects.pop(chunk)
+            [self.renderized_sprites.pop(pos) for pos in chunk]
 
 
-    def get_renderized_objects(self, chunk) -> list:
+    def get_renderized_sprites(self, positions) -> list:
         """ Returns the list of renderized objects for a given Chunk.
         """
 
-        return self.renderized_objects[chunk]
-
-    
-    def get_cells(self, positions:Matrix) -> Matrix:
-        """ It receives a Matrix of tuples that indicates 
-            the positions and chunks in which they are found and 
-            returns a Matrix of CellSprite objects with all 
-            the requested positions.
-
-            Recives:
-                positions:  Matrix[tuple[Chunk, Position]]
-        """
-
-        chunks = set([element[0] for element in positions])
-        cells = positions.copy()
-        for chunk in chunks:
-            cells_in_chunk = self.renderized_objects[chunk][0]
-            for element in positions:
-                if element[0] == chunk:
-                    position_index = chunk.get_position_index(element[1])
-                    cell = cells_in_chunk.get_element(position_index)
-                    cell_index  = positions.index(element)
-                    cells.set_element(cell_index, [chunk, cell])
-
-        return cells
+        return [self.renderized_sprites[pos] for pos in positions]
 
 
-    def get_cells_by_list(self, positions: list):
-        """ Receives a list of positions (Chunk, Position) and 
-            returns the corresponding CellSprite list.
+    def get_cells(self, positions: iter):
+        """ Receives an iterable of positions and returns the cells in it.
         """
         
         # We use list comprehension in this case because
         # even if the procedure is less clear, it increases performance. 
 
-        return [(element[0],cell) for element in positions 
-            for cell in self.renderized_objects[element[0]][0] 
-            if cell.get_position() == element[1]]
+        return {
+            position: self.renderized_sprites[position]
+            for position in positions
+            }
 
 
     def validate_origin(self, origin: tuple, length: tuple) -> tuple[Chunk, Position]:
@@ -114,136 +90,176 @@ class WorldView:
         while (origin[1] + length[1]-1) > limit[1]: origin[1] -= 1
 
         return self.world_model.get_position(origin)
-
-
-    def complete_cells(self, cells: Matrix, origin: Position, desired_length: tuple):
-        """ It receives a Matrix of cells (Chunk, CellSprite), 
-            a Position of origin and a desired length and
-            mutates the matrix to the given length and
-            containing all the remaining cells.
-        """
-
-        while cells.length() != desired_length:
-
-            first_position = cells.get_element((0,0))[1].get_position()
-            if first_position != origin[1]:
-                
-                if  first_position.get_index()[0] > origin[1].get_index()[0]:
-                    
-                    last_cells = cells.get_row(0)
-                    new_cells = self._find_parallel_cells(last_cells, 0, -1)
-                    cells.insert_row(0, new_cells)
-                
-                elif first_position.get_index()[1] > origin[1].get_index()[1]:
-                    
-                    last_cells = cells.get_column(0)
-                    new_cells = self._find_parallel_cells(last_cells, 1, -1)
-                    cells.insert_column(0, new_cells)
-
-            elif cells.length()[0] < desired_length[0]:
-
-                last_cells = cells.get_row(cells.get_last_index()[0])
-                new_cells = self._find_parallel_cells(last_cells, 0, 1)
-                cells.append_row(new_cells)
-
-            elif cells.length()[1] < desired_length[1]:
-
-                last_cells = cells.get_column(cells.get_last_index()[1])
-                new_cells = self._find_parallel_cells(last_cells, 1, 1)
-                cells.append_column(new_cells)
-
     
 
-    def replace_cells(self, subscriber, cells: Matrix, origin: Position):
-        """ It receives a Matrix of cells and mutates it
+    def complete_cells(self, subscriber, positions: Matrix, origin: Position, desired_length: tuple):
+        """ It receives a subscriber, a Matrix of Position objects, 
+            a Position of origin and a desired length. 
+            And mutates the matrix to the given length and
+            containing all the remaining positions.
+        """
+
+        new_sprites = dict()
+        chunks = set()
+        while positions.length() != desired_length:
+            first_position = positions.get_element((0,0))
+
+            if first_position != origin[1]:
+
+                if  first_position.get_index()[0] > origin[1].get_index()[0]:
+                    last_positions = positions.get_row(0)
+                    new_chunks, new_positions = self._find_parallel_positions(
+                        last_positions, 0, -1
+                        )
+
+                    positions.insert_row(0, new_positions)
+                
+                elif first_position.get_index()[1] > origin[1].get_index()[1]:
+                    last_positions = positions.get_column(0)
+                    new_chunks, new_positions = self._find_parallel_positions(
+                        last_positions, 1, -1
+                        )
+
+                    positions.insert_column(0, new_positions)
+
+            elif positions.length()[0] < desired_length[0]:
+                last_positions = positions.get_row(
+                    positions.get_last_index()[0]
+                    )
+
+                new_chunks, new_positions = self._find_parallel_positions(
+                    last_positions, 0, 1
+                    )
+
+                positions.append_row(new_positions)
+
+            elif positions.length()[1] < desired_length[1]:
+                last_positions = positions.get_column(
+                    positions.get_last_index()[1]
+                    )
+
+                new_chunks, new_positions = self._find_parallel_positions(
+                    last_positions, 1, 1
+                    )
+
+                positions.append_column(new_positions)
+
+            chunks |= new_chunks
+            new_sprites |= self.get_cells(new_positions)
+            
+        self.render_adjacent_chunks(subscriber, chunks)
+        
+        return new_sprites
+
+
+    def replace_cells(self, subscriber, positions: Matrix, origin: Position):
+        """ It receives a Matrix of positions that mutates it 
             until the first element of this matrix is the origin.
             It also renders the Chunks adjacent to all those it passes through
             (for that the subscriber is needed).
         """
 
         origin_index = origin[1].get_index()
-        first_pos = cells.get_element((0,0))[1].get_position()
+        first_pos = positions.get_element((0,0))
         first_pos_index = first_pos.get_index()
+
+        chunks = set()
+        new_sprites = dict()
+        removed_sprites = dict()
 
         while origin_index != first_pos_index:
 
             if  first_pos_index[0] > origin_index[0]:
-                
-                last_cells = cells.get_row(0)
-                new_cells = self._find_parallel_cells(last_cells, 0, -1)
-                cells.insert_row(0, new_cells)
-                cells.pop_row(cells.get_last_index()[0])
+                last_positions = positions.get_row(0)
+                new_chunks, new_positions = self._find_parallel_positions(
+                    last_positions, 0, -1
+                    )
+
+                positions.insert_row(0, new_positions)
+                removed_positions = positions.pop_row(
+                    positions.get_last_index()[0]
+                    )
 
             elif first_pos_index[1] > origin_index[1]:
-                
-                last_cells = cells.get_column(0)
-                new_cells = self._find_parallel_cells(last_cells, 1, -1)
-                cells.insert_column(0, new_cells)
-                cells.pop_column(cells.get_last_index()[1])
+                last_positions = positions.get_column(0)
+                new_chunks, new_positions = self._find_parallel_positions(
+                    last_positions, 1, -1
+                    )
+
+                positions.insert_column(0, new_positions)
+                removed_positions = positions.pop_column(
+                    positions.get_last_index()[1]
+                    )
 
             elif first_pos_index[0] < origin_index[0]:
+                last_positions = positions.get_row(
+                    positions.get_last_index()[0]
+                    )
 
-                last_cells = cells.get_row(cells.get_last_index()[0])
-                new_cells = self._find_parallel_cells(last_cells, 0, 1)
-                cells.append_row(new_cells)
-                cells.pop_row(cells.get_first_index()[0])
+                new_chunks, new_positions = self._find_parallel_positions(
+                    last_positions, 0, 1
+                    )
+                    
+                positions.append_row(new_positions)
+                removed_positions = positions.pop_row(
+                    positions.get_first_index()[0]
+                    )
                 
             elif first_pos_index[1] < origin_index[1]:
+                last_positions = positions.get_column(
+                    positions.get_last_index()[1]
+                    )
 
-                last_cells = cells.get_column(cells.get_last_index()[1])
-                new_cells = self._find_parallel_cells(last_cells, 1, 1)
-                cells.append_column(new_cells)
-                cells.pop_column(cells.get_first_index()[1])
+                new_chunks, new_positions = self._find_parallel_positions(
+                    last_positions, 1, 1
+                    )
+
+                positions.append_column(new_positions)
+                removed_positions = positions.pop_column(
+                    positions.get_first_index()[1]
+                    )
 
             else: return False
 
-            first_pos = cells.get_element((0,0))[1].get_position()
+            first_pos = positions.get_element((0,0))
             first_pos_index = first_pos.get_index()
             
-            chunks = set([element[0] for element in new_cells])
-            self.render_adjacent_chunks(subscriber, chunks)
+            chunks |= new_chunks
+            new_sprites |= self.get_cells(new_positions)
+            removed_sprites |= self.get_cells(removed_positions)
+
+        self.render_adjacent_chunks(subscriber, chunks)
+
+        return new_sprites, removed_sprites
 
 
-    def _find_parallel_cells(self, cells:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
+    def _find_parallel_positions(self, positions:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
         """ Returns a list of composed tuples of Chunk and position
             with the row/column after/before the one passed by parameter.
         """
         
         new_positions = []
-        for element in cells:
-            position_index  = list(element[1].get_position().get_index())
+        new_chunks = set()
+
+        for position in positions:
+            position_index  = list(position.get_index())
             position_index[axis] += difference
 
-            position = self.world_model.get_position_by_chunk(
-                position_index, element[0].get_index()
-            )
+            position = self.world_model.get_position(position_index)
 
-            if not position:
-                chunk_index = list(element[0].get_index())
-                chunk_index[axis] += difference
-                position = self.world_model.get_position_by_chunk(
-                    position_index,chunk_index
-                )
+            new_positions.append(position[1])
+            new_chunks.add(position[0])
 
-                if not position: return False
-            
-
-            new_positions.append(position)
+        return new_chunks, new_positions
 
 
-        return self.get_cells_by_list(new_positions)
-
-
-    def _render_cells(self, chunk):
-        """ Receive a Chunk and render the suitable CellSprite objects Matrix.
+    def _render_cells(self, positions):
+        """ Receive positions and adds the corresponding CellSprites
+            to the renderized objects dictionary.
         """
 
-        renderized_cells = Matrix([[CellSprite(position) 
-            for position in row] for row in chunk.copy_matrix().iter_rows()])
-        
-        
-
-        self.renderized_objects.setdefault(
-            chunk, list()
-            ).append(renderized_cells)
-
+        [
+            self.renderized_sprites.setdefault(
+                position, list()
+                ).append(CellSprite(position)) for position in positions
+        ]
