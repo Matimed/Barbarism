@@ -65,7 +65,7 @@ class Camera:
         estimated_origin[1] += event.get_x()
                         
         actual_length = self.visible_positions.length()
-        origin = self.world.validate_origin(estimated_origin, actual_length)
+        origin = self.world.validate_origin(estimated_origin, actual_length)[1]
 
         new_sprites, removed_sprites = self.world.replace_cells(
             self, self.visible_positions, origin
@@ -162,9 +162,7 @@ class Camera:
 
             self._switch = not self._switch
                         
-        origin = self.world.validate_origin(
-            estimated_origin, desired_length
-        )
+        origin = self.world.validate_origin(estimated_origin, desired_length)[1]
 
         sprites = self.world.complete_cells(
             self, self.visible_positions, origin, desired_length
@@ -215,7 +213,7 @@ class Camera:
         new_sprites = self.world.get_cells(self.visible_positions)
         
         sprites = self.world.complete_cells(
-            self, self.visible_positions, origin, actual_length
+            self, self.visible_positions, origin[1], actual_length
             )
 
         new_sprites |= sprites

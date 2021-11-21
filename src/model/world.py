@@ -17,7 +17,7 @@ class World:
         self.cells: dict = self._generate_cells(self.positions)
 
 
-    def get_position(self, position_index):
+    def get_position(self, position_index) -> (Chunk,Position):
         """ Returns the chunk and position 
             object that match with the given position index.
         """

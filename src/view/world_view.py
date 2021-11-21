@@ -70,13 +70,13 @@ class WorldView:
             }
 
 
-    def validate_origin(self, origin: tuple, length: tuple) -> tuple[Chunk, Position]:
+    def validate_origin(self, origin: tuple, length: tuple) -> (Chunk, Position):
         """ Given an origin point and a length of Matrix, 
             it returns the closest valid Position and its Chunk 
             (or the same one passed by parameter if it is valid).
         """
 
-        limit = list(self.world_model.get_limit().get_index())
+        limit = self.world_model.get_limit()
         while origin[0] < 0: origin[0] += 1
         while origin[1] < 0: origin[1] +=1
 
@@ -91,6 +91,8 @@ class WorldView:
             a Position of origin and a desired length. 
             And mutates the matrix to the given length and
             containing all the remaining positions.
+            It also renders the Chunks adjacent to all those it passes through
+            (for that the subscriber is needed).
         """
 
         new_sprites = dict()
@@ -98,9 +100,9 @@ class WorldView:
         while positions.length() != desired_length:
             first_position = positions.get_element((0,0))
 
-            if first_position != origin[1]:
+            if first_position != origin:
 
-                if  first_position.get_index()[0] > origin[1].get_index()[0]:
+                if  first_position[0] > origin[0]:
                     last_positions = positions.get_row(0)
                     new_chunks, new_positions = self._find_parallel_positions(
                         last_positions, 0, -1
@@ -108,7 +110,7 @@ class WorldView:
 
                     positions.insert_row(0, new_positions)
                 
-                elif first_position.get_index()[1] > origin[1].get_index()[1]:
+                elif first_position[1] > origin[1]:
                     last_positions = positions.get_column(0)
                     new_chunks, new_positions = self._find_parallel_positions(
                         last_positions, 1, -1
@@ -130,11 +132,11 @@ class WorldView:
             elif positions.length()[1] < desired_length[1]:
                 last_positions = positions.get_column(
                     positions.get_last_index()[1]
-                    )
+                )
 
                 new_chunks, new_positions = self._find_parallel_positions(
                     last_positions, 1, 1
-                    )
+                )
 
                 positions.append_column(new_positions)
 
@@ -153,17 +155,15 @@ class WorldView:
             (for that the subscriber is needed).
         """
 
-        origin_index = origin[1].get_index()
-        first_pos = positions.get_element((0,0))
-        first_pos_index = first_pos.get_index()
+        first_position = positions.get_element((0,0))
 
         chunks = set()
         new_sprites = dict()
         removed_sprites = dict()
 
-        while origin_index != first_pos_index:
+        while origin != first_position:
 
-            if  first_pos_index[0] > origin_index[0]:
+            if  first_position[0] > origin[0]:
                 last_positions = positions.get_row(0)
                 new_chunks, new_positions = self._find_parallel_positions(
                     last_positions, 0, -1
@@ -174,7 +174,7 @@ class WorldView:
                     positions.get_last_index()[0]
                     )
 
-            elif first_pos_index[1] > origin_index[1]:
+            elif first_position[1] > origin[1]:
                 last_positions = positions.get_column(0)
                 new_chunks, new_positions = self._find_parallel_positions(
                     last_positions, 1, -1
@@ -185,7 +185,7 @@ class WorldView:
                     positions.get_last_index()[1]
                     )
 
-            elif first_pos_index[0] < origin_index[0]:
+            elif first_position[0] < origin[0]:
                 last_positions = positions.get_row(
                     positions.get_last_index()[0]
                     )
@@ -199,7 +199,7 @@ class WorldView:
                     positions.get_first_index()[0]
                     )
                 
-            elif first_pos_index[1] < origin_index[1]:
+            elif first_position[1] < origin[1]:
                 last_positions = positions.get_column(
                     positions.get_last_index()[1]
                     )
@@ -214,9 +214,6 @@ class WorldView:
                     )
 
             else: return False
-
-            first_pos = positions.get_element((0,0))
-            first_pos_index = first_pos.get_index()
             
             chunks |= new_chunks
             new_sprites |= self.get_cells(new_positions)

@@ -33,8 +33,13 @@ class Position:
         return (self.y, self.x)
 
 
-    def __hash__(self):
-        return hash((self.y, self.x))
+    def __hash__(self): return hash((self.y, self.x))
+
+
+    def __repr__(self): return f"({self.y}, {self.x})"
+
+
+    def __getitem__(self, i): return list(self.get_index())[i]
 
 
     def __eq__(self, other):
@@ -48,6 +53,3 @@ class Position:
             return False
 
         return self.get_index() == other_get_index()
-
-    def __repr__(self):
-        return f"({self.y}, {self.x})"
