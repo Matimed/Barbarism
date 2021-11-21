@@ -186,7 +186,7 @@ class Camera:
 
         chunks = set([chunk[0] for chunk in cells])
         for chunk in chunks:
-            self.world.render_adjacent_chunks(self, chunk)
+            self.world.render_adjacent_chunks(self, set([chunk]))
 
         self.set_visible_chunks(chunks)
         self.visible_cells = cells

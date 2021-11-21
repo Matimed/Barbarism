@@ -105,3 +105,7 @@ class CellSprite(pg.sprite.Sprite):
 
     
     def get_position(self): return self.position
+
+
+    def __hash__(self):
+        return hash(self.position)

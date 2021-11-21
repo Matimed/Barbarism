@@ -1,4 +1,3 @@
-from pygame.sprite import AbstractGroup
 from src.view.sprites import CellSprite
 from src.events import Tick
 from lib.abstract_data_types import Matrix
@@ -26,18 +25,25 @@ class WorldView:
         """ Receives a Chunk and its subscriber(any object) and render it.
         """
 
-        self.renderized_chunks.add_edge((subscriber, chunk))
-        self._render_cells(chunk)
+        if not self.renderized_chunks.has_node(chunk):
+            self.renderized_chunks.add_edge((subscriber, chunk))
+            self._render_cells(chunk)
 
 
-    def render_adjacent_chunks(self, subscriber, chunk):
-        """ Receives a Chunk and its subscriber (any object)
-            and render the Chunk and all its neighbors.
+    def render_adjacent_chunks(self, subscriber, chunks:set):
+        """ Receives a list of Chunks and its subscriber (any object)
+            and render the Chunks and all its neighbors.
         """
+    
+        adyacent_chunks = chunks.copy()
+        for chunk in chunks:
+            adyacent_chunks |= set([
+                adyacent_chunk for adyacent_chunk 
+                in self.world_model.get_adjacent_chunks(chunk)
+            ])
 
-        self.render_chunk(subscriber, chunk)
-        for node in self.world_model.get_adjacent_chunks(chunk):
-            self.render_chunk(subscriber, node)
+        [self.render_chunk(subscriber, chunk) for chunk in adyacent_chunks]
+
 
 
     def remove_chunks(self, chunks: list):
@@ -158,7 +164,7 @@ class WorldView:
         origin_index = origin[1].get_index()
         first_pos = cells.get_element((0,0))[1].get_position()
         first_pos_index = first_pos.get_index()
-        
+
         while origin_index != first_pos_index:
 
             if  first_pos_index[0] > origin_index[0]:
@@ -190,12 +196,12 @@ class WorldView:
                 cells.pop_column(cells.get_first_index()[1])
 
             else: return False
-            
+
             first_pos = cells.get_element((0,0))[1].get_position()
             first_pos_index = first_pos.get_index()
             
-            [self.render_adjacent_chunks(subscriber, chunk[0]) 
-                for chunk in new_cells]
+            chunks = set([element[0] for element in new_cells])
+            self.render_adjacent_chunks(subscriber, chunks)
 
 
     def _find_parallel_cells(self, cells:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:

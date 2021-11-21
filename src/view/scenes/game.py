@@ -33,7 +33,7 @@ class Game(Scene):
 
         self.world_view.render_adjacent_chunks(
             Founder(),
-            spawn_point[0]
+            set([spawn_point[0]])
             )
 
         self.camera = Camera(
