@@ -128,7 +128,7 @@ class Chunk:
             
             for column in range(origin[1], area[1]+origin[1]):
                 try:
-                    verify_row.append((self, self.positions.get_element((row,column))))
+                    verify_row.append(self.positions.get_element((row,column)))
 
                 except IndexError:
                     continue

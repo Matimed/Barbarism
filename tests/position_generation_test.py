@@ -67,7 +67,7 @@ def _generate_chunks(min_size:int, order, positions):
 
 
 def _generate_cells(positions):
-    """ Recives a Matrix of Position type objects and
+    """ Receives a Matrix of Position type objects and
         generate a dict of Cell type objects with a position as key.
     """
     

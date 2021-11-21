@@ -46,7 +46,7 @@ class Window:
 
 
     def create_resolution(self, scale):
-        """ Recives:
+        """ Receives:
                 scale:<int>
             Returns:
                 resolution:<tuple> scaled native resolution.
@@ -63,7 +63,7 @@ class Window:
     def fit_screen(self, scale, flags = 0):
         """ Change the display size to other scale.
             
-            Recives:
+            Receives:
                 scale:<int> new scale
                 flags:<int> pygame enum.
         """
@@ -95,7 +95,7 @@ class Window:
     def set_background(self, color=(0,0,0)):
         """ Change the color of the display background.
             
-            Recives:
+            Receives:
                 color:<tuple>
         """
 

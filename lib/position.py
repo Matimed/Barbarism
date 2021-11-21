@@ -19,7 +19,7 @@ class Position:
         assert type(first_position[1]) == int and type(last_position[1]) == int, \
             "'x' must be an int."
 
-        return [[(Position(y, x)) 
+        return [[Position(y, x) 
             for x in range(first_position[1], last_position[1] + 1)]
                 for y in range(first_position[0], last_position[0] + 1)]
     

@@ -15,7 +15,7 @@ class EventDispatcher:
     def add(self, eventcls, listener):
         """ Suscribes a listener to an specific Event class.
 
-            Recives:
+            Receives:
                 eventcls:<Event.__class__>
                 listener:<BoundMethod>
         """
@@ -36,7 +36,7 @@ class EventDispatcher:
     def post(self, event):
         """ Sends an event instance to their suscribers.
 
-                Recives:
+                Receives:
                     event:<Event>
         """
 

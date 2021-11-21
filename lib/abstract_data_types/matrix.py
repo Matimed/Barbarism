@@ -193,8 +193,8 @@ class Matrix:
 
 
     def get_next_index(self, index:tuple):
-        """ Recives an index and return the next one 
-            and if recives None returns (0,0).
+        """ Receives an index and return the next one 
+            and if receives None returns (0,0).
         """
 
         if index == None: return (0,0)
@@ -423,7 +423,7 @@ class Matrix:
         """ Return the next element in the sequence.
         """
 
-        if self.length() == (0,0): raise StopIteration()
+        if self.length() == (0,0): raise StopIteration
 
         # One is subtracted from the length 
         # because the index starts counting from (0,0).
@@ -431,7 +431,7 @@ class Matrix:
             iteration_max = (self.length()[0] -1 ,self.length()[1] - 1)
 
         except: 
-            raise StopIteration()
+            raise StopIteration
         
         if self.iteration_index == iteration_max:
             raise StopIteration

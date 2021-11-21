@@ -113,7 +113,7 @@ class World:
 
 
     def _generate_cells(self, positions):
-        """ Recives a Matrix of Position type objects and
+        """ Receives a Matrix of Position type objects and
             generate a dict of Cell type objects with a position as key.
         """
         
