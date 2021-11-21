@@ -12,38 +12,38 @@ class Matrix:
 
     @staticmethod
     @ft.lru_cache(maxsize=None)
-    def factorize(number):
+    def decompose(number):
         """ Returns the list of prime numbers 
             in which the given number can be decomposed. 
         """
 
-        factoring = [int(number)]
+        factors = [int(number)]
         while True:
 
-            factorized_factors=list()
-            for factor in factoring:
+            decomposed_factors=list()
+            for factor in factors:
 
                 residing = int(factor**(1/2))
                 for n in range(residing, 1, -1):
 
                     if factor % n == 0:
-                        factorized_factors.extend([n, factor // n])
+                        decomposed_factors.extend([n, factor // n])
                         break
 
-                else: factorized_factors.append(int(factor))
+                else: decomposed_factors.append(int(factor))
                 
-            if factoring == factorized_factors: return factoring
+            if factors == decomposed_factors: return factors
 
-            factoring = factorized_factors
+            factors = decomposed_factors
 
 
     @staticmethod
     @ft.lru_cache(maxsize=None)
     def get_divisors(number):
-        """ Returns a list of all natural divisors of a given number.
+        """ Returns a set of all prime divisors of a given number.
         """
 
-        factors = list(Matrix.factorize(number))
+        factors = list(Matrix.decompose(number))
         combinations = set()
 
         for i in range(0,len(factors)+1):

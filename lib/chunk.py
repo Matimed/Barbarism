@@ -130,7 +130,7 @@ class Chunk:
                 try:
                     verify_row.append((self, self.positions.get_element((row,column))))
 
-                except AssertionError:
+                except IndexError:
                     continue
             
             if verify_row: verify_matrix.append_row(verify_row)
