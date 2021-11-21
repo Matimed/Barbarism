@@ -1,9 +1,9 @@
-from src.view.scenes import Scene
-from src.view.scenes import MainMenu
-from src.view.scenes import Game
-from src.events import EndScene
 from src.events import BackMenu
+from src.events import EndScene
 from src.events import GameStart
+from src.view.scenes import Game
+from src.view.scenes import MainMenu
+from src.view.scenes import Scene
 
 
 class SceneManager:

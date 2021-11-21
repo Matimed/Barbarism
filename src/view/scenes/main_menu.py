@@ -1,5 +1,5 @@
-from src.events import Tick
 from src.events import EndScene
+from src.events import Tick
 from src.view.scenes import Scene
 
 

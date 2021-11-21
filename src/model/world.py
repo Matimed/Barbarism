@@ -1,8 +1,8 @@
-from src.model import Cell
-from lib.position import Position
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
+from lib.position import Position
 from random import choice
+from src.model import Cell
 
 
 class World:

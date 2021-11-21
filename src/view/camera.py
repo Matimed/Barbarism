@@ -1,10 +1,10 @@
-from src.view.sprites import CellSprite
+import itertools as it
+from lib.abstract_data_types import Matrix
+from src.events import ArrowKey
+from src.events import Click
 from src.events import Tick
 from src.events import Wheel
-from src.events import ArrowKey
-from lib.abstract_data_types import Matrix
-from src.events import Click
-import itertools as it
+from src.view.sprites import CellSprite
 
 
 class Camera:

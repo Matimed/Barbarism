@@ -1,9 +1,9 @@
-from src.events import Tick
-from src.events import Quit
-from src.events import Click
-from src.events import Wheel
-from src.events import ArrowKey
 import pygame as pg
+from src.events import ArrowKey
+from src.events import Click
+from src.events import Quit
+from src.events import Tick
+from src.events import Wheel
 
 
 class PygameController:

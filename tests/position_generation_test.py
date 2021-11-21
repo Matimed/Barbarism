@@ -1,9 +1,9 @@
-from time import time
 from functools import reduce
+from time import time
 from src.model import Cell
 from lib.abstract_data_types.matrix import Matrix
-from lib.position import Position
 from lib.chunk import Chunk
+from lib.position import Position
 
 def generate(order):
     with open('tests/position_generation.log', 'a') as log:

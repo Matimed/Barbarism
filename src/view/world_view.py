@@ -1,9 +1,9 @@
-from src.view.sprites import CellSprite
-from src.events import Tick
 from lib.abstract_data_types import Matrix
 from lib.abstract_data_types import Graph
 from lib.chunk import Chunk
 from lib.position import Position
+from src.events import Tick
+from src.view.sprites import CellSprite
 
 
 class WorldView:

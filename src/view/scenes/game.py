@@ -1,7 +1,7 @@
 from src.events import Tick
 from src.events import WorldGenerated
-from src.view.scenes import Scene
 from src.model.charactors import Founder
+from src.view.scenes import Scene
 
 
 class Game(Scene):

@@ -1,6 +1,6 @@
 import pygame as pg
-from src.events import Tick
 from src.events import CellPressed
+from src.events import Tick
 from src.view.references import CELL
 
 

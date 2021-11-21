@@ -1,8 +1,9 @@
+import functools as ft
+import itertools as it
+import random
+
 from typing import Any
 from typing import Union
-import itertools as it
-import functools as ft
-import random
 
 
 class Matrix:
@@ -214,7 +215,7 @@ class Matrix:
         """ Returns all the elements contiguous to the one 
             of the given index.
         """
-
+ 
         elements = []
         
         min_index = [0,0]
