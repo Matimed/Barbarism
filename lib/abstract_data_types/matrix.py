@@ -1,6 +1,7 @@
 from typing import Any
 from typing import Union
 import itertools as it
+import functools as ft
 import random
 
 
@@ -10,8 +11,10 @@ class Matrix:
     """
 
     @staticmethod
+    @ft.lru_cache(maxsize=None)
     def factorize(number):
-        """ Returns all the factors that make up the given number.
+        """ Returns the list of prime numbers 
+            in which the given number can be decomposed. 
         """
 
         factoring = [int(number)]
@@ -35,6 +38,7 @@ class Matrix:
 
 
     @staticmethod
+    @ft.lru_cache(maxsize=None)
     def get_divisors(number):
         """ Returns a list of all natural divisors of a given number.
         """
@@ -190,6 +194,7 @@ class Matrix:
             return (index[0], index[1] + 1)
 
 
+    @ft.lru_cache
     def get_adjacencies(self, index:tuple):
         """ Returns all the elements contiguous to the one 
             of the given index.
