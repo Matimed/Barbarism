@@ -2,9 +2,9 @@ from src.events import Event
 
 
 class WorldGenerated(Event):
-    def __init__(self, positions):
-        self.positions = positions
+    def __init__(self, world):
+        self.world = world
 
-    
-    def get_positions(self):
-        return self.positions
+
+    def get_world(self):
+        return self.world

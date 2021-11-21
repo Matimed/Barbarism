@@ -13,3 +13,10 @@ class WeakBoundMethod:
 
     def __call__(self, *args, **kwargs):
         self._func(self._self(), *args, **kwargs)
+
+
+    def __eq__(self, other):
+        try:
+            return self._func == other.__func__ and self._self == weakref.ref(other.__self__)
+        except:
+            return self._func == other._func and self._self == other._self

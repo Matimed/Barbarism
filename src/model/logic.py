@@ -1,9 +1,9 @@
-from src.model import Nation
-from src.model import Landlord
-from src.model import World 
+from lib.weak_bound_method import WeakBoundMethod as Wbm
 from src.events import GameStart
 from src.events import WorldGenerated
-from lib.weak_bound_method import WeakBoundMethod as Wbm
+from src.model import Landlord
+from src.model import Nation
+from src.model import World 
 
 
 class Logic:
@@ -19,7 +19,7 @@ class Logic:
         world = World()
         self.world = world
         Nation.world = world
-        self.ed.post(WorldGenerated(world.get_positions()))
+        self.ed.post(WorldGenerated(world))
 
 
     def _generate_nations(self):
@@ -29,7 +29,7 @@ class Logic:
         # We hardcoded... this should have a larger list of Nation and 
         # a better way to assing a Landlord to each one.
         nations = [ 
-            Nation(Landlord(input('Input landlord name: ')))
+            Nation(Landlord('Player'))
             ]
         
         return nations

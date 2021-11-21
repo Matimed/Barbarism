@@ -1,64 +1,55 @@
-from functools import singledispatchmethod
 
 
 class Position:
-    """ Coordanates system that uses an 'x' and 'y' notation 
+    """ Coordanates system that uses an 'y' and 'x' notation 
         to represent unequivocally a specific location that goes 
         universally for every object.
     """
 
-    def __init__(self, x, y):
-        """ Recives:
-                x:<int>
-                y:<int>
+    __slots__ = ('y', 'x')
+
+    @staticmethod
+    def create_collection(first_position: tuple, last_position: tuple):
+        """ Generates the postions between the passed two position index.
         """
-
-        self._format_verification(x, y)
         
-        self.x = x
+        assert type(last_position[0]) == int and type(first_position[0]) == int, \
+            "'y' must be an int."
+
+        assert type(first_position[1]) == int and type(last_position[1]) == int, \
+            "'x' must be an int."
+
+        return [[Position(y, x) 
+            for x in range(first_position[1], last_position[1] + 1)]
+                for y in range(first_position[0], last_position[0] + 1)]
+    
+
+    def __init__(self, y:int, x:int):
         self.y = y
+        self.x = x
 
 
-    def get_position(self):
-        return self.x, self.y
+    def get_index(self):
+        return (self.y, self.x)
 
 
-    @singledispatchmethod
+    def __hash__(self): return hash((self.y, self.x))
+
+
+    def __repr__(self): return f"({self.y}, {self.x})"
+
+
+    def __getitem__(self, i): return list(self.get_index())[i]
+
+
     def __eq__(self, other):
-        """ Uses the get_position method to equalize 
+        """ Uses the get_index method to equalize 
             both instannces of position
         """
 
         try:
-            other_get_position = other.get_position
+            other_get_index = other.get_index
         except AttributeError:
             return False
 
-        return self.get_position() == other_get_position()
-
-
-    @__eq__.register(tuple)
-    def _(self, other):
-        """ Uses get_position method to equalize an instance 
-            of position with a tuple.
-        """
-
-        assert len(other) == 2, ("Tuple that went through a parameter" 
-            + "must contain two elements.")
-
-        self._format_verification(other[0], other[1])
-
-        return (other[0], other[1]) == self.get_position()
-
-
-    def __hash__(self):
-        return hash((self.x, self.y))
-
-
-    def _format_verification(self, x, y):
-        assert type(x) == int, "'x' must be an int."
-        assert type(y) == int, "'y' must be an int."
-
-
-    def __repr__(self):
-        return f"({self.x}, {self.y})"
+        return self.get_index() == other_get_index()

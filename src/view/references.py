@@ -1,6 +1,6 @@
-import pygame
+import pygame as pg
 
 
 CELL = {
-    'plain':pygame.image.load('assets/graphics/plain.png').convert()
+    'plain':pg.image.load('assets/graphics/plain.png').convert()
 }

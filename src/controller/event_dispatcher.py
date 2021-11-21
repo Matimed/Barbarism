@@ -15,7 +15,7 @@ class EventDispatcher:
     def add(self, eventcls, listener):
         """ Suscribes a listener to an specific Event class.
 
-            Recives:
+            Receives:
                 eventcls:<Event.__class__>
                 listener:<BoundMethod>
         """
@@ -25,18 +25,21 @@ class EventDispatcher:
         # If the event is not in the dictionary, 
         # it is added and subscribed to by the listener.
         self.listeners.setdefault(eventcls, list()).append(listener)
-        
+
+    
+    def remove(self, eventcls, listener):
+        for l in self.listeners[eventcls]:
+            if l == listener:
+                self.listeners[eventcls].remove(l)
+
 
     def post(self, event):
         """ Sends an event instance to their suscribers.
 
-                Recives:
+                Receives:
                     event:<Event>
         """
 
-        try:
+        if self.listeners.get(event.get_class(), False):
             for listener in self.listeners[event.get_class()]:
                 listener(event)
-
-        except KeyError: #Event argument never added.
-            pass

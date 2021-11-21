@@ -1,27 +1,45 @@
 from src.events import Tick
 from src.events import WorldGenerated
+from src.model.charactors import Founder
 from src.view.scenes import Scene
 
 
 class Game(Scene):
     def __init__(self):
         super().__init__()
-        self.world = None
+        self.world_view = None
+        self.camera  = None
+
         ed = Scene.get_event_dispatcher()
-        ed.add(Tick,self.update)
         ed.add(WorldGenerated, self.generates_world_view)
+        ed.add(Tick, Scene.window.update)
 
 
     def generates_world_view(self, event):
         from src.view import WorldView
-        
-        self.world = WorldView(
-            self.get_event_dispatcher(),
-            event.get_positions()
+        from src.view import Camera
+
+        world = event.get_world()
+
+        self.world_view = WorldView(
+            Scene.get_event_dispatcher(),
+            world,
+            Scene.get_window()
             )
 
+        # Obtain the chunk and position where 
+        # the game will start to be seen.
+        spawn_point = world.generate_spawn_point()
 
-    def update(self, event):
-        if (self.world != None):
-            self.world.draw(Scene.get_window_sur())
-            Scene.get_window().update()
+        self.world_view.render_adjacent_chunks(
+            Founder(),
+            set([spawn_point[0]])
+            )
+
+        self.camera = Camera(
+            Scene.ed,
+            Scene.window,
+            self.world_view
+            )
+        
+        self.camera.point(spawn_point[0],spawn_point[1])
