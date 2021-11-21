@@ -9,21 +9,21 @@ def generate(order):
     with open('tests/position_generation.log', 'a') as log:
         print_log(file=log)
         print_log("-"*35, file=log)
-        print_log ("Atempt to generate "+ str(order) + " positions:", file = log)
+        print_log ("Atempt to generate "+ str(order) + " positions without mt:", file = log)
         print_log(file=log)
 
         start_time = time()
         positions = _generate_positions(order)
-        last_time = time() - start_time
-        print_log("Positions:   " +  seconds_to_str(last_time), file = log)
+        postions_time = time() - start_time
+        print_log("Positions:   " +  seconds_to_str(postions_time), file = log)
 
         chunks = _generate_chunks(25, order, positions)
-        last_time = time() - (start_time + last_time)
-        print_log("Chunks:      "+ seconds_to_str(last_time), file = log)
+        chunks_time = time() - (start_time + postions_time)
+        print_log("Chunks:      "+ seconds_to_str(chunks_time), file = log)
 
         cells = _generate_cells(positions)
-        last_time = time() - (start_time + last_time)
-        print_log("Cells:       "+ seconds_to_str(last_time) , file = log)
+        cells_time = time() - (start_time + chunks_time + postions_time)
+        print_log("Cells:       "+ seconds_to_str(cells_time) , file = log)
 
         print_log("Total:       "+ seconds_to_str(time() - start_time), file = log) 
         print_log("-"*35, file = log)
