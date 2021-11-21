@@ -3,6 +3,7 @@ from lib.abstract_data_types import Graph
 from lib.chunk import Chunk
 from lib.position import Position
 from src.events import Tick
+from src.view.references import Layer
 from src.view.sprites import CellSprite
 
 
@@ -14,7 +15,7 @@ class WorldView:
 
         self.window = window
 
-        self.renderized_sprites = dict() # dic{key: position, value: object(Sprite)}
+        self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
         self.renderized_chunks = Graph()
 
         CellSprite.set_size(CellSprite.get_min_size())
@@ -54,13 +55,6 @@ class WorldView:
         for chunk in chunks:
             self.renderized_chunks.remove_node(chunk)
             [self.renderized_sprites.pop(pos) for pos in chunk]
-
-
-    def get_renderized_sprites(self, positions) -> list:
-        """ Returns the list of renderized objects for a given Chunk.
-        """
-
-        return [self.renderized_sprites[pos] for pos in positions]
 
 
     def get_cells(self, positions: iter):
@@ -258,8 +252,7 @@ class WorldView:
             to the renderized objects dictionary.
         """
 
-        [
-            self.renderized_sprites.setdefault(
-                position, list()
-                ).append(CellSprite(position)) for position in positions
-        ]
+        self.renderized_sprites |= {
+            position: {Layer.CELL: CellSprite(position)} 
+            for position in positions
+            }

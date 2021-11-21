@@ -4,22 +4,23 @@ from src.events import ArrowKey
 from src.events import Click
 from src.events import Tick
 from src.events import Wheel
+from src.view.references import Layer
 from src.view.sprites import CellSprite
 
 
 class Camera:
     def __init__(self, event_dispatcher, window, world_view):
         self.ed = event_dispatcher
-        self.ed.add(Tick, self.draw)
+        self.ed.add(Tick, self.draw_cells)
         self.ed.add(ArrowKey, self.move)
         self.ed.add(Wheel, self.zoom)
 
         self.window = window
-
+        
         self.world = world_view
 
         self.visible_positions = Matrix()
-        self.visible_sprites = dict() # {Position: list[Sprite]}
+        self.visible_sprites = dict() # {Position: {Layer: Sprite}}
 
         self.origin = (0,0)
 
@@ -30,25 +31,25 @@ class Camera:
         self.max_length = self._calculate_length(CellSprite.get_min_size())
 
 
-    def draw(self, event):
+    def draw_cells(self, event):
         """ Loops through the CellSprites of visible_sprites and draw them. 
         """
 
-        previous_point = self.origin
+        last_p = self.origin # Last point.
 
         for row in self.visible_positions.iter_rows():
             for pos in row:
-                cell = self.visible_sprites[pos][0]
+                cell = self.visible_sprites[pos][Layer.CELL]
 
                 # We know that we are breaking OOP paradim
                 # when we access an argument directly but 
                 # this is neccesary because pygame does not have 
                 # a suitable method of accessing the rect attributes.
-                cell.rect.topleft = previous_point
-                previous_point = cell.rect.topright
+                cell.rect.topleft = last_p
+                last_p = cell.rect.topright
                 cell.draw(self.window.get_surface())
             
-            previous_point = self.visible_sprites[row[0]][0].rect.bottomleft
+            last_p = self.visible_sprites[row[0]][Layer.CELL].rect.bottomleft
 
 
     def move(self, event):
@@ -72,15 +73,8 @@ class Camera:
 
         self.visible_sprites |= new_sprites
 
-        self._change_cell_events(
-            self.ed.remove,
-            [sprite[0] for sprite in removed_sprites.values()]
-            )
-
-        self._change_cell_events(
-            self.ed.add,
-            [sprite[0] for sprite in new_sprites.values()]
-            )
+        self._change_sprite_events(self.ed.remove, removed_sprites)
+        self._change_sprite_events(self.ed.add, new_sprites)
 
         self.origin = self._get_new_origin()
         self.refresh_sprites()
@@ -130,9 +124,9 @@ class Camera:
         for _ in it.repeat(None, (actual_size[0] - desired_size[0])):
             row = self.visible_positions.pop_row(-(self._switch))
             
-            self._change_cell_events(
+            self._change_sprite_events(
                 self.ed.remove,
-                [self.visible_sprites[pos][0] for pos in row]
+                {pos: self.visible_sprites.pop(pos) for pos in row}
                 )
 
             self._switch = not self._switch
@@ -140,9 +134,9 @@ class Camera:
         for _ in it.repeat(None, (actual_size[1] - desired_size[1])):
             column = self.visible_positions.pop_column(-self._switch)
 
-            self._change_cell_events(
+            self._change_sprite_events(
                 self.ed.remove,
-                [self.visible_sprites[pos][0] for pos in column]
+                {pos: self.visible_sprites.pop(pos) for pos in column}
                 )
 
             self._switch = not self._switch
@@ -171,25 +165,15 @@ class Camera:
         origin = self.world.validate_origin(
             estimated_origin, desired_length
         )
-        
-        cells = self.get_visible_cells()
 
         sprites = self.world.complete_cells(
             self, self.visible_positions, origin, desired_length
             )
 
         self.update_visible_sprites(sprites)
-
-        self._change_cell_events(
-            self.ed.add,
-            [sprite[0] for sprite in sprites.values()]
-            )
+        self._change_sprite_events(self.ed.add, sprites)
 
         self.origin = self._get_new_origin()
-
-
-    def get_visible_cells(self):
-        return [self.visible_sprites[pos][0] for pos in self.visible_sprites]
 
     
     def update_visible_sprites(self, sprites: dict):
@@ -206,8 +190,8 @@ class Camera:
         
         [[
             sprite.refresh() 
-            for sprite in self.visible_sprites[pos]
-            ]for pos in self.visible_sprites
+            for sprite in dictionary.values()
+            ]for dictionary in self.visible_sprites.values()
         ]
 
 
@@ -217,7 +201,7 @@ class Camera:
         """
 
         if self.visible_positions: 
-            self._change_cell_events(self.ed.remove, self.get_visible_cells())
+            self._change_sprite_events(self.ed.remove, self.visible_sprites)
 
         actual_length = self._calculate_length(CellSprite.get_actual_size())
         
@@ -237,21 +221,22 @@ class Camera:
         new_sprites |= sprites
         self.visible_sprites |= new_sprites
 
-        self._change_cell_events(
-            self.ed.add, [sprite[0] for sprite in new_sprites.values()]
-            )
+        self._change_sprite_events(self.ed.add, new_sprites)
             
         self.origin = self._get_new_origin()
 
 
-    def _change_cell_events(self, method, cells):
+    def _change_sprite_events(self, dispatcher_method, sprites):
         """ It receives an event method from the EventDispatcher and 
             applies it to the entire set of given cells. 
         """
 
-        for cell in cells:
-            method(Click, cell.handle_collisions)
-
+        for dictionary in sprites.values():
+            for layer in dictionary:
+                if layer == Layer.CELL:
+                    dispatcher_method(Click, dictionary[layer].handle_collisions)
+                    
+            
 
     def _get_new_origin(self):
         """ Calculates and returns the point 
