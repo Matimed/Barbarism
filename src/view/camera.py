@@ -4,7 +4,7 @@ from src.events import ArrowKey
 from src.events import Click
 from src.events import Tick
 from src.events import Wheel
-from src.view.references import Layer
+from src.references import Layer
 from src.view.sprites import CellSprite
 
 

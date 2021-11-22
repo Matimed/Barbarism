@@ -3,7 +3,7 @@ from lib.abstract_data_types import Graph
 from lib.chunk import Chunk
 from lib.position import Position
 from src.events import Tick
-from src.view.references import Layer
+from src.references import Layer
 from src.view.sprites import CellSprite
 
 
@@ -226,7 +226,7 @@ class WorldView:
         return new_sprites, removed_sprites
 
 
-    def _find_parallel_positions(self, positions:list, axis:bool, difference: int) -> list[tuple[Chunk, Position]]:
+    def _find_parallel_positions(self, positions:list, axis:bool, difference: int) -> list[(Chunk, Position)]:
         """ Returns a list of composed tuples of Chunk and position
             with the row/column after/before the one passed by parameter.
         """
@@ -251,7 +251,9 @@ class WorldView:
             to the renderized objects dictionary.
         """
 
+        biomes = self.world_model.get_cells(positions)
+
         self.renderized_sprites |= {
-            position: {Layer.CELL: CellSprite(position)} 
+            position: {Layer.CELL: CellSprite(position, biomes[position])} 
             for position in positions
             }

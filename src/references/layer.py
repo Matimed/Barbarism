@@ -1,4 +1,5 @@
+from enum import auto
 from enum import IntEnum
 
 class Layer(IntEnum):
-    CELL = 0
+    CELL = auto()

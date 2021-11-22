@@ -2,7 +2,7 @@ from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
 from lib.position import Position
 from random import choice
-from src.model import Cell
+from src.references import Biome
 
 
 class World:
@@ -104,7 +104,7 @@ class World:
         """
         
             
-        return {position:Cell(friction = 1) for row in positions.iter_rows()
+        return {position:Biome.PLAIN for row in positions.iter_rows()
             for position in row}
 
 
@@ -116,4 +116,9 @@ class World:
         # In the future a more complex spawn method will be implemented.
         chunk = self.chunks.random()
         return (chunk, chunk.get_random_position())
+
+    
+    def get_cells(self, positions):
+        return {position:self.cells[position] for position in positions}
+        
         
