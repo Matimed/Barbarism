@@ -10,7 +10,7 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, size:tuple = (50,100), min_size:tuple = (10,20)):
+    def __init__(self, size:tuple = (55,100), min_size:tuple = (10,20)):
         self.size = size
         self.positions = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
@@ -104,11 +104,41 @@ class World:
         """ Receives an iterable of Position type objects and
             generate a dict of Biomes with a position as key.
         """
-        
-            
-        return {position:Biome.GRASS for row in positions.iter_rows()
-            for position in row}
 
+        # Biomes sorted by temperature order.
+        sorted_biomes = [
+            Biome.SNOW, Biome.TUNDRA, Biome.GRASS, Biome.SAVANNA, Biome.DESERT
+        ]
+
+        temperatures = list()
+        step = 1
+        i = 0
+        while True:
+            if i == len(sorted_biomes)-1: 
+                step = -1
+                temperatures.append(i)
+            temperatures.append(i)
+            i += step
+            if i == -1: break
+
+        
+        rows_quantity = positions.length()[0]
+        rows_per_zone = rows_quantity// len(temperatures)
+        cells = dict()
+
+        rows = positions.iter_rows()
+        for temperature in temperatures:
+            for i in range(rows_per_zone):
+                for position in next(rows):
+                    cells[position] = sorted_biomes[temperature]
+
+        
+        # Add snow to excess positions.
+        cells.update(
+            {position:sorted_biomes[0] for row in rows for position in row}
+        )
+
+        return cells
 
     def generate_spawn_point(self) -> (Chunk, Position):
         """ Returns a Chunk and a Position on that 
