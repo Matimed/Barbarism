@@ -3,6 +3,7 @@ from lib.chunk import Chunk
 from lib.position import Position
 from random import choice
 from src.model import Cell
+from src.references import Layer
 
 
 class World:
@@ -14,7 +15,8 @@ class World:
         self.order = order
         self.positions: Matrix = self._generate_positions(order)
         self.chunks: Matrix = self._generate_chunks(25, order, self.positions)
-        self.cells: dict = self._generate_cells(self.positions)
+        self.entities = dict() # {Position: {Layer: Object}}
+        self._generate_cells(self.positions)
 
 
     def get_position(self, position_index) -> (Chunk,Position):
@@ -81,6 +83,27 @@ class World:
         return Matrix(Position.create_collection((0,0), (order -1 ,order -1)))
 
 
+    def update_entities(self, position: Position, entities: set):
+        self.entities[position] |= entities
+
+
+    def add_entity(self, position, layer, entity):
+        self.entities[position][layer] = entity
+
+
+    def get_entities(self, positions: list):
+        entities = dict()
+
+        for position in positions:
+            entities |= {
+                position: {layer: self.entities[position][layer]}
+                for layer in self.entities[position]
+                if layer != Layer.CELL
+                }
+            
+        return entities
+
+
     def _generate_chunks(self, min_size:int, order, positions):
         """ Returns a Matrix of Chunk objects based on a given size 
             (the minimum number of cells that can fit in a Chunk).
@@ -104,11 +127,11 @@ class World:
         """
         
             
-        return {position:Cell(friction = 1) for row in positions.iter_rows()
+        self.entities |= {position: {Layer.CELL: Cell(friction = 1)} for row in positions.iter_rows()
             for position in row}
 
 
-    def generate_spawn_point(self) -> tuple[Chunk, Position]:
+    def get_random_point(self) -> (Chunk, Position):
         """ Returns a Chunk and a Position on that 
             chunk where to place a charactor.
         """
@@ -116,4 +139,3 @@ class World:
         # In the future a more complex spawn method will be implemented.
         chunk = self.chunks.random()
         return (chunk, chunk.get_random_position())
-        

@@ -21,6 +21,8 @@ class Game(Scene):
 
         world = event.get_world()
 
+        principal_founder = Founder()
+
         self.world_view = WorldView(
             Scene.get_event_dispatcher(),
             world,
@@ -32,7 +34,7 @@ class Game(Scene):
         spawn_point = world.generate_spawn_point()
 
         self.world_view.render_adjacent_chunks(
-            Founder(),
+            principal_founder,
             set([spawn_point[0]])
             )
 
