@@ -73,7 +73,7 @@ def _generate_cells(positions):
     """
     
         
-    return {position:Biome.PLAIN for row in positions.iter_rows() 
+    return {position:Biome.GRASS for row in positions.iter_rows() 
         for position in row}
 
 

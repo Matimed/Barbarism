@@ -46,7 +46,6 @@ class WorldView:
         [self.render_chunk(subscriber, chunk) for chunk in adyacent_chunks]
 
 
-
     def remove_chunks(self, chunks: list):
         """ Removes a chunk from the renderized_chunks
             Graph and the renderized_sprites dictionary.
@@ -246,7 +245,7 @@ class WorldView:
         return new_chunks, new_positions
 
 
-    def _render_cells(self, positions):
+    def _render_cells(self, positions:iter):
         """ Receive positions and adds the corresponding CellSprites
             to the renderized objects dictionary.
         """

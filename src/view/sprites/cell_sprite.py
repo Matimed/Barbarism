@@ -10,8 +10,7 @@ class CellSprite(pg.sprite.Sprite):
     min_size = 50
 
 
-    # Later we should use different images for each type of biome.
-    native_biomes = {Biome.PLAIN:CELL[Biome.PLAIN]}
+    native_biomes = {biome:CELL[biome] for biome in Biome}
     biomes = native_biomes.copy()
     
     # native_biomes keep the original size in order to 
@@ -51,7 +50,7 @@ class CellSprite(pg.sprite.Sprite):
         """ Returns the current height of the surface.
         """
 
-        return cls.biomes[Biome.PLAIN].get_size()[0]
+        return cls.biomes[Biome.GRASS].get_size()[0]
 
 
     @classmethod

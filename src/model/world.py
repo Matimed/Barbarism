@@ -25,20 +25,15 @@ class World:
         position = self.positions.get_element(position_index)
         length = Chunk.get_length()
 
-        chunk_index = (position_index[0] // (length[0]), position_index[1] // (length[1]))
+        chunk_index = (
+            position_index[0] // (length[0]), position_index[1] // (length[1])
+        )
+
         chunk = self.chunks.get_element(chunk_index)
 
         if not chunk.has(position): raise KeyError()
 
         return (chunk, position)
-
-
-    def get_biomes(self):
-        """ Return a dict of biomes with Positions
-            as keys based on self.cells.
-        """
-        
-        raise NotImplementedError
 
 
     def get_adjacent_chunks(self, chunk) -> list:
@@ -98,17 +93,17 @@ class World:
             for y, row in enumerate(splited_positions.iter_rows())])
 
 
-    def _generate_cells(self, positions):
-        """ Receives a Matrix of Position type objects and
-            generate a dict of Cell type objects with a position as key.
+    def _generate_cells(self, positions:iter) -> dict:
+        """ Receives an iterable of Position type objects and
+            generate a dict of Biomes with a position as key.
         """
         
             
-        return {position:Biome.PLAIN for row in positions.iter_rows()
+        return {position:Biome.GRASS for row in positions.iter_rows()
             for position in row}
 
 
-    def generate_spawn_point(self) -> tuple[Chunk, Position]:
+    def generate_spawn_point(self) -> (Chunk, Position):
         """ Returns a Chunk and a Position on that 
             chunk where to place a charactor.
         """
@@ -118,7 +113,11 @@ class World:
         return (chunk, chunk.get_random_position())
 
     
-    def get_cells(self, positions):
+    def get_cells(self, positions:iter):
+        """ Return a dict of biomes with Positions
+            as keys based on self.cells.
+        """
+
         return {position:self.cells[position] for position in positions}
         
         

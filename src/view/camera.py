@@ -73,7 +73,9 @@ class Camera:
 
         self.visible_sprites |= new_sprites
 
-        self._change_sprite_events(self.ed.remove, removed_sprites)
+        self._change_sprite_events(self.ed.remove, 
+            {pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
+        )
         self._change_sprite_events(self.ed.add, new_sprites)
 
         self.origin = self._get_new_origin()

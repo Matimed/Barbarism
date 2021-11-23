@@ -3,4 +3,11 @@ from enum import IntEnum
 
 
 class Biome(IntEnum):
-    PLAIN = auto()
+    DESERT = auto()
+    FLOWERED = auto()
+    GRASS = auto()
+    TUNDRA = auto()
+    OCEAN = auto()
+    SAVANNA = auto()
+    SNOW = auto()
+
