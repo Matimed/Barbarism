@@ -10,11 +10,11 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, order = 1000):
-        self.order = order
-        self.positions: Matrix = self._generate_positions(order)
-        self.chunks: Matrix = self._generate_chunks(25, order, self.positions)
-        self.cells: dict = self._generate_cells(self.positions)
+    def __init__(self, size:tuple = (50,100), min_size:tuple = (10,20)):
+        self.size = size
+        self.positions = self._generate_positions(size)
+        self.chunks= self._generate_chunks(min_size, size, self.positions)
+        self.cells = self._generate_cells(self.positions)
 
 
     def get_position(self, position_index) -> (Chunk,Position):
@@ -68,29 +68,36 @@ class World:
         return self.positions.get_element(index)
 
 
-    def _generate_positions(self, order):
+    def _generate_positions(self, size:tuple) -> Matrix:
         """ Generates a Matrix of Position type objects 
-            based on the given size (order).
+            based on the given size.
         """
 
-        return Matrix(Position.create_collection((0,0), (order -1 ,order -1)))
+        return Matrix(
+            Position.create_collection((0,0), (size[0] -1 ,size[1] -1))
+        )
 
 
-    def _generate_chunks(self, min_size:int, order, positions):
+    def _generate_chunks(self, min_size:tuple, size:tuple, positions:Matrix) -> Matrix:
         """ Returns a Matrix of Chunk objects based on a given size 
             (the minimum number of cells that can fit in a Chunk).
         """
 
-        size = min_size
-        while True:
-            if not (order%size):
-                break
-            size +=1
+        chunk_size = list(min_size)
+        for i in range(2):
+            while True:
+                if not (size[i]%chunk_size[i]):
+                    break
+                chunk_size[i] +=1
 
-        splited_positions = positions.split(order/size)
+        chunks_amount = (size[0] * size[1]) // (chunk_size[0] * chunk_size[1])
 
-        return Matrix([[Chunk(positions, (y,x)) for x, positions in enumerate(row)]
-            for y, row in enumerate(splited_positions.iter_rows())])
+        splited_positions = positions.split(chunks_amount)
+
+        return Matrix(
+            [[Chunk(positions, (y,x)) for x, positions in enumerate(row)]
+            for y, row in enumerate(splited_positions.iter_rows())]
+        )
 
 
     def _generate_cells(self, positions:iter) -> dict:
