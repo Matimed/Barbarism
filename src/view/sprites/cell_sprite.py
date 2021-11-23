@@ -1,7 +1,7 @@
 import pygame as pg
 from src.events import CellPressed
 from src.events import Tick
-from src.view.references.images import CELL
+from src.references.images import CELL
 
 
 class CellSprite(pg.sprite.Sprite):
