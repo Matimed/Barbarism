@@ -3,8 +3,9 @@ from lib.abstract_data_types import Graph
 from lib.chunk import Chunk
 from lib.position import Position
 from src.events import Tick
-from src.view.references import Layer
+from src.references import Layer
 from src.view.sprites import CellSprite
+from src.view.sprite_factory import SpriteFactory
 
 
 class WorldView:
@@ -18,8 +19,13 @@ class WorldView:
         self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
         self.renderized_chunks = Graph()
 
-        CellSprite.set_size(CellSprite.get_min_size())
+        self.set_sprites_size()
         CellSprite.set_event_dispatcher(event_dispatcher)
+
+    def set_sprites_size(self):
+        for position in self.renderized_sprites:
+            sprite = self.renderized_sprites[position].values()[0]
+            sprite.set_size(sprite.get_min_size())
 
 
     def render_chunk(self, subscriber, chunk):
@@ -29,6 +35,7 @@ class WorldView:
         if not self.renderized_chunks.has_node(chunk):
             self.renderized_chunks.add_edge((subscriber, chunk))
             self._render_cells(chunk)
+            self._render_entities(chunk)
 
 
     def render_adjacent_chunks(self, subscriber, chunks:set):
@@ -255,3 +262,9 @@ class WorldView:
             position: {Layer.CELL: CellSprite(position)} 
             for position in positions
             }
+
+    
+    def _render_entities(self, positions):
+        new_sprites = SpriteFactory.translate_entity_dict(self.world_model.get_entities(positions))
+        for position in new_sprites:
+            self.renderized_sprites[position] |= new_sprites[position]

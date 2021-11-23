@@ -4,14 +4,15 @@ from src.events import ArrowKey
 from src.events import Click
 from src.events import Tick
 from src.events import Wheel
-from src.view.references import Layer
+from src.references import Layer
+from src.view.sprites import FounderSprite
 from src.view.sprites import CellSprite
 
 
 class Camera:
     def __init__(self, event_dispatcher, window, world_view):
         self.ed = event_dispatcher
-        self.ed.add(Tick, self.draw_cells)
+        self.ed.add(Tick, self.draw)
         self.ed.add(ArrowKey, self.move)
         self.ed.add(Wheel, self.zoom)
 
@@ -31,7 +32,14 @@ class Camera:
         self.max_length = self._calculate_length(CellSprite.get_min_size())
 
 
-    def draw_cells(self, event):
+    def draw(self, event):
+        self.draw_cells()
+        for layer in Layer:
+            if layer != Layer.CELL:
+                self.draw_on_all_cells(layer)
+
+
+    def draw_cells(self):
         """ Loops through the CellSprites of visible_sprites and draw them. 
         """
 
@@ -50,6 +58,19 @@ class Camera:
                 cell.draw(self.window.get_surface())
             
             last_p = self.visible_sprites[row[0]][Layer.CELL].rect.bottomleft
+
+
+    def draw_on_all_cells(self, layer):
+        [self.draw_on_cell(
+            self.visible_sprites[position][layer],
+            position
+            ) for position in self.visible_sprites 
+            if layer in self.visible_sprites[position]]
+
+
+    def draw_on_cell(self, sprite, position):
+        sprite.rect.center = self.visible_sprites[position][Layer.CELL].rect.center
+        sprite.draw(self.window.get_surface())
 
 
     def move(self, event):
@@ -73,7 +94,10 @@ class Camera:
 
         self.visible_sprites |= new_sprites
 
-        self._change_sprite_events(self.ed.remove, removed_sprites)
+        self._change_sprite_events(self.ed.remove, {
+            pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
+            )
+
         self._change_sprite_events(self.ed.add, new_sprites)
 
         self.origin = self._get_new_origin()
