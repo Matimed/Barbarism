@@ -403,6 +403,25 @@ class Matrix:
         
         return True
 
+    
+    @ft.lru_cache(maxsize=500)
+    def manhattan_distance(self, p1, p2):
+        """ Receive two index and calculate the distance between them 
+            using the taxicab metric (a.k.a. rectilinear distance).
+        """
+
+        return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1]) 
+
+    
+    @ft.lru_cache(maxsize=500)
+    def euclidean_distance(self, p1, p2):
+        """ Receive two index and calculate the distance between them 
+            using the Pythagorean theorem.
+        """
+
+        return ((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2) **(1/2)
+
+    
 
     def __bool__(self):
         """ It returns False if there is any empty element in the matrix,
