@@ -62,9 +62,11 @@ class Matrix:
 
 
     @staticmethod
-    def get_squarest_length(lengths):
-        """ Receive a list of tuples and decide which of them 
-            forms the most square-like figure. 
+    @ft.lru_cache(maxsize=None)
+    def get_squarest_length(lengths:tuple):
+        """ Receive a tuple of lengths (also tuples) 
+            and decide which of them forms 
+            the most square-like figure. 
         """
 
         remainders = []
@@ -102,9 +104,7 @@ class Matrix:
         assert len(index) == 2, \
             "The index must be a tuple of one position in y and one in x"
 
-        if (index[0] >= self.length()[0] or index[1] >= self.length()[1] 
-            or index[0] < 0 or index[1] < 0): 
-            
+        if (index[0] >= self.length()[0] or index[1] >= self.length()[1]): 
             raise IndexError("matrix index out of range")
 
         return self.rows[index[0]][index[1]]
@@ -171,7 +171,7 @@ class Matrix:
             "into the ordered quantity of parts"
         )
 
-        new_length = self.get_squarest_length(posible_lengths)
+        new_length = self.get_squarest_length(tuple(posible_lengths))
         grand_matrix = Matrix()
 
         for row in range(0, self.length()[0],new_length[0]) :
@@ -422,6 +422,102 @@ class Matrix:
         return ((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2) **(1/2)
 
     
+    def generate_voronoi_tesselation(self, seeds:list) -> dict:
+        """ It receives a list of index where the seeds are found, 
+            and it returns a complete Matrix, where each element 
+            indicates with a number which seed it belongs to. 
+        """
+
+        # Generates a matrix with the same length but with the indices.
+        original_matrix = Matrix([
+            [(y,x) for x in range(self.length()[1])] 
+            for y in range(self.length()[0])
+        ])
+
+        # Generates a matrix with the same length but empty.
+        voronoi = Matrix([
+            [None for x in range(self.length()[1])] 
+            for y in range(self.length()[0])
+        ])
+
+        seeds = {seed:i+1 for i,seed in enumerate(seeds)}
+        
+        [voronoi.set_element(seed, seeds[seed]) for seed in seeds]
+
+        matrix_pieces = [original_matrix]
+
+        while matrix_pieces:
+            splited_matrix, seed = self._find_closest_seed(
+                matrix_pieces.pop(), seeds
+            )
+
+            if seed != None: 
+                 for y in range(splited_matrix.length()[0]):
+                    for x in range(splited_matrix.length()[1]):
+                        element_index = splited_matrix.get_element((y,x))
+                        voronoi.set_element(element_index, seed)
+    
+            else:
+                matrix_pieces.extend(
+                    [matrix_piece for matrix_piece in splited_matrix]
+                )
+            
+        
+        return voronoi
+            
+
+
+    def _find_closest_seed(self, matrix_piece, seeds:dict):
+        """ It is a method used to calculate the voronoi tessellation 
+            that checks if there is a seed that is closer 
+            than the rest of all the corners of the matrix_piece.
+            If there is it returns it together with the given matrix, 
+            and if there is not, it returns the splited matrix and None.
+        """
+
+        closest_seed = None
+        for y in range(2):
+            for x in range(2):
+                # y and x are bools so -y and -x can only be 0 or -1.
+
+                corner = matrix_piece.get_element((-y,-x))
+                corner_distance = list()
+                
+                distances = {
+                    seeds[seed]:self.euclidean_distance(seed, corner) 
+                    for seed in seeds
+                }
+
+                shortest_distance = min(distances.values())
+                closest_seeds = [
+                    seed for seed in distances 
+                    if distances[seed]==shortest_distance
+                ]
+
+                if closest_seed and not closest_seed in closest_seeds:
+
+                    if not matrix_piece.length()[0] % 4 or not matrix_piece.length()[1] % 4: 
+                        return matrix_piece.split(4), None
+
+                    elif not matrix_piece.length()[0] % 2 or not matrix_piece.length()[1] % 2: 
+                        return matrix_piece.split(2), None
+
+                    elif matrix_piece.length()[0] > 1 or matrix_piece.length()[1] > 1:
+                        i = 3
+                        while True:
+                            try:
+                                return matrix_piece.split(i), None
+                            except AssertionError:
+                                i += 2
+                    
+                    
+                else: closest_seed = closest_seeds[0]
+
+        return matrix_piece, closest_seed
+                        
+        
+        
+
 
     def __bool__(self):
         """ It returns False if there is any empty element in the matrix,
@@ -469,4 +565,3 @@ class Matrix:
             rows.append(' '.join(map(str, row)))
         
         return ' \n'.join(rows)
-
