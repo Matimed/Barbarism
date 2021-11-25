@@ -1,8 +1,8 @@
+import random 
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
 from lib.position import Position
-from random import choice
-from src.references import Biome
+from src.model import BiomesManager
 
 
 class World:
@@ -104,41 +104,42 @@ class World:
         """ Receives an iterable of Position type objects and
             generate a dict of Biomes with a position as key.
         """
+        
+        temperatures = sorted({
+            BiomesManager.get_temperature(biome) 
+            for biome in BiomesManager.get_biomes()
+        })
 
-        # Biomes sorted by temperature order.
-        sorted_biomes = [
-            Biome.SNOW, Biome.TUNDRA, Biome.GRASS, Biome.SAVANNA, Biome.DESERT
-        ]
+        heat_zones = list()
+        for temperature in temperatures:
+            heat_zones.append(temperature)
 
-        temperatures = list()
-        step = 1
-        i = 0
-        while True:
-            if i == len(sorted_biomes)-1: 
-                step = -1
-                temperatures.append(i)
-            temperatures.append(i)
-            i += step
-            if i == -1: break
+        for temperature in reversed(temperatures):
+            heat_zones.append(temperature)
 
         
         rows_quantity = positions.length()[0]
-        rows_per_zone = rows_quantity// len(temperatures)
+        rows_per_zone = rows_quantity// len(heat_zones)
         cells = dict()
 
         rows = positions.iter_rows()
-        for temperature in temperatures:
+        for temperature in heat_zones:
             for i in range(rows_per_zone):
                 for position in next(rows):
-                    cells[position] = sorted_biomes[temperature]
+                    biomes = BiomesManager.get_biomes(temperature=temperature)
+                    cells[position] = random.choice(biomes) 
+
+                
 
         
         # Add snow to excess positions.
+        biomes = BiomesManager.get_biomes(temperature=0)
         cells.update(
-            {position:sorted_biomes[0] for row in rows for position in row}
+            {position:random.choice(biomes) for row in rows for position in row}
         )
 
         return cells
+
 
     def generate_spawn_point(self) -> (Chunk, Position):
         """ Returns a Chunk and a Position on that 

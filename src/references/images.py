@@ -8,5 +8,5 @@ CELL = {
     Biome.TUNDRA:pg.image.load('assets/graphics/biomes/tundra.png').convert(),
     Biome.SAVANNA:pg.image.load('assets/graphics/biomes/savanna.png').convert(),
     Biome.SNOW:pg.image.load('assets/graphics/biomes/snow.png').convert(),
-    Biome.OCEAN:pg.image.load('assets/graphics/biomes/ocean.png').convert()
+    Biome.OCEAN:pg.image.load('assets/graphics/biomes/ocean.png').convert(),
 }
