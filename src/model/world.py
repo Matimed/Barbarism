@@ -10,7 +10,7 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, size:tuple = (128,128), min_size:tuple = (10,20)):
+    def __init__(self, size:tuple = (64,64), min_size:tuple = (10,20)):
         self.size = size
         self.positions = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
@@ -100,7 +100,7 @@ class World:
         )
 
 
-    def _generate_cells(self, positions:Matrix, biomes_qty=20) -> dict:
+    def _generate_cells(self, positions:Matrix, biomes_qty=100) -> dict:
         """ Receives an iterable of Position type objects and
             generate a dict of Biomes with a position as key.
         """
@@ -117,29 +117,37 @@ class World:
         for temperature in reversed(temperatures):
             heat_zones.append(temperature)
 
-        
-        rows_quantity = positions.length()[0]
-        rows_per_zone = rows_quantity// len(heat_zones)
-        cells = dict()
-    
-        seeds = [positions.random().get_index() for i in range(biomes_qty)]
-        zones = positions.generate_voronoi_tesselation(seeds)
-        
-        
-        heat_per_seed = {
-            i + 1 : heat_zones[(seed[0] // rows_per_zone)-1] 
-            for i,seed in enumerate(seeds)
-        }
-        
-        biome_per_seed = dict()
-        for seed in heat_per_seed:
-            biomes = BiomesManager.get_biomes(temperature=heat_per_seed[seed])
-            biome_per_seed[seed] = random.choice(biomes)
-        
-        zones = iter(zones)
-        cells = {position:biome_per_seed[next(zones)] for position in positions}
+        rows_per_zone = positions.length()[0]// len(heat_zones)
 
-        return cells
+        biomes= dict()
+        for i in range (biomes_qty):
+            biome = BiomesManager.select_random(BiomesManager.get_biomes())
+            temperature = BiomesManager.get_temperature(biome)
+            biomes.setdefault(temperature, list())
+            biomes[temperature].append(biome)
+
+        seeds = dict()
+        seeds_index = dict()
+        seed = 1
+        while biomes:
+            for i,temperature in enumerate(heat_zones):
+                if temperature in biomes and biomes[temperature]:
+                    biome = biomes[temperature].pop() 
+                    row = positions.get_row(
+                        i * rows_per_zone + random.randrange(0,rows_per_zone-1)
+                    )
+                    
+                    seeds[seed] = biome
+                    seeds_index[seed] = (random.choice(row).get_index())
+                    seed +=1
+                else:
+                    if temperature in biomes:
+                        biomes.pop(temperature)
+                    continue
+
+        sorted_index = [seeds_index[key] for key in sorted(seeds_index)]
+        zones = iter(positions.generate_voronoi_tesselation(sorted_index))
+        return {position:seeds[next(zones)] for position in positions}
 
 
     def generate_spawn_point(self) -> (Chunk, Position):
