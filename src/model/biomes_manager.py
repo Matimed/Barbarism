@@ -1,3 +1,4 @@
+import random
 from src.references.biome import Biome
 
 class BiomesManager:
@@ -5,25 +6,35 @@ class BiomesManager:
     biomes = dict()
     
     @staticmethod
-    def detail_biome(temperature,friction=1) -> dict:
+    def detail_biome(temperature:int, ocurrence:float=1, friction:float=0) -> dict:
         """ Returns a dictionary containing all the given parameters.
+
+            Parameters:
+                temperature:  Is used to order it in its generation.
+                
+                ocurrence:  Range from 0 to 1 that indicates 
+                    the probability of occurrence when random is called.
+                
+                friction:   Range from 0 to 1 that indicates how much it costs
+                    the characters to move through the terrain. 
         """
 
         return {
+            'temperature':temperature,
+            'ocurrence':ocurrence,
             'friction':friction,
-            'temperature':temperature
         }
     
     #We declare the biomes here and use the .__ func __ () because 
     # it is the best way to call a static method from the class body.
     biomes = {
-        Biome.SNOW: detail_biome.__func__(temperature=0, friction=2),
-        Biome.TUNDRA: detail_biome.__func__(temperature=1),
-        Biome.GRASS: detail_biome.__func__(temperature=2),
-        Biome.FLOWERED: detail_biome.__func__(temperature=2),
-        Biome.OCEAN: detail_biome.__func__(temperature=2),
-        Biome.SAVANNA: detail_biome.__func__(temperature=3),
-        Biome.DESERT: detail_biome.__func__(temperature=4),
+        Biome.SNOW: detail_biome.__func__(temperature=0, friction=0.3),
+        Biome.TUNDRA: detail_biome.__func__(temperature=1, ocurrence=0.5),
+        Biome.GRASS: detail_biome.__func__(temperature=2, ocurrence=1),
+        Biome.FLOWERED: detail_biome.__func__(temperature=2, ocurrence=0.2),
+        Biome.OCEAN: detail_biome.__func__(temperature=2, ocurrence=0.1),
+        Biome.SAVANNA: detail_biome.__func__(temperature=3, ocurrence=0.5),
+        Biome.DESERT: detail_biome.__func__(temperature=4, ocurrence=0.3),
     }   
    
 
@@ -32,11 +43,15 @@ class BiomesManager:
 
 
     @classmethod
+    def get_ocurrence(cls, biome): return cls.biomes[biome]['ocurrence']
+
+
+    @classmethod
     def get_friction(cls, biome): return cls.biomes[biome]['friction']
 
 
     @classmethod
-    def get_biomes(cls, temperature=None, friction=None):
+    def get_biomes(cls, temperature=None, friction=None, ocurrence=None):
         """ Returns the list of biomes that satisfy all the conditions.
         """
 
@@ -53,4 +68,21 @@ class BiomesManager:
                 if cls.get_temperature(biome)== temperature
                 ]
 
+        if ocurrence != None:
+            biomes = [
+                biome for biome in biomes 
+                if cls.get_ocurrence(biome)== temperature
+                ]
+
         return biomes
+
+
+    @classmethod
+    def select_random(cls, biomes:list):
+        """Given a list of biomes choose one at random
+            based on their occurrences.
+        """
+        options = list()
+        for biome in biomes:
+            options.extend([biome] * int(cls.get_ocurrence(biome) * 100))
+        return random.choice(options)
