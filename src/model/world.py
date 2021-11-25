@@ -10,7 +10,7 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, size:tuple = (55,100), min_size:tuple = (10,20)):
+    def __init__(self, size:tuple = (128,128), min_size:tuple = (10,20)):
         self.size = size
         self.positions = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
@@ -100,7 +100,7 @@ class World:
         )
 
 
-    def _generate_cells(self, positions:iter) -> dict:
+    def _generate_cells(self, positions:Matrix, biomes_qty=20) -> dict:
         """ Receives an iterable of Position type objects and
             generate a dict of Biomes with a position as key.
         """
@@ -121,22 +121,23 @@ class World:
         rows_quantity = positions.length()[0]
         rows_per_zone = rows_quantity// len(heat_zones)
         cells = dict()
-
-        rows = positions.iter_rows()
-        for temperature in heat_zones:
-            for i in range(rows_per_zone):
-                for position in next(rows):
-                    biomes = BiomesManager.get_biomes(temperature=temperature)
-                    cells[position] = random.choice(biomes) 
-
-                
-
+    
+        seeds = [positions.random().get_index() for i in range(biomes_qty)]
+        zones = positions.generate_voronoi_tesselation(seeds)
         
-        # Add snow to excess positions.
-        biomes = BiomesManager.get_biomes(temperature=0)
-        cells.update(
-            {position:random.choice(biomes) for row in rows for position in row}
-        )
+        
+        heat_per_seed = {
+            i + 1 : heat_zones[(seed[0] // rows_per_zone)-1] 
+            for i,seed in enumerate(seeds)
+        }
+        
+        biome_per_seed = dict()
+        for seed in heat_per_seed:
+            biomes = BiomesManager.get_biomes(temperature=heat_per_seed[seed])
+            biome_per_seed[seed] = random.choice(biomes)
+        
+        zones = iter(zones)
+        cells = {position:biome_per_seed[next(zones)] for position in positions}
 
         return cells
 
