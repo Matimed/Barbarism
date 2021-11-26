@@ -10,11 +10,19 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, size:tuple = (128,128), min_size:tuple = (20,30)):
+    def __init__(self, size:tuple = (128,128), min_size:tuple = (20,30), biomes:int=64):
+        assert biomes <=128, \
+            "So many biomes take a long time to generate the world"
+        
+        assert size[0]/2 >= biomes, (
+            "The requested number of biomes" 
+            "is not very suitable for the size of the map"
+        )
+
         self.size = size
         self.positions = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
-        self.cells = self._generate_cells(self.positions)
+        self.cells = self._generate_cells(self.positions,biomes)
 
 
     def get_position(self, position_index) -> (Chunk,Position):
@@ -100,25 +108,24 @@ class World:
         )
 
 
-    def _generate_cells(self, positions:Matrix, biomes_qty=100) -> dict:
+    def _generate_cells(self, positions:Matrix, biomes_qty=64) -> dict:
         """ Receives an iterable of Position type objects and
             generate a dict of Biomes with a position as key.
         """
         
-        temperatures = sorted({
+        rows = sorted({
             BiomesManager.get_temperature(biome) 
             for biome in BiomesManager.get_biomes()
         })
 
         heat_zones = list()
-        for temperature in temperatures:
+        for temperature in rows:
             heat_zones.append(temperature)
 
-        for temperature in reversed(temperatures):
+        for temperature in reversed(rows):
             heat_zones.append(temperature)
 
-        rows_per_zone = positions.length()[0]// len(heat_zones)
-
+        rows_biome = positions.length()[0]/ biomes_qty
         biomes= dict()
         for i in range (biomes_qty):
             biome = BiomesManager.select_random(BiomesManager.get_biomes())
@@ -126,20 +133,31 @@ class World:
             biomes.setdefault(temperature, list())
             biomes[temperature].append(biome)
 
+        rows_temperature = {
+            temperature: int((len(biomes[temperature]) * rows_biome) /
+            (heat_zones.count(temperature))) for temperature in biomes
+        }
+        
         seeds = dict()
         seeds_index = dict()
         seed = 1
         while biomes:
+            start_row = 0
+            stop_row = rows_temperature[0]-1
             for i,temperature in enumerate(heat_zones):
                 if temperature in biomes and biomes[temperature]:
-                    biome = biomes[temperature].pop() 
+                    if i != 0:
+                        start_row = stop_row
+                        stop_row += rows_temperature[temperature]
+
                     row = positions.get_row(
-                        i * rows_per_zone + random.randrange(0,rows_per_zone-1)
+                        random.randrange(start_row, stop_row)
                     )
-                    
+                    biome = biomes[temperature].pop()
                     seeds[seed] = biome
                     seeds_index[seed] = (random.choice(row).get_index())
                     seed +=1
+
                 else:
                     if temperature in biomes:
                         biomes.pop(temperature)

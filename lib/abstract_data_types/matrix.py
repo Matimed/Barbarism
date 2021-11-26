@@ -466,9 +466,9 @@ class Matrix:
         return voronoi
             
 
-
     def _find_closest_seed(self, matrix_piece, seeds:dict):
-        """ It is a method used to calculate the voronoi tessellation 
+        """ It is a Divide-and-Conquer algorithm 
+            used to calculate the voronoi tessellation 
             that checks if there is a seed that is closer 
             than the rest of all the corners of the matrix_piece.
             If there is it returns it together with the given matrix, 
