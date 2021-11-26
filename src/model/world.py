@@ -10,7 +10,7 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, size:tuple = (64,64), min_size:tuple = (10,20)):
+    def __init__(self, size:tuple = (128,128), min_size:tuple = (20,30)):
         self.size = size
         self.positions = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)

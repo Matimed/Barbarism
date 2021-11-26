@@ -7,7 +7,7 @@ from src.references.images import CELL
 
 class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
-    min_size = 50
+    min_size = 30
 
 
     native_biomes = {biome:CELL[biome] for biome in Biome}
