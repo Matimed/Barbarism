@@ -4,7 +4,6 @@ from src.events import PointEntity
 from src.events import ShiftEnded
 from src.events import WorldGenerated
 from src.model.charactors import Founder
-from src.model import Landlord
 from src.model import Nation
 from src.model import World 
 

@@ -1,4 +1,3 @@
-from src.model.landlord import Landlord
 from src.model.cell import Cell
 from src.model.city import City
 from src.model.world import World
