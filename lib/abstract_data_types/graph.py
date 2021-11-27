@@ -40,9 +40,15 @@ class Graph:
         """ Removes all the nodes that not have any adjacencies.
         """
 
-        for node in list(self.nodes):
-            if not self.nodes[node]:
-                self.remove_node(node)
+        [self.remove_node(node) for node in self.get_empty_nodes()]
+                
+
+
+    def get_empty_nodes(self):
+        """ Returns all the nodes that not have any adjacencies.
+        """
+
+        return [node for node in self.nodes.keys() if not self.nodes[node]]
 
 
     def add_edge(self, *edges: tuple[Any, Any]):

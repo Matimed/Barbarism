@@ -5,6 +5,7 @@ from src.events import Click
 from src.events import Tick
 from src.events import Wheel
 from src.references import Layer
+from src.view.sprites import CellSprite
 from src.view.sprites.sprite import Sprite
 
 
@@ -101,10 +102,9 @@ class Camera:
 
         self.visible_sprites |= new_sprites
 
-        self._change_sprite_events(self.ed.remove, {
-            pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
-            )
-
+        self._change_sprite_events(self.ed.remove, 
+            {pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
+        )
         self._change_sprite_events(self.ed.add, new_sprites)
 
         self.origin = self._get_new_origin()
@@ -130,6 +130,7 @@ class Camera:
                 ):
                 
                 Sprite.set_size(new_size)
+                CellSprite.set_size(new_size)
                 self.zoom_in(desired_length)
 
             elif (
@@ -139,6 +140,7 @@ class Camera:
                 ):
                 
                 Sprite.set_size(new_size)
+                CellSprite.set_size(new_size)
                 self.zoom_out(desired_length)
             
             self.refresh_sprites()
@@ -240,7 +242,7 @@ class Camera:
 
         origin = self.world.validate_origin(estimated_origin, actual_length)
         self.visible_positions = origin[0].verify_area(origin[1], actual_length)
-        
+        self.world.render_chunks(self, [origin[0]])
         new_sprites = self.world.get_cells(self.visible_positions)
         
         sprites = self.world.complete_cells(

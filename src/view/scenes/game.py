@@ -38,9 +38,7 @@ class Game(Scene):
 
 
     def point_entity(self, event):
-        self.world_view.render_adjacent_chunks(
-            event.get_entity(),
-            set([event.get_chunk()])
-            )
+        chunks = self.world_view.get_adjacent_chunks([event.get_chunk()])
+        self.world_view.set_renderized_chunks(event.get_entity(), chunks)
         
         self.camera.point(event.get_position())

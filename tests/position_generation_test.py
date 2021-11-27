@@ -1,5 +1,6 @@
 from functools import reduce
 from time import time
+from src.references import Biome
 from src.model import Cell
 from lib.abstract_data_types.matrix import Matrix
 from lib.chunk import Chunk
@@ -9,7 +10,7 @@ def generate(order):
     with open('tests/position_generation.log', 'a') as log:
         print_log(file=log)
         print_log("-"*35, file=log)
-        print_log ("Atempt to generate "+ str(order) + " positions without mt:", file = log)
+        print_log ("Atempt to generate "+ str(order) + " positions:", file = log)
         print_log(file=log)
 
         start_time = time()
@@ -72,7 +73,7 @@ def _generate_cells(positions):
     """
     
         
-    return {position:Cell() for row in positions.iter_rows() 
+    return {position:Biome.GRASS for row in positions.iter_rows() 
         for position in row}
 
 

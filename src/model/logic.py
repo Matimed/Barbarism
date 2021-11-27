@@ -48,7 +48,7 @@ class Logic:
 
     def _position_nations(self):
         [nation.add_charactor(
-            self.world.get_random_point()[1], Founder(nation)
+            self.world.generate_spawn_point()[1], Founder(nation)
             ) for nation in self.nations]
 
     

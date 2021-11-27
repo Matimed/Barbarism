@@ -1,39 +1,58 @@
 import pygame as pg
 from src.events import CellPressed
 from src.events import Tick
+from src.references import Biome
 from src.references.images import CELL
 from src.view.sprites.sprite import Sprite
 
-
 class CellSprite(Sprite):
-    ed = None # EventDispatcher
     min_size = 50
 
 
-    # Later we should use different images for each type of biome.
-    native_biomes = [CELL['plain']]
+    native_biomes = {biome:CELL[biome] for biome in Biome}
     biomes = native_biomes.copy()
     
     # native_biomes keep the original size in order to 
     # not to lose image quality.
 
+
     @classmethod
-    def get_biomes(cls) -> list:
+    def set_size(cls, height:int):
+        """ Scales all the images to the given size.
+        """
+
+        assert height >= cls.min_size, "Size must be larger than minimum."
+
+        for biome in cls.native_biomes:
+            surface = cls.native_biomes[biome]
+            new_surface = pg.transform.scale(surface,(height,height))
+            cls.biomes[biome]= new_surface
+
+
+    @classmethod
+    def get_min_size(cls) -> int:
+        return cls.min_size
+
+
+    @classmethod
+    def get_actual_size(cls) -> int:
+        """ Returns the current height of the surface.
+        """
+
+        return cls.biomes[Biome.GRASS].get_size()[0]
+
+
+    @classmethod
+    def get_biome(cls, biome) -> list:
         """ Returns the list of biomes (Surfaces).
         """
-        
-        height = Sprite.get_actual_size()
 
-        for i, surface in enumerate(cls.native_biomes):
-            new_surface = pg.transform.scale(surface,(height,height))
-            cls.biomes[i]= new_surface
-
-        return cls.biomes
+        return cls.biomes[biome]
 
 
-    def __init__(self, position):
-        self.biome = 0
-        self.image = CellSprite.get_biomes()[self.biome]
+    def __init__(self, position, biome):
+        self.biome = biome
+        self.image = CellSprite.get_biome(biome)
         self.rect = self.image.get_rect()
 
         Sprite.get_event_dispatcher().add(Tick, self.routine_update)
@@ -62,7 +81,7 @@ class CellSprite(Sprite):
         """
 
         if self.rect.collidepoint(event.get_pos()) and event.get_button() == 1:
-            Sprite.get_event_dispatcher().post(CellPressed(self.position))
+            self.get_event_dispatcher().post(CellPressed(self.position))
             print(self.position)
 
 
@@ -71,7 +90,7 @@ class CellSprite(Sprite):
             in order to update its information (e.g. size).
         """
         
-        self.image = CellSprite.get_biomes()[self.biome]
+        self.image = CellSprite.get_biome(self.biome)
         self.rect = self.image.get_rect()
 
     
