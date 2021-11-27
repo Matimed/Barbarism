@@ -3,12 +3,12 @@ from src.references import Biome
 
 
 JOB = {
-    'founder':pg.image.load('assets/graphics/founder.png').convert_alpha()
+    'founder':pg.image.load('assets/graphics/charactors/founder.png').convert_alpha()
 }
 
 CHIP = {
-    'red':pg.image.load('assets/graphics/red_chip.png').convert_alpha(),
-    'blue':pg.image.load('assets/graphics/blue_chip.png').convert_alpha()
+    'filling':pg.image.load('assets/graphics/charactors/filling.png').convert_alpha(),
+    'edges':pg.image.load('assets/graphics/charactors/edges.png').convert_alpha()
 }
 
 CELL = {
