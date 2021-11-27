@@ -8,8 +8,7 @@ class Nation:
     def _get_world():
         return Nation.world
 
-    def __init__(self, landlord):
-        self.landlord = landlord
+    def __init__(self):
         self.charactors = list()
         self.cities = []
 

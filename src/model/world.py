@@ -3,7 +3,7 @@ from lib.chunk import Chunk
 from lib.position import Position
 from random import choice
 from src.model import Cell
-from src.references import Layer
+from lib.abstract_data_types.graph import Graph
 
 
 class World:
@@ -11,11 +11,12 @@ class World:
         are all the characters and buildings of the game
     """
 
-    def __init__(self, order = 1000):
+    def __init__(self, order = 100):
         self.order = order
         self.positions: Matrix = self._generate_positions(order)
         self.chunks: Matrix = self._generate_chunks(25, order, self.positions)
-        self.entities = dict() # {Position: {Layer: Object}}
+        self.entities = Graph() # {Position -- Object}
+        self.cells = dict() # {Position: Cell}
         self._generate_cells(self.positions)
 
 
@@ -83,25 +84,29 @@ class World:
         return Matrix(Position.create_collection((0,0), (order -1 ,order -1)))
 
 
-    def update_entities(self, position: Position, entities: set):
-        self.entities[position] |= entities
-
-
-    def add_entity(self, position, layer, entity):
-        self.entities[position][layer] = entity
+    def add_entity(self, position, entity):
+        self.entities.add_edge((position, entity))
 
 
     def get_entities(self, positions: list):
         entities = dict()
-
-        for position in positions:
-            entities |= {
-                position: {layer: self.entities[position][layer]}
-                for layer in self.entities[position]
-                if layer != Layer.CELL
-                }
+        entities |= {
+            position: list(self.entities.get_adjacencies(position))[0]
+            for position in positions
+            if self.entities.has_node(position)
+            }
             
         return entities
+
+
+    def get_entity_position(self, entity):
+        return list(self.entities.get_adjacencies(entity))[0]
+
+
+    def get_charactor_nation(self, position):
+        for nation in self.nations:
+            if nation.has_charactor(position):
+                return nation
 
 
     def _generate_chunks(self, min_size:int, order, positions):
@@ -127,8 +132,7 @@ class World:
         """
         
             
-        self.entities |= {position: {Layer.CELL: Cell(friction = 1)} for row in positions.iter_rows()
-            for position in row}
+        self.cells |= {position: Cell(friction = 1) for position in positions}
 
 
     def get_random_point(self) -> (Chunk, Position):
