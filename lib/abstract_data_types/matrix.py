@@ -473,6 +473,9 @@ class Matrix:
             than the rest of all the corners of the matrix_piece.
             If there is it returns it together with the given matrix, 
             and if there is not, it returns the splited matrix and None.
+            
+            The algorithm is based on this paper:
+            https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7840081/
         """
 
         closest_seed = None
@@ -514,9 +517,6 @@ class Matrix:
                 else: closest_seed = closest_seeds[0]
 
         return matrix_piece, closest_seed
-                        
-        
-        
 
 
     def __bool__(self):

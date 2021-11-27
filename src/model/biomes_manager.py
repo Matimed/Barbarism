@@ -27,13 +27,13 @@ class BiomesManager:
     #We declare the biomes here and use the .__ func __ () because 
     # it is the best way to call a static method from the class body.
     biomes = {
-        Biome.SNOW: detail_biome.__func__(temperature=0, friction=0.3, ocurrence=0.3),
-        Biome.TUNDRA: detail_biome.__func__(temperature=1, ocurrence=0.4),
-        Biome.GRASS: detail_biome.__func__(temperature=2, ocurrence=1),
-        Biome.FLOWERED: detail_biome.__func__(temperature=2, ocurrence=0.1),
-        Biome.OCEAN: detail_biome.__func__(temperature=2, ocurrence=0.1),
-        Biome.SAVANNA: detail_biome.__func__(temperature=3, ocurrence=0.4),
-        Biome.DESERT: detail_biome.__func__(temperature=4, ocurrence=0.3),
+        Biome.SNOW: detail_biome.__func__(temperature=0, ocurrence=0.4, friction=0.3,),
+        Biome.TUNDRA: detail_biome.__func__(temperature=0, ocurrence=0.3,),
+        Biome.GRASS: detail_biome.__func__(temperature=1, ocurrence=1,),
+        Biome.FLOWERED: detail_biome.__func__(temperature=1, ocurrence=0.1,),
+        Biome.OCEAN: detail_biome.__func__(temperature=1, ocurrence=0.1,),
+        Biome.SAVANNA: detail_biome.__func__(temperature=2, ocurrence=0.3,),
+        Biome.DESERT: detail_biome.__func__(temperature=2, ocurrence=0.4,),
     }   
    
 
