@@ -6,6 +6,7 @@ from src.events.game_start import GameStart
 from src.events.world_generated import WorldGenerated
 from src.events.cell_pressed import CellPressed
 from src.events.point_entity import PointEntity
+from src.events.shift_ended import ShiftEnded
 
 # Pygame events:
 from src.events.pygame_events.tick import Tick
