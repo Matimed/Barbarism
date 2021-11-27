@@ -22,7 +22,8 @@ class PygameController:
                 self.ed.post(Quit())
 
             elif event.type == pg.KEYUP:
-                self.arrow_keys_pressed.pop(event.key)
+                if event.key in self.arrow_keys_pressed:
+                    self.arrow_keys_pressed.pop(event.key)
 
             elif event.type == pg.KEYDOWN:
                 if event.key == pg.K_UP: 

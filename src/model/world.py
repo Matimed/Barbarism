@@ -170,7 +170,7 @@ class World:
         seed = 1
         while biomes:
             start_row = 0
-            stop_row = rows_temperature[0]-1
+            stop_row = int(rows_temperature[0]-1)
             for i,temperature in enumerate(heat_zones):
                 if temperature in biomes and biomes[temperature]:
                     if i != 0:
