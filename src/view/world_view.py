@@ -22,13 +22,14 @@ class WorldView:
         CellSprite.set_event_dispatcher(event_dispatcher)
 
 
-    def render_chunk(self, subscriber, chunk):
+    def render_chunks(self, subscriber, chunks:set):
         """ Receives a Chunk and its subscriber(any object) and render it.
         """
 
+        for chunk in chunks:
         if not self.renderized_chunks.has_node(chunk):
+                self._render_cells(chunk)
             self.renderized_chunks.add_edge((subscriber, chunk))
-            self._render_cells(chunk)
 
 
     def render_adjacent_chunks(self, subscriber, chunks:set):

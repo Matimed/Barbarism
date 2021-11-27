@@ -49,7 +49,7 @@ class World:
             adjacent to the one given by parameter.
         """
 
-        return self.chunks.get_adjacencies(self.chunks.index(chunk))
+        return self.chunks.get_adjacencies(chunk.get_index())
 
 
     def get_adjacent_positions(self, position) -> list:
