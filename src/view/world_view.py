@@ -5,6 +5,7 @@ from lib.position import Position
 from src.events import Tick
 from src.references import Layer
 from src.view.sprites import CellSprite
+from src.view.sprites.sprite import Sprite
 from src.view.sprite_factory import SpriteFactory
 
 
@@ -20,12 +21,11 @@ class WorldView:
         self.renderized_chunks = Graph()
 
         self.set_sprites_size()
-        CellSprite.set_event_dispatcher(event_dispatcher)
+        Sprite.set_event_dispatcher(event_dispatcher)
+
 
     def set_sprites_size(self):
-        for position in self.renderized_sprites:
-            sprite = self.renderized_sprites[position].values()[0]
-            sprite.set_size(sprite.get_min_size())
+        Sprite.set_size(Sprite.get_min_size())
 
 
     def render_chunk(self, subscriber, chunk):

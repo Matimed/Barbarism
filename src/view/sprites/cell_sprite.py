@@ -2,9 +2,10 @@ import pygame as pg
 from src.events import CellPressed
 from src.events import Tick
 from src.references.images import CELL
+from src.view.sprites.sprite import Sprite
 
 
-class CellSprite(pg.sprite.Sprite):
+class CellSprite(Sprite):
     ed = None # EventDispatcher
     min_size = 50
 
@@ -15,47 +16,17 @@ class CellSprite(pg.sprite.Sprite):
     
     # native_biomes keep the original size in order to 
     # not to lose image quality.
-    
-   
-    @staticmethod
-    def set_event_dispatcher(event_dispatcher):
-        CellSprite.ed = event_dispatcher
-
-
-    @classmethod
-    def set_size(cls, height:int):
-        """ Scales all the images to the given size.
-        """
-
-        assert height >= cls.min_size, "Size must be larger than minimum."
-
-        for i, surface in enumerate(cls.native_biomes):
-            new_surface = pg.transform.scale(surface,(height,height))
-            cls.biomes[i]= new_surface
-
-
-    @classmethod
-    def get_event_dispatcher(cls):
-        return cls.ed
-
-
-    @classmethod
-    def get_min_size(cls) -> int:
-        return cls.min_size
-
-
-    @classmethod
-    def get_actual_size(cls) -> int:
-        """ Returns the current height of the surface.
-        """
-
-        return cls.biomes[0].get_size()[0]
-
 
     @classmethod
     def get_biomes(cls) -> list:
         """ Returns the list of biomes (Surfaces).
         """
+        
+        height = Sprite.get_actual_size()
+
+        for i, surface in enumerate(cls.native_biomes):
+            new_surface = pg.transform.scale(surface,(height,height))
+            cls.biomes[i]= new_surface
 
         return cls.biomes
 
@@ -65,7 +36,7 @@ class CellSprite(pg.sprite.Sprite):
         self.image = CellSprite.get_biomes()[self.biome]
         self.rect = self.image.get_rect()
 
-        CellSprite.get_event_dispatcher().add(Tick, self.routine_update)
+        Sprite.get_event_dispatcher().add(Tick, self.routine_update)
 
         # The cell is only interested in knowing its position
         # to be able to launch it as data for an event.
@@ -91,7 +62,7 @@ class CellSprite(pg.sprite.Sprite):
         """
 
         if self.rect.collidepoint(event.get_pos()) and event.get_button() == 1:
-            self.get_event_dispatcher().post(CellPressed(self.position))
+            Sprite.get_event_dispatcher().post(CellPressed(self.position))
             print(self.position)
 
 

@@ -5,8 +5,7 @@ from src.events import Click
 from src.events import Tick
 from src.events import Wheel
 from src.references import Layer
-from src.view.sprites import FounderSprite
-from src.view.sprites import CellSprite
+from src.view.sprites.sprite import Sprite
 
 
 class Camera:
@@ -29,7 +28,7 @@ class Camera:
 
         # Minimum harcoded size for the cells matrix. 
         self.min_length = (3,5)
-        self.max_length = self._calculate_length(CellSprite.get_min_size())
+        self.max_length = self._calculate_length(Sprite.get_min_size())
 
 
     def draw(self, event):
@@ -61,6 +60,10 @@ class Camera:
 
 
     def draw_on_all_cells(self, layer):
+        """ Pass all the sprites in the layer passed by parameter
+            to the draw_on_cell method.
+        """
+
         [self.draw_on_cell(
             self.visible_sprites[position][layer],
             position
@@ -69,6 +72,10 @@ class Camera:
 
 
     def draw_on_cell(self, sprite, position):
+        """ Draws a sprite on the center of the cell with the 
+            position passed by parameter.
+        """
+
         sprite.rect.center = self.visible_sprites[position][Layer.CELL].rect.center
         sprite.draw(self.window.get_surface())
 
@@ -109,10 +116,10 @@ class Camera:
             closer to the map by changing the CellSprites size and quantity.
         """
         
-        actual_size = CellSprite.get_actual_size()
+        actual_size = Sprite.get_actual_size()
         new_size = (actual_size + (event.get_movement() * (actual_size //10)))
         
-        if new_size > CellSprite.get_min_size():
+        if new_size > Sprite.get_min_size():
             desired_length = self._calculate_length(new_size)
 
                 
@@ -122,7 +129,7 @@ class Camera:
                 desired_length[1] >= self.min_length[1]
                 ):
                 
-                CellSprite.set_size(new_size)
+                Sprite.set_size(new_size)
                 self.zoom_in(desired_length)
 
             elif (
@@ -131,7 +138,7 @@ class Camera:
                 desired_length[1] <= self.max_length[1]
                 ):
                 
-                CellSprite.set_size(new_size)
+                Sprite.set_size(new_size)
                 self.zoom_out(desired_length)
             
             self.refresh_sprites()
@@ -217,7 +224,7 @@ class Camera:
         ]
 
 
-    def point(self, chunk, position):
+    def point(self, position):
 
         """ Receives a Position and its Chunk and centers them on screen.
         """
@@ -225,7 +232,7 @@ class Camera:
         if self.visible_positions: 
             self._change_sprite_events(self.ed.remove, self.visible_sprites)
 
-        actual_length = self._calculate_length(CellSprite.get_actual_size())
+        actual_length = self._calculate_length(Sprite.get_actual_size())
         
         estimated_origin = list(position.get_index())
         estimated_origin[0] -=  (actual_length[0]-1)//2
@@ -233,7 +240,7 @@ class Camera:
 
         origin = self.world.validate_origin(estimated_origin, actual_length)
         self.visible_positions = origin[0].verify_area(origin[1], actual_length)
-
+        
         new_sprites = self.world.get_cells(self.visible_positions)
         
         sprites = self.world.complete_cells(
@@ -267,7 +274,7 @@ class Camera:
         """
 
         resolution = self.window.get_resolution()
-        cell_size = CellSprite.get_actual_size()
+        cell_size = Sprite.get_actual_size()
         length = self.visible_positions.length()
 
         margins = (
