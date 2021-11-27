@@ -196,7 +196,6 @@ class Camera:
 
 
     def point(self, chunk, position):
-
         """ Receives a Position and its Chunk and centers them on screen.
         """
 
@@ -211,7 +210,7 @@ class Camera:
 
         origin = self.world.validate_origin(estimated_origin, actual_length)
         self.visible_positions = origin[0].verify_area(origin[1], actual_length)
-
+        self.world.render_chunks(self, [origin[0]])
         new_sprites = self.world.get_cells(self.visible_positions)
         
         sprites = self.world.complete_cells(
