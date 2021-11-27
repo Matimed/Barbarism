@@ -32,19 +32,32 @@ class WorldView:
             self.renderized_chunks.add_edge((subscriber, chunk))
 
 
-    def render_adjacent_chunks(self, subscriber, chunks:set):
+    def get_adjacent_chunks(self, chunks:list):
         """ Receives a list of Chunks and its subscriber (any object)
             and render the Chunks and all its neighbors.
         """
     
-        adyacent_chunks = chunks.copy()
+        adyacent_chunks = set(chunks)
         for chunk in chunks:
             adyacent_chunks |= set([
                 adyacent_chunk for adyacent_chunk 
                 in self.world_model.get_adjacent_chunks(chunk)
             ])
 
-        [self.render_chunk(subscriber, chunk) for chunk in adyacent_chunks]
+        return adyacent_chunks
+
+
+    def set_renderized_chunks(self, subscriber, chunks:set):
+        if self.renderized_chunks.has_node(subscriber):
+            render_chunks = tuple(
+                self.renderized_chunks.get_adjacencies(subscriber)
+            )
+            for chunk in render_chunks:
+                if chunk not in chunks:
+                    self.renderized_chunks.remove_edge((subscriber, chunk))
+           
+        self.render_chunks(subscriber, chunks)
+        
 
 
     def remove_chunks(self, chunks: list):
@@ -145,6 +158,9 @@ class WorldView:
             
         self.render_adjacent_chunks(subscriber, chunks)
         
+        self.set_renderized_chunks(
+            subscriber, self.get_adjacent_chunks(chunks)
+        )
         return new_sprites
 
 
@@ -218,10 +234,12 @@ class WorldView:
             first_position = positions.get_element((0,0))
 
             chunks |= new_chunks
+            self.set_renderized_chunks(
+                subscriber, self.get_adjacent_chunks(chunks)
+            )
             new_sprites |= self.get_cells(new_positions)
             removed_sprites |= self.get_cells(removed_positions)
 
-        self.render_adjacent_chunks(subscriber, chunks)
 
         return new_sprites, removed_sprites
 

@@ -31,10 +31,8 @@ class Game(Scene):
         # the game will start to be seen.
         spawn_point = world.generate_spawn_point()
 
-        self.world_view.render_adjacent_chunks(
-            Founder(),
-            set([spawn_point[0]])
-            )
+        chunks = self.world_view.get_adjacent_chunks([spawn_point[0]])
+        self.world_view.set_renderized_chunks(Founder(), chunks)
 
         self.camera = Camera(
             Scene.ed,
