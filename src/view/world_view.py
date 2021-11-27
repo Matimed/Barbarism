@@ -1,3 +1,4 @@
+import gc
 from lib.abstract_data_types import Matrix
 from lib.abstract_data_types import Graph
 from lib.chunk import Chunk
@@ -8,7 +9,7 @@ from src.view.sprites import CellSprite
 
 
 class WorldView:
-    def __init__(self, event_dispatcher, world_model, window):
+    def __init__(self, event_dispatcher, world_model, window, max_loaded_chunks=30):
         self.ed = event_dispatcher
 
         self.world_model = world_model
@@ -17,6 +18,10 @@ class WorldView:
 
         self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
         self.renderized_chunks = Graph()
+
+        # It is the maximum amount of chunks that a subscriber 
+        # can have loaded at the same time before being eliminated.
+        self.max_loaded_chunks = max_loaded_chunks
 
         CellSprite.set_size(CellSprite.get_min_size())
         CellSprite.set_event_dispatcher(event_dispatcher)
@@ -27,7 +32,7 @@ class WorldView:
         """
 
         for chunk in chunks:
-        if not self.renderized_chunks.has_node(chunk):
+            if not self.renderized_chunks.has_node(chunk):
                 self._render_cells(chunk)
             self.renderized_chunks.add_edge((subscriber, chunk))
 
@@ -58,6 +63,10 @@ class WorldView:
            
         self.render_chunks(subscriber, chunks)
         
+        if (len(self.renderized_chunks.get_empty_nodes()) >
+            self.max_loaded_chunks):
+            
+            self.delete_orphan_chunks()
 
 
     def remove_chunks(self, chunks: list):
@@ -66,8 +75,29 @@ class WorldView:
         """
 
         for chunk in chunks:
-            self.renderized_chunks.remove_node(chunk)
             [self.renderized_sprites.pop(pos) for pos in chunk]
+
+
+    def delete_orphan_chunks(self):
+        """ It checks if there are elements in the graph 
+            that do not have connections and removes them 
+            from it and from the sprite dictionary.
+        """
+
+        orphans = self.renderized_chunks.get_empty_nodes()
+        if orphans:
+            chunks = list()
+            for orphan in orphans:
+                try:
+                    # We apply the duck test to verify if they are chunks:
+                    if orphan.get_random_position: chunks.append(orphan) 
+                except AttributeError:
+                    continue
+            
+            self.remove_chunks(chunks)
+            self.renderized_chunks.remove_empty_nodes()
+            gc.collect()
+            
 
 
     def get_cells(self, positions: iter):
@@ -156,11 +186,11 @@ class WorldView:
             chunks |= new_chunks
             new_sprites |= self.get_cells(new_positions)
             
-        self.render_adjacent_chunks(subscriber, chunks)
-        
+
         self.set_renderized_chunks(
             subscriber, self.get_adjacent_chunks(chunks)
         )
+        self.delete_orphan_chunks()
         return new_sprites
 
 
@@ -240,7 +270,7 @@ class WorldView:
             new_sprites |= self.get_cells(new_positions)
             removed_sprites |= self.get_cells(removed_positions)
 
-
+        
         return new_sprites, removed_sprites
 
 
