@@ -6,7 +6,7 @@ class Founder(Passive):
         the hability to create cities.
     """
     
-    def __init__(self):
-        super()
+    def __init__(self, nation):
+        super().__init__(nation)
 
     
