@@ -1,16 +1,16 @@
 import pygame as pg
 from src.events import CellPressed
 from src.events import Tick
-from src.view.references.images import CELL
+from src.references import Biome
+from src.references.images import CELL
 
 
 class CellSprite(pg.sprite.Sprite):
     ed = None # EventDispatcher
-    min_size = 50
+    min_size = 30
 
 
-    # Later we should use different images for each type of biome.
-    native_biomes = [CELL['plain']]
+    native_biomes = {biome:CELL[biome] for biome in Biome}
     biomes = native_biomes.copy()
     
     # native_biomes keep the original size in order to 
@@ -29,9 +29,10 @@ class CellSprite(pg.sprite.Sprite):
 
         assert height >= cls.min_size, "Size must be larger than minimum."
 
-        for i, surface in enumerate(cls.native_biomes):
+        for biome in cls.native_biomes:
+            surface = cls.native_biomes[biome]
             new_surface = pg.transform.scale(surface,(height,height))
-            cls.biomes[i]= new_surface
+            cls.biomes[biome]= new_surface
 
 
     @classmethod
@@ -49,20 +50,20 @@ class CellSprite(pg.sprite.Sprite):
         """ Returns the current height of the surface.
         """
 
-        return cls.biomes[0].get_size()[0]
+        return cls.biomes[Biome.GRASS].get_size()[0]
 
 
     @classmethod
-    def get_biomes(cls) -> list:
+    def get_biome(cls, biome) -> list:
         """ Returns the list of biomes (Surfaces).
         """
 
-        return cls.biomes
+        return cls.biomes[biome]
 
 
-    def __init__(self, position):
-        self.biome = 0
-        self.image = CellSprite.get_biomes()[self.biome]
+    def __init__(self, position, biome):
+        self.biome = biome
+        self.image = CellSprite.get_biome(biome)
         self.rect = self.image.get_rect()
 
         CellSprite.get_event_dispatcher().add(Tick, self.routine_update)
@@ -100,7 +101,7 @@ class CellSprite(pg.sprite.Sprite):
             in order to update its information (e.g. size).
         """
         
-        self.image = CellSprite.get_biomes()[self.biome]
+        self.image = CellSprite.get_biome(self.biome)
         self.rect = self.image.get_rect()
 
     

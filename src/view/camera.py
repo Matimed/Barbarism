@@ -4,7 +4,7 @@ from src.events import ArrowKey
 from src.events import Click
 from src.events import Tick
 from src.events import Wheel
-from src.view.references import Layer
+from src.references import Layer
 from src.view.sprites import CellSprite
 
 
@@ -73,7 +73,9 @@ class Camera:
 
         self.visible_sprites |= new_sprites
 
-        self._change_sprite_events(self.ed.remove, removed_sprites)
+        self._change_sprite_events(self.ed.remove, 
+            {pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
+        )
         self._change_sprite_events(self.ed.add, new_sprites)
 
         self.origin = self._get_new_origin()
