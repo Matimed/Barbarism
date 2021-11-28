@@ -3,6 +3,7 @@ import pygame as pg
 import random
 from src.model.charactors import Founder
 from src.view.sprites import FounderSprite
+from src.view.sprites import CharactorSprite 
 from src.references import images as img
 from src.references import Layer
 
@@ -16,7 +17,6 @@ class SpriteFactory:
         Founder: (Layer.CHARACTOR, FounderSprite)
     }
 
-    chip_equivalences = dict()
     hue = random.random()
 
 
@@ -48,12 +48,12 @@ class SpriteFactory:
 
 
     @classmethod
-    def get_chip(cls, nation):
+    def set_chip(cls, nation):
         """ Dynamically, as the player looks at certain sprites, 
             an image is assigned to them according to its nation.
         """
-
-        if not cls.chip_equivalences.get(nation): 
+        
+        if not CharactorSprite.get_native_chip(nation): 
             color = cls.get_new_color()
             primary_color = cls.hsv_to_color(color, 0.7, 0.95)
             secundary_color = cls.hsv_to_color(color, 0.7, 0.5)
@@ -63,10 +63,7 @@ class SpriteFactory:
 
             filling.blit(edges, (0,0))
 
-            cls.chip_equivalences[nation] = filling
-        
-
-        return cls.chip_equivalences[nation]
+            CharactorSprite.add_chip(nation, filling)
 
 
     @classmethod
@@ -78,8 +75,8 @@ class SpriteFactory:
         equivalence = cls.sprite_equivalences[entity.__class__]
 
         if equivalence[0] == Layer.CHARACTOR:
-            return equivalence[0], equivalence[1](
-                cls.get_chip(entity.get_nation())) 
+            cls.set_chip(entity.get_nation())
+            return equivalence[0], equivalence[1](entity.get_nation()) 
 
         else:
             return equivalence[0], equivalence[1]()

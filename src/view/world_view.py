@@ -23,7 +23,6 @@ class WorldView:
         self.renderized_chunks = Graph()
 
         Sprite.set_size(Sprite.get_min_size())
-        CellSprite.set_size(Sprite.get_min_size())
         Sprite.set_event_dispatcher(event_dispatcher)
 
 

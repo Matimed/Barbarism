@@ -6,9 +6,6 @@ from src.references.images import CELL
 from src.view.sprites.sprite import Sprite
 
 class CellSprite(Sprite):
-    min_size = 50
-
-
     native_biomes = {biome:CELL[biome] for biome in Biome}
     biomes = native_biomes.copy()
     
@@ -17,29 +14,16 @@ class CellSprite(Sprite):
 
 
     @classmethod
-    def set_size(cls, height:int):
+    def update_size(cls):
         """ Scales all the images to the given size.
         """
 
-        assert height >= cls.min_size, "Size must be larger than minimum."
+        height = cls.get_actual_size()
 
         for biome in cls.native_biomes:
             surface = cls.native_biomes[biome]
             new_surface = pg.transform.scale(surface,(height,height))
             cls.biomes[biome]= new_surface
-
-
-    @classmethod
-    def get_min_size(cls) -> int:
-        return cls.min_size
-
-
-    @classmethod
-    def get_actual_size(cls) -> int:
-        """ Returns the current height of the surface.
-        """
-
-        return cls.biomes[Biome.GRASS].get_size()[0]
 
 
     @classmethod
@@ -60,6 +44,7 @@ class CellSprite(Sprite):
         # The cell is only interested in knowing its position
         # to be able to launch it as data for an event.
         self.position = position
+        self.update_size()
 
 
     def draw(self, surface):
@@ -90,7 +75,7 @@ class CellSprite(Sprite):
             in order to update its information (e.g. size).
         """
         
-        self.image = CellSprite.get_biome(self.biome)
+        self.image = self.get_biome(self.biome)
         self.rect = self.image.get_rect()
 
     

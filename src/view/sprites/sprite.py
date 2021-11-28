@@ -3,7 +3,7 @@ import pygame as pg
 
 class Sprite(pg.sprite.Sprite):
     ed = None
-    min_size = 50
+    min_size = 30
     actual_size = min_size
 
     @staticmethod
@@ -16,10 +16,10 @@ class Sprite(pg.sprite.Sprite):
         return cls.ed
 
 
-    @staticmethod
-    def set_size(height):
-        assert height >= Sprite.min_size, "Size must be larger than minimum."
-        Sprite.actual_size = height
+    @classmethod
+    def set_size(cls, height):
+        assert height >= cls.min_size, "Size must be larger than minimum."
+        cls.actual_size = height
 
 
     @classmethod

@@ -2,41 +2,50 @@ import pygame as pg
 from src.view.sprites.sprite import Sprite
 
 
-class Charactor(Sprite):
-    job_image = None
+
+class CharactorSprite(Sprite):
+    native_job = None
+    job = None 
+    native_chips = dict()
+    chips = native_chips.copy()
+
+    @classmethod
+    def get_native_chip(cls, nation): return cls.native_chips.get(nation)
 
 
-    @staticmethod
-    def get_sized_images(chip_image, job_image):
+    @classmethod
+    def add_chip(cls, nation, chip):
+        cls.native_chips[nation] = chip
+        cls.update_chip_size()
+
+
+    @classmethod
+    def update_chip_size(cls):
         """ Scales the image to the given size.
         """
 
-        height = Charactor.get_actual_size()
+        height = cls.get_actual_size()
+            
+        for nation in cls.native_chips:
+            surface = cls.native_chips[nation]
+            new_surface = pg.transform.scale(surface,(height,height))
+            cls.chips[nation]= new_surface
 
-        sized_chip_image = pg.transform.scale(
-            chip_image,(height,height)
-            )
-        
-        sized_job_image = pg.transform.scale(
-            job_image,(height,height)
-            )
-        
-        return sized_chip_image, sized_job_image
     
-
     @classmethod
-    def get_job_image(cls): return cls.job_image
+    def get_job(cls): pass
 
 
-    def __init__(self, chip_image):
-        self.chip_image = chip_image
+    def __init__(self, nation):
+        self.nation = nation
+        self.image = self.get_image()
 
 
     def get_image(self):
-        chip_img, job_img = Charactor.get_sized_images(
-            self.chip_image, self.get_job_image()
-            )
-        
-        chip_img.blit(job_img, (0,0))
+        full_image = self.get_chip(self.nation).copy()
+        full_image.blit(self.get_job(), (0,0)) 
+        return full_image
 
-        return chip_img
+
+    @classmethod
+    def get_chip(cls, nation): return cls.chips[nation]

@@ -30,7 +30,7 @@ class Camera:
         # Minimum harcoded size for the cells matrix. 
         self.min_length = (3,5)
         self.max_length = self._calculate_length(Sprite.get_min_size())
-
+        
 
     def draw(self, event):
         self.draw_cells()
@@ -129,8 +129,7 @@ class Camera:
                 desired_length[1] >= self.min_length[1]
                 ):
                 
-                Sprite.set_size(new_size)
-                CellSprite.set_size(new_size)
+                self.set_sprites_size(new_size)
                 self.zoom_in(desired_length)
 
             elif (
@@ -139,11 +138,20 @@ class Camera:
                 desired_length[1] <= self.max_length[1]
                 ):
                 
-                Sprite.set_size(new_size)
-                CellSprite.set_size(new_size)
+                self.set_sprites_size(new_size)
                 self.zoom_out(desired_length)
             
             self.refresh_sprites()
+
+
+    def set_sprites_size(self, size):
+        Sprite.set_size(size)
+
+        [[
+            sprite.update_size() 
+            for sprite in dictionary.values()
+            ]for dictionary in self.visible_sprites.values()
+        ]
 
 
     def zoom_in(self, desired_size):
@@ -255,6 +263,8 @@ class Camera:
         self._change_sprite_events(self.ed.add, new_sprites)
             
         self.origin = self._get_new_origin()
+
+        self.refresh_sprites()
 
 
     def _change_sprite_events(self, dispatcher_method, sprites):
