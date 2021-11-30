@@ -1,4 +1,5 @@
 import random 
+from lib.abstract_data_types import Graph
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
 from lib.position import Position
@@ -20,9 +21,10 @@ class World:
         )
 
         self.size = size
-        self.positions = self._generate_positions(size)
+        self.positions: Matrix = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
         self.cells = self._generate_cells(self.positions,biomes)
+        self.entities = Graph() # {Position -- Object}
 
 
     def get_position(self, position_index) -> (Chunk,Position):
@@ -86,6 +88,31 @@ class World:
         )
 
 
+    def add_entity(self, position, entity):
+        self.entities.add_edge((position, entity))
+
+
+    def get_entities(self, positions: list):
+        entities = dict()
+        entities |= {
+            position: self.entities.get_adjacencies(position)
+            for position in positions
+            if self.entities.has_node(position)
+            }
+            
+        return entities
+
+
+    def get_entity_position(self, entity):
+        return list(self.entities.get_adjacencies(entity))[0]
+
+
+    def get_charactor_nation(self, position):
+        for nation in self.nations:
+            if nation.has_charactor(position):
+                return nation
+
+
     def _generate_chunks(self, min_size:tuple, size:tuple, positions:Matrix) -> Matrix:
         """ Returns a Matrix of Chunk objects based on a given size 
             (the minimum number of cells that can fit in a Chunk).
@@ -143,7 +170,7 @@ class World:
         seed = 1
         while biomes:
             start_row = 0
-            stop_row = rows_temperature[0]-1
+            stop_row = int(rows_temperature[min(rows_temperature)]-1)
             for i,temperature in enumerate(heat_zones):
                 if temperature in biomes and biomes[temperature]:
                     if i != 0:
@@ -173,9 +200,12 @@ class World:
             chunk where to place a charactor.
         """
 
-        # In the future a more complex spawn method will be implemented.
+        while True:
         chunk = self.chunks.random()
-        return (chunk, chunk.get_random_position())
+            position = chunk.get_random_position()
+            
+            if BiomesManager.get_passable(self.cells[position]):
+                return (chunk, position)
 
     
     def get_cells(self, positions:iter):

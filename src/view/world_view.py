@@ -6,25 +6,24 @@ from lib.position import Position
 from src.events import Tick
 from src.references import Layer
 from src.view.sprites import CellSprite
+from src.view.sprites.sprite import Sprite
+from src.view.sprite_factory import SpriteFactory
 
 
 class WorldView:
     def __init__(self, event_dispatcher, world_model, window, max_loaded_chunks=30):
         self.ed = event_dispatcher
-
         self.world_model = world_model
-
         self.window = window
-
-        self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
-        self.renderized_chunks = Graph()
-
         # It is the maximum amount of chunks that a subscriber 
         # can have loaded at the same time before being eliminated.
         self.max_loaded_chunks = max_loaded_chunks
 
-        CellSprite.set_size(CellSprite.get_min_size())
-        CellSprite.set_event_dispatcher(event_dispatcher)
+        self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
+        self.renderized_chunks = Graph()
+
+        Sprite.set_size(Sprite.get_min_size())
+        Sprite.set_event_dispatcher(event_dispatcher)
 
 
     def render_chunks(self, subscriber, chunks:set):
@@ -34,6 +33,8 @@ class WorldView:
         for chunk in chunks:
             if not self.renderized_chunks.has_node(chunk):
                 self._render_cells(chunk)
+                self._render_entities(chunk)
+
             self.renderized_chunks.add_edge((subscriber, chunk))
 
 
@@ -138,7 +139,7 @@ class WorldView:
             (for that the subscriber is needed).
         """
 
-        new_sprites = dict()
+        new_sprites = set()
         chunks = set()
         while positions.length() != desired_length:
             first_position = positions.get_element((0,0))
@@ -184,13 +185,14 @@ class WorldView:
                 positions.append_column(new_positions)
 
             chunks |= new_chunks
-            new_sprites |= self.get_cells(new_positions)
+            new_sprites |= set(new_positions)
             
 
         self.set_renderized_chunks(
             subscriber, self.get_adjacent_chunks(chunks)
         )
         self.delete_orphan_chunks()
+        new_sprites = self.get_cells(new_sprites)
         return new_sprites
 
 
@@ -305,3 +307,9 @@ class WorldView:
             position: {Layer.CELL: CellSprite(position, biomes[position])} 
             for position in positions
             }
+
+    
+    def _render_entities(self, positions):
+        new_sprites = SpriteFactory.translate_entity_dict(self.world_model.get_entities(positions))
+        for position in new_sprites:
+            self.renderized_sprites[position] |= new_sprites[position]

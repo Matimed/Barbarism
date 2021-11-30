@@ -10,9 +10,13 @@ class Charactor:
     # Character can also mean "a single letter".
 
     
-    def __init__(self):
+    def __init__(self, nation):
+        self.nation = nation
         self.path = []
         self.speed = 2
+
+
+    def get_nation(self): return self.nation
 
 
     def change_path(self, route):

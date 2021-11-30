@@ -6,12 +6,13 @@ from src.events import Tick
 from src.events import Wheel
 from src.references import Layer
 from src.view.sprites import CellSprite
+from src.view.sprites.sprite import Sprite
 
 
 class Camera:
     def __init__(self, event_dispatcher, window, world_view):
         self.ed = event_dispatcher
-        self.ed.add(Tick, self.draw_cells)
+        self.ed.add(Tick, self.draw)
         self.ed.add(ArrowKey, self.move)
         self.ed.add(Wheel, self.zoom)
 
@@ -28,10 +29,17 @@ class Camera:
 
         # Minimum harcoded size for the cells matrix. 
         self.min_length = (3,5)
-        self.max_length = self._calculate_length(CellSprite.get_min_size())
+        self.max_length = self._calculate_length(Sprite.get_min_size())
+        
+
+    def draw(self, event):
+        self.draw_cells()
+        for layer in Layer:
+            if layer != Layer.CELL:
+                self.draw_on_all_cells(layer)
 
 
-    def draw_cells(self, event):
+    def draw_cells(self):
         """ Loops through the CellSprites of visible_sprites and draw them. 
         """
 
@@ -50,6 +58,27 @@ class Camera:
                 cell.draw(self.window.get_surface())
             
             last_p = self.visible_sprites[row[0]][Layer.CELL].rect.bottomleft
+
+
+    def draw_on_all_cells(self, layer):
+        """ Pass all the sprites in the layer passed by parameter
+            to the draw_on_cell method.
+        """
+
+        [self.draw_on_cell(
+            self.visible_sprites[position][layer],
+            position
+            ) for position in self.visible_sprites 
+            if layer in self.visible_sprites[position]]
+
+
+    def draw_on_cell(self, sprite, position):
+        """ Draws a sprite on the center of the cell with the 
+            position passed by parameter.
+        """
+
+        sprite.rect.center = self.visible_sprites[position][Layer.CELL].rect.center
+        sprite.draw(self.window.get_surface())
 
 
     def move(self, event):
@@ -71,7 +100,8 @@ class Camera:
             self, self.visible_positions, origin
             )
 
-        self.visible_sprites |= new_sprites
+
+        self.update_visible_sprites(new_sprites)
 
         self._change_sprite_events(self.ed.remove, 
             {pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
@@ -87,10 +117,10 @@ class Camera:
             closer to the map by changing the CellSprites size and quantity.
         """
         
-        actual_size = CellSprite.get_actual_size()
+        actual_size = Sprite.get_actual_size()
         new_size = (actual_size + (event.get_movement() * (actual_size //10)))
         
-        if new_size > CellSprite.get_min_size():
+        if new_size > Sprite.get_min_size():
             desired_length = self._calculate_length(new_size)
 
                 
@@ -100,7 +130,7 @@ class Camera:
                 desired_length[1] >= self.min_length[1]
                 ):
                 
-                CellSprite.set_size(new_size)
+                self.set_sprites_size(new_size)
                 self.zoom_in(desired_length)
 
             elif (
@@ -109,10 +139,20 @@ class Camera:
                 desired_length[1] <= self.max_length[1]
                 ):
                 
-                CellSprite.set_size(new_size)
+                self.set_sprites_size(new_size)
                 self.zoom_out(desired_length)
             
             self.refresh_sprites()
+
+
+    def set_sprites_size(self, size):
+        Sprite.set_size(size)
+
+        [[
+            sprite.update_size() 
+            for sprite in dictionary.values()
+            ]for dictionary in self.visible_sprites.values()
+        ]
 
 
     def zoom_in(self, desired_size):
@@ -180,6 +220,7 @@ class Camera:
         """ Receives: dict{Position: list[Sprite]}
         """
 
+        [sprite.update_size() for layer in sprites.values() for sprite in layer.values()]
         self.visible_sprites |= sprites
 
 
@@ -195,14 +236,15 @@ class Camera:
         ]
 
 
-    def point(self, chunk, position):
+    def point(self, position):
+
         """ Receives a Position and its Chunk and centers them on screen.
         """
 
         if self.visible_positions: 
             self._change_sprite_events(self.ed.remove, self.visible_sprites)
 
-        actual_length = self._calculate_length(CellSprite.get_actual_size())
+        actual_length = self._calculate_length(Sprite.get_actual_size())
         
         estimated_origin = list(position.get_index())
         estimated_origin[0] -=  (actual_length[0]-1)//2
@@ -218,11 +260,13 @@ class Camera:
             )
 
         new_sprites |= sprites
-        self.visible_sprites |= new_sprites
+        self.update_visible_sprites(new_sprites)
 
         self._change_sprite_events(self.ed.add, new_sprites)
             
         self.origin = self._get_new_origin()
+
+        self.refresh_sprites()
 
 
     def _change_sprite_events(self, dispatcher_method, sprites):
@@ -244,7 +288,7 @@ class Camera:
         """
 
         resolution = self.window.get_resolution()
-        cell_size = CellSprite.get_actual_size()
+        cell_size = Sprite.get_actual_size()
         length = self.visible_positions.length()
 
         margins = (

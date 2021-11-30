@@ -1,6 +1,16 @@
 import pygame as pg
 from src.references import Biome
 
+
+JOB = {
+    'founder':pg.image.load('assets/graphics/charactors/founder.png').convert_alpha()
+}
+
+CHIP = {
+    'filling':pg.image.load('assets/graphics/charactors/filling.png').convert_alpha(),
+    'edges':pg.image.load('assets/graphics/charactors/edges.png').convert_alpha()
+}
+
 CELL = {
     Biome.DESERT:pg.image.load('assets/graphics/biomes/desert.png').convert(),
     Biome.FLOWERED:pg.image.load('assets/graphics/biomes/flowered.png').convert(),

@@ -6,7 +6,7 @@ class BiomesManager:
     biomes = dict()
     
     @staticmethod
-    def detail_biome(temperature:int, ocurrence:float=1, friction:float=0) -> dict:
+    def detail_biome(temperature:int, ocurrence:float=1, friction:float=0.1, passable=True) -> dict:
         """ Returns a dictionary containing all the given parameters.
 
             Parameters:
@@ -22,6 +22,7 @@ class BiomesManager:
             'temperature':temperature,
             'ocurrence':ocurrence,
             'friction':friction,
+            'passable':passable,
         }
     
     #We declare the biomes here and use the .__ func __ () because 
@@ -31,7 +32,7 @@ class BiomesManager:
         Biome.TUNDRA: detail_biome.__func__(temperature=0, ocurrence=0.3,),
         Biome.GRASS: detail_biome.__func__(temperature=1, ocurrence=1,),
         Biome.FLOWERED: detail_biome.__func__(temperature=1, ocurrence=0.1,),
-        Biome.OCEAN: detail_biome.__func__(temperature=1, ocurrence=0.1,),
+        Biome.OCEAN: detail_biome.__func__(temperature=1, ocurrence=0.1,passable=False),
         Biome.SAVANNA: detail_biome.__func__(temperature=2, ocurrence=0.3,),
         Biome.DESERT: detail_biome.__func__(temperature=2, ocurrence=0.4,),
     }   
@@ -47,6 +48,10 @@ class BiomesManager:
 
     @classmethod
     def get_friction(cls, biome): return cls.biomes[biome]['friction']
+
+
+    @classmethod
+    def get_passable(cls, biome): return cls.biomes[biome]['passable']
 
 
     @classmethod
