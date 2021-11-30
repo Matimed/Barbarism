@@ -200,9 +200,12 @@ class World:
             chunk where to place a charactor.
         """
 
-        # In the future a more complex spawn method will be implemented.
+        while True:
         chunk = self.chunks.random()
-        return (chunk, chunk.get_random_position())
+            position = chunk.get_random_position()
+            
+            if BiomesManager.get_passable(self.cells[position]):
+                return (chunk, position)
 
     
     def get_cells(self, positions:iter):
