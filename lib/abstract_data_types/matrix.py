@@ -211,6 +211,25 @@ class Matrix:
 
 
     @ft.lru_cache
+    def get_adjacencies_without_diagonals(self, index:tuple):
+        elements = list()
+        
+        switch = True
+        for _ in range(2):
+            for x in [1, -1]:
+
+                try:        
+                    elements.append(
+                        self.rows[index[0]+x*switch][index[1]+x*(not switch)]
+                        )
+                except IndexError: continue 
+
+            switch = not switch
+
+        return elements
+
+
+    @ft.lru_cache
     def get_adjacencies(self, index:tuple):
         """ Returns all the elements contiguous to the one 
             of the given index.
