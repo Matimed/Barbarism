@@ -21,7 +21,7 @@ class World:
         )
 
         self.size = size
-        self.positions = self._generate_positions(size)
+        self.positions: Matrix = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
         self.cells = self._generate_cells(self.positions,biomes)
         self.entities = Graph() # {Position -- Object}
@@ -170,7 +170,7 @@ class World:
         seed = 1
         while biomes:
             start_row = 0
-            stop_row = int(rows_temperature[0]-1)
+            stop_row = int(rows_temperature[min(rows_temperature)]-1)
             for i,temperature in enumerate(heat_zones):
                 if temperature in biomes and biomes[temperature]:
                     if i != 0:

@@ -139,7 +139,7 @@ class WorldView:
             (for that the subscriber is needed).
         """
 
-        new_sprites = dict()
+        new_sprites = set()
         chunks = set()
         while positions.length() != desired_length:
             first_position = positions.get_element((0,0))
@@ -185,13 +185,14 @@ class WorldView:
                 positions.append_column(new_positions)
 
             chunks |= new_chunks
-            new_sprites |= self.get_cells(new_positions)
+            new_sprites |= set(new_positions)
             
 
         self.set_renderized_chunks(
             subscriber, self.get_adjacent_chunks(chunks)
         )
         self.delete_orphan_chunks()
+        new_sprites = self.get_cells(new_sprites)
         return new_sprites
 
 

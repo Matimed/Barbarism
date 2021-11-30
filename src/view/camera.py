@@ -100,7 +100,8 @@ class Camera:
             self, self.visible_positions, origin
             )
 
-        self.visible_sprites |= new_sprites
+
+        self.update_visible_sprites(new_sprites)
 
         self._change_sprite_events(self.ed.remove, 
             {pos: self.visible_sprites.pop(pos) for pos in removed_sprites}
@@ -219,6 +220,7 @@ class Camera:
         """ Receives: dict{Position: list[Sprite]}
         """
 
+        [sprite.update_size() for layer in sprites.values() for sprite in layer.values()]
         self.visible_sprites |= sprites
 
 
@@ -258,7 +260,7 @@ class Camera:
             )
 
         new_sprites |= sprites
-        self.visible_sprites |= new_sprites
+        self.update_visible_sprites(new_sprites)
 
         self._change_sprite_events(self.ed.add, new_sprites)
             
