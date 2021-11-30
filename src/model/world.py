@@ -95,7 +95,7 @@ class World:
     def get_entities(self, positions: list):
         entities = dict()
         entities |= {
-            position: list(self.entities.get_adjacencies(position))[0]
+            position: self.entities.get_adjacencies(position)
             for position in positions
             if self.entities.has_node(position)
             }

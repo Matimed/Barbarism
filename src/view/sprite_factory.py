@@ -87,7 +87,8 @@ class SpriteFactory:
         entity_sprites = dict()
 
         for position in entities:
-            layer, sprite = cls.get_sprite(entities[position])
-            entity_sprites |= {position: {layer: sprite}}
+            for entity in entities[position]:
+                layer, sprite = cls.get_sprite(entity)
+                entity_sprites |= {position: {layer: sprite}}
 
         return entity_sprites
