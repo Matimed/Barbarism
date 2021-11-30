@@ -1,5 +1,6 @@
 import random 
-from lib.abstract_data_types import Graph
+from lib.abstract_data_types import NonDirectionalGraph
+from lib.abstract_data_types import DirectionalGraph
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
 from lib.position import Position
@@ -24,7 +25,7 @@ class World:
         self.positions: Matrix = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
         self.cells = self._generate_cells(self.positions,biomes)
-        self.entities = Graph() # {Position -- Object}
+        self.entities = NonDirectionalGraph() # {Position -- Object}
 
 
     def get_position(self, position_index) -> (Chunk,Position):

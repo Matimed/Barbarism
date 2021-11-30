@@ -1,6 +1,6 @@
 import gc
 from lib.abstract_data_types import Matrix
-from lib.abstract_data_types import Graph
+from lib.abstract_data_types import NonDirectionalGraph
 from lib.chunk import Chunk
 from lib.position import Position
 from src.events import Tick
@@ -20,7 +20,7 @@ class WorldView:
         self.max_loaded_chunks = max_loaded_chunks
 
         self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
-        self.renderized_chunks = Graph()
+        self.renderized_chunks = NonDirectionalGraph()
 
         Sprite.set_size(Sprite.get_min_size())
         Sprite.set_event_dispatcher(event_dispatcher)

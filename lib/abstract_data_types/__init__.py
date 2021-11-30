@@ -1,2 +1,3 @@
 from lib.abstract_data_types.matrix import Matrix
-from lib.abstract_data_types.graph import Graph
+from lib.abstract_data_types.non_directional_graph import NonDirectionalGraph
+from lib.abstract_data_types.directional_graph import DirectionalGraph
