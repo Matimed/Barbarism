@@ -1,8 +1,11 @@
 from lib.weak_bound_method import WeakBoundMethod as Wbm
+from src.events import CellPressed
 from src.events import GameStart
 from src.events import PointEntity
 from src.events import ShiftEnded
 from src.events import WorldGenerated
+from src.model.biomes_manager import BiomesManager
+from src.model.charactors import Charactor
 from src.model.charactors import Founder
 from src.model import Nation
 from src.model import World 
@@ -12,6 +15,7 @@ class Logic:
     def __init__(self, event_dispatcher):
         self.ed = event_dispatcher
         self.ed.add(GameStart, self.game_start)
+        self.ed.add(CellPressed, self.cell_interaction)
 
         self.nations = list()
         self.shift = tuple() # (Nation, Charactor)
@@ -65,3 +69,10 @@ class Logic:
                 self.nations[0], 
                 self.nations[0].get_charactor(0)
                 )
+
+
+    def cell_interaction(self, event):
+        cell = self.world.get_cells([event.get_position()])
+        if BiomesManager.get_passable(cell[event.get_position()]):
+            origin = self.world.get_entity_position(self.shift[1])
+            self.world.create_route(origin, event.get_position())

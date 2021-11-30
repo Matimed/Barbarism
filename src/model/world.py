@@ -68,7 +68,50 @@ class World:
             to get from the origin to the destination point.
         """
 
-        raise NotImplementedError
+        open_set = dict() # {Position: g}
+        closed_set = set() # {Position}
+        dirty_path = DirectionalGraph()
+        
+        open_set[origin] = 0
+        while open_set:
+            fs = dict()
+            for position in open_set:
+                h =  self.positions.manhattan_distance(destination, position)
+                fs[h + open_set[position]] = position
+            
+            winner = fs[min(fs)]
+
+            open_set.pop(winner)
+            closed_set.add(winner)
+
+            if winner is destination: break
+            
+            positions = self.positions.get_adjacencies_without_diagonals(winner)
+            for position in positions:
+                if position in closed_set: continue
+                if not BiomesManager.get_passable(self.cells[position]): continue
+
+                friction = BiomesManager.get_friction(self.cells[position]) 
+                g = self.positions.manhattan_distance(winner, position) * friction
+                
+                if position in open_set:
+                    if g > open_set[position]:
+                        continue
+
+                open_set[position] = g
+                dirty_path.add_edge(position, winner)
+
+
+        if dirty_path.has_node(destination):
+            path = list()
+            key = {destination}
+            while key != set():
+                path.append(list(key)[0])
+                key = dirty_path.get_adjacencies(list(key)[0])
+
+            return list(reversed(path))
+
+        else: return None
 
 
     def get_limit(self) -> Position:
