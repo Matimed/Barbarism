@@ -201,7 +201,7 @@ class World:
         """
 
         while True:
-        chunk = self.chunks.random()
+            chunk = self.chunks.random()
             position = chunk.get_random_position()
             
             if BiomesManager.get_passable(self.cells[position]):

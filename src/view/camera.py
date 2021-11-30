@@ -202,8 +202,7 @@ class Camera:
             if actual_length[0] < desired_length[0]: estimated_origin[0] -= 1
             if actual_length[1] < desired_length[1]: estimated_origin[1] -= 1
 
-            self._switch = not self._switch
-                        
+        self._switch = not self._switch
         origin = self.world.validate_origin(estimated_origin, desired_length)[1]
 
         sprites = self.world.complete_cells(
