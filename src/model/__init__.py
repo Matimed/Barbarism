@@ -1,3 +1,4 @@
+from src.model.entity import Entity
 from src.model.biomes_manager import BiomesManager
 from src.model.city import City
 from src.model.world import World
