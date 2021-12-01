@@ -20,3 +20,7 @@ class WeakBoundMethod:
             return self._func == other.__func__ and self._self == weakref.ref(other.__self__)
         except:
             return self._func == other._func and self._self == other._self
+
+
+    def __bool__(self):
+        return self._self() is not None

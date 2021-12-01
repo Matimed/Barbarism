@@ -1,6 +1,6 @@
 import pygame as pg
+from lib.event_system import EventDispatcher
 from src.controller import TickController
-from src.controller import EventDispatcher
 from src.controller import PygameController
 from src.events import Quit
 from src.model import Logic

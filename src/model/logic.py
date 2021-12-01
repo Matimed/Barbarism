@@ -1,4 +1,3 @@
-from lib.weak_bound_method import WeakBoundMethod as Wbm
 from src.events import GameStart
 from src.events import PointEntity
 from src.events import ShiftEnded

@@ -1,4 +1,4 @@
-from lib.weak_bound_method import WeakBoundMethod as Wbm
+from lib.event_system import WeakBoundMethod as Wbm
 
 
 class EventDispatcher:
@@ -42,4 +42,7 @@ class EventDispatcher:
 
         if self.listeners.get(event.get_class(), False):
             for listener in self.listeners[event.get_class()]:
-                listener(event)
+                if listener: 
+                    listener(event)
+                else:
+                    self.listeners.remove(listener)
