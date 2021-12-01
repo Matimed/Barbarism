@@ -1,10 +1,13 @@
 import random 
+from src.events import MoveEntity
+from src.events import WorldUpdated
 from lib.abstract_data_types import NonDirectionalGraph
 from lib.abstract_data_types import DirectionalGraph
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
 from lib.position import Position
 from src.model import BiomesManager
+from src.model.charactors import Charactor
 
 
 class World:
@@ -76,7 +79,8 @@ class World:
         while open_set:
             fs = dict()
             for position in open_set:
-                h =  self.positions.manhattan_distance(destination, position)
+                friction = BiomesManager.get_friction(self.cells[position]) 
+                h =  self.positions.manhattan_distance(destination, position)*friction
                 fs[h + open_set[position]] = position
             
             winner = fs[min(fs)]
@@ -89,10 +93,9 @@ class World:
             positions = self.positions.get_adjacencies_without_diagonals(winner)
             for position in positions:
                 if position in closed_set: continue
-                if not BiomesManager.get_passable(self.cells[position]): continue
+                if self.avoid_position(position): continue
 
-                friction = BiomesManager.get_friction(self.cells[position]) 
-                g = self.positions.manhattan_distance(winner, position) * friction
+                g = self.positions.manhattan_distance(winner, position)
                 
                 if position in open_set:
                     if g > open_set[position]:
@@ -109,10 +112,26 @@ class World:
                 path.append(list(key)[0])
                 key = dirty_path.get_adjacencies(list(key)[0])
 
-            return list(reversed(path))
+            return list(reversed(path))[1:]
 
         else: return None
 
+
+    def avoid_position(self, position):
+        """ Returns True if it's no problem with pass over a position.
+        """
+        
+        if not BiomesManager.get_passable(self.cells[position]): 
+            return True
+
+        elif self.entities.has_node(position): 
+            for entity in self.entities.get_adjacencies(position):
+                entity
+                if isinstance(entity, Charactor):
+                    return True
+
+
+        else: return False
 
     def get_limit(self) -> Position:
         """ Returns the last Position in the world.
