@@ -147,6 +147,13 @@ class World:
         return entities
 
 
+    def get_entity(self, position):
+        if self.entities.has_node(position):
+            return {position: self.entities.get_adjacencies(position)}
+
+        else: return None
+
+
     def get_entity_position(self, entity):
         return list(self.entities.get_adjacencies(entity))[0]
 
