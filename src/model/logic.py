@@ -14,11 +14,16 @@ from src.model import World
 class Logic:
     def __init__(self, event_dispatcher):
         self.ed = event_dispatcher
+
+        Charactor.set_event_dispatcher(self.ed)
+        
         self.ed.add(GameStart, self.game_start)
         self.ed.add(CellPressed, self.cell_interaction)
+        self.ed.add(ShiftEnded, self.next_shift)
+
 
         self.nations = list()
-        self.shift = tuple() # (Nation, Charactor)
+        self.shift = list() # (Nation, Charactor)
         self.world: World = None # Will be initialized in game_start.
 
 
@@ -41,7 +46,7 @@ class Logic:
         
 
     def _create_world(self):
-        world = World()
+        world = World(self.ed)
         Nation.world = world
         return world
 
@@ -57,22 +62,39 @@ class Logic:
 
     
     def next_shift(self, event):
+        """ Updates the shift.
+        """
+
+        if len(self.shift) == 2: 
+            if self.shift[1].has_path():
+                self.update_charactor_path(self.shift[1].get_destination())
+                self.shift[1].move()
+
+        # Will fail if it's the last shift.
         try: 
-            try: 
-                self.shift[1] = self.shift[0].get_next_charactor(self.shift[1])
+            # Will fail if it's the last charactor of the nation.
+            try:
+                new_charactor = self.shift[0].get_next_charactor(self.shift[1])
 
             except StopIteration:
                 self.shift[0] = self.nations[self.nations.index(self.shift[0]) + 1]
+                self.shift[1] = self.shift[0].get_charactor(0)
 
-        except IndexError: 
-            self.shift = (
-                self.nations[0], 
+        except IndexError:
+            self.shift = [
+                self.nations[0],
                 self.nations[0].get_charactor(0)
-                )
+            ]
 
 
     def cell_interaction(self, event):
         cell = self.world.get_cells([event.get_position()])
+
         if BiomesManager.get_passable(cell[event.get_position()]):
-            origin = self.world.get_entity_position(self.shift[1])
-            self.world.create_route(origin, event.get_position())
+            self.update_charactor_path(event.get_position())
+
+
+    def update_charactor_path(self, destination):
+        origin = self.world.get_entity_position(self.shift[1])
+        path = self.world.create_route(origin, destination)
+        self.shift[1].set_path(path)
