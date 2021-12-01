@@ -5,9 +5,8 @@ class InputBox(pg.sprite.Sprite):
     """ Rectangle in which text can be entered and accessed.
     """
 
-    def __init__(self, click_event, write_event, event_dispatcher, 
-            font, initial_text ='', margin=(5,20), size=(350,50),
-            text_color=(255,255,255), box_color=(0,0,0), 
+    def __init__(self, font, initial_text ='', margin=(5,20), 
+            size=(350,50), text_color=(255,255,255), box_color=(0,0,0), 
             backspace_sound=None, key_sound=None,):
         super().__init__()
 
@@ -26,13 +25,11 @@ class InputBox(pg.sprite.Sprite):
         self.backspace_sound = backspace_sound
         self.key_sound = key_sound
 
-        event_dispatcher.add(click_event, self.handle_collisions)
-        if write_event: event_dispatcher.add(write_event, self.write)
 
 
     def handle_collisions(self, event):
-        """ It is called every time the click event is triggered
-            and returns True if the button was pressed.
+        """ It has to be called every time the click event is triggered
+            and focus in the box if the button was pressed.
         """
 
         if (self.rect.collidepoint(event.get_pos())
@@ -43,9 +40,10 @@ class InputBox(pg.sprite.Sprite):
             
 
     def write(self, event):
-        """ It is called every time the write event is triggered
+        """ It has to be called every time the write event is triggered
             and adds the letter from the event to the text.
         """
+
         text = self.get_text()
         if event.key == pg.K_BACKSPACE:
             self.set_text(text[:-1])

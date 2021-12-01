@@ -7,28 +7,24 @@ class ArrowButton(pg.sprite.Sprite):
     """
 
     def __init__(self, pressed_image, unpressed_image, 
-            click_event, event_dispatcher, height, angle=0, sound=None):
+            height, angle=0, sound=None):
 
         super().__init__()
-        self.ed = event_dispatcher
         self.images = images
         self.button = [
             self._adjust_surface(pressed_image, height, angle),
             self._adjust_surface(unpressed_image, height, angle)
         ]
         
-
         self.index = 0
         self.image = self.button[self.index]
 
         self.rect = self.image.get_rect()
         self.sound = sound
 
-        event_dispatcher.add(click_event, self.handle_collisions)
-
 
     def handle_collisions(self, event):
-        """ It is called every time the click event is triggered
+        """ It has to be called every time the click event is triggered
             and returns True if the button was pressed.
         """
 

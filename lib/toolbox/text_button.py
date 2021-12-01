@@ -3,9 +3,11 @@ from lib.toolbox import TextBox
 
 
 class TextButton(pg.sprite.Sprite):
-    """ An interactive button that adjusts its length according to the text it contains.
-        It has two states that are: pressed and released (not released).
-        The only thing that changes between these two states is the right part of the button.
+    """ An interactive button that adjusts its length 
+        according to the text it contains. It has two states that are:
+        pressed and released (not pressed). 
+        The only thing that changes between these two states 
+        is the right part of the button.
     """
 
     def __init__(self, images:dict, font, click_event, event_dispatcher, 
@@ -56,7 +58,8 @@ class TextButton(pg.sprite.Sprite):
         height = self.images['left'].get_size()[1]
         
         width = self.images['left'].get_size()[0]
-        width += self.images['middle'].get_size()[0] * (self.text.get_size()[0] - 1)
+        width += self.images['middle'].get_size()[0] \
+            * (self.text.get_size()[0] - 1)
         width += self.images['right'].get_size()[0]        
 
         return [width, height]
@@ -142,5 +145,5 @@ class TextButton(pg.sprite.Sprite):
         scale = height // native_height
 
         return pg.transform.scale(
-            surface, (native_length * scale, native_height  * scale)
+            surface, (native_length*scale, native_height*scale)
         )

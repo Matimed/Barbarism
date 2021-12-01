@@ -8,9 +8,9 @@ class NumericSelector(pg.AbstractGroup):
     """
 
     def __init__(self, pressed_image, unpressed_image, 
-            click_event, event_dispatcher, font, maximum, minimum, 
-            box_size=(60,60), text_color=(255,255,255),
-            box_color=(0,0,0), sound=None, initial_number=None,):
+            font, maximum, minimum, box_size=(60,60), 
+            text_color=(255,255,255), box_color=(0,0,0), 
+            sound=None, initial_number=None,):
 
         
         assert maximum > minimum, \
@@ -23,21 +23,38 @@ class NumericSelector(pg.AbstractGroup):
         else: self.number = minimum
 
         self.up_button = ArrowButton(
-            pressed_image, unpressed_image, 
-            click_event, event_dispatcher,
+            pressed_image, unpressed_image,
             self.box_size[0], 90, sound
             )
 
         self.down_button = ArrowButton(
-            pressed_image, unpressed_image, 
-            click_event, event_dispatcher,
+            pressed_image, unpressed_image,
             self.box_size[0], 270, sound
             )
 
-        self.box = InputBox(click_event, None, event_dispatcher, font,
-            str(self.number), (10, int(self.box_size[1] * 1/3)),
+        self.box = InputBox(font, str(self.number), 
+            (10, int(self.box_size[1] * 1/3)),
             self.box_size, text_color, box_color
             )
+
+
+    def handle_collisions(self, event):
+        """ It has to be called every time the click event is triggered
+            and returns True if the button was pressed.
+        """
+
+        if (self.up_button.handle_collisions(event) 
+            and self.number < self.maximum):
+
+            self.number += 1
+            
+        if (self.down_button.handle_collisions(event) 
+            and self.number > self.minimum):
+
+            self.number -= 1
+
+        
+        self.box.handle_collisions(event)
 
 
     def draw(self, surface):
