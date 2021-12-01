@@ -30,7 +30,14 @@ class Camera:
         # Minimum harcoded size for the cells matrix. 
         self.min_length = (3,5)
         self.max_length = self._calculate_length(Sprite.get_min_size())
+
+
+    def is_visible(self, position):
+        """ Returns true if the position passed is being seen.
+        """
         
+        return position in self.visible_positions
+
 
     def draw(self, event):
         self.draw_cells()
@@ -308,4 +315,3 @@ class Camera:
         resolution = self.window.get_resolution()
 
         return (resolution[1] // cells_size, resolution[0] // cells_size)
-
