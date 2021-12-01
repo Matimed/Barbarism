@@ -7,8 +7,9 @@ class Window:
     """
 
     def __init__(self):
-        pg.display.set_caption('Barbarisim')
-        
+        pg.display.set_caption('Barbarism')
+        pg.display.set_icon(pg.image.load('assets/graphics/icon.png'))
+
         self.max_resolution = (
             pg.display.Info().current_w,
             pg.display.Info().current_h
