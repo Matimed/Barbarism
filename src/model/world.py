@@ -14,15 +14,19 @@ class World:
     """ Class that represents the physical space where 
         are all the characters and buildings of the game
     """
-
-    def __init__(self, size:tuple = (128,128), min_size:tuple = (20,30), biomes:int=64):
-        assert biomes <=128, \
+    
+    def __init__(self, event_dispatcher, size:tuple = (128,128), min_size:tuple = (20,30), biomes:int=64):
+        assert biomes <= 128, \
             "So many biomes take a long time to generate the world"
         
         assert size[0]/2 >= biomes, (
             "The requested number of biomes" 
             "is not very suitable for the size of the map"
         )
+
+        self.ed = event_dispatcher
+
+        self.ed.add(MoveEntity, self.move_charactor)
 
         self.size = size
         self.positions: Matrix = self._generate_positions(size)
@@ -132,6 +136,7 @@ class World:
 
 
         else: return False
+
 
     def get_limit(self) -> Position:
         """ Returns the last Position in the world.
@@ -276,6 +281,27 @@ class World:
             
             if BiomesManager.get_passable(self.cells[position]):
                 return (chunk, position)
+
+
+    def move_charactor(self, event):
+        """ Moves an entity to another position.
+            Recives an event with an entity and it's destination.
+        """
+        charactor = event.get_entity()
+        
+        # Saves the position of ther charactor.
+        past_position = list(self.entities.get_adjacencies(charactor))[0]
+        
+        # Removes the position of ther charactor and the charactor 
+        # from the entities graph.
+        self.entities.remove_node(charactor)
+        self.entities.remove_empty_nodes()
+
+        # Creates an edge between the charactor and the destination 
+        # position in the graph.
+        self.entities.add_edge((charactor, event.get_destination()))
+        
+        self.ed.post(WorldUpdated([past_position, event.get_destination()]))
 
     
     def get_cells(self, positions:iter):
