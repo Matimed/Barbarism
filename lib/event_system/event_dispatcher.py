@@ -45,4 +45,4 @@ class EventDispatcher:
                 if listener: 
                     listener(event)
                 else:
-                    self.listeners.remove(listener)
+                    self.listeners[event.get_class()].remove(listener)
