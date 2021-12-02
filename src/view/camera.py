@@ -246,6 +246,9 @@ class Camera:
 
         """ Receives a Position and its Chunk and centers them on screen.
         """
+        if self.visible_sprites:
+            self._change_sprite_events(self.ed.remove, self.visible_sprites)
+            self.visible_sprites = dict()
 
         if self.visible_positions: 
             self._change_sprite_events(self.ed.remove, self.visible_sprites)
