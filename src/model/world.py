@@ -116,7 +116,8 @@ class World:
                 path.append(list(key)[0])
                 key = dirty_path.get_adjacencies(list(key)[0])
 
-            return list(reversed(path))[1:]
+            path.pop()
+            return path
 
         else: return None
 

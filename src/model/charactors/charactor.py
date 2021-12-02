@@ -24,10 +24,12 @@ class Charactor(Entity):
         self.speed = 2
 
     def has_path(self): return bool(self.path)
+
+
     def get_nation(self): return self.nation
 
 
-    def get_destination(self): return self.path[-1]
+    def get_destination(self): return self.path[0]
 
 
     def set_path(self, path):
@@ -39,7 +41,8 @@ class Charactor(Entity):
 
     
     def move(self):
+        
         if self.path:
-            position = self.path.pop(0)
+            position = self.path.pop()
 
             self.ed.post(MoveEntity(self, position))
