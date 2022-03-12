@@ -271,17 +271,24 @@ class World:
         return {position:seeds[next(zones)] for position in positions}
 
 
-    def generate_spawn_point(self) -> (Chunk, Position):
+    def generate_spawn_points(self, quantity:int=1) -> set[Position]:
         """ Returns a Chunk and a Position on that 
             chunk where to place a charactor.
         """
 
+        positions = set()
         while True:
             chunk = self.chunks.random()
-            position = chunk.get_random_position()
+            positions = set()
+            for _ in range(quantity):
+                position = chunk.get_random_position()
+                
+                if BiomesManager.get_passable(self.cells[position]):
+                    positions.add(position)
             
-            if BiomesManager.get_passable(self.cells[position]):
-                return (chunk, position)
+            if len(positions) == quantity: break
+        
+        return positions
 
 
     def move_charactor(self, event):

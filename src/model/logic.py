@@ -1,4 +1,3 @@
-from lib.weak_bound_method import WeakBoundMethod as Wbm
 from src.events import CellPressed
 from src.events import GameStart
 from src.events import PointEntity
@@ -7,6 +6,7 @@ from src.events import WorldGenerated
 from src.model.biomes_manager import BiomesManager
 from src.model.charactors import Charactor
 from src.model.charactors import Founder
+from src.model.charactors import Warrior
 from src.model import Nation
 from src.model import World 
 
@@ -52,9 +52,10 @@ class Logic:
 
 
     def _position_nations(self):
-        [nation.add_charactor(
-            self.world.generate_spawn_point()[1], Founder(nation)
-            ) for nation in self.nations]
+        for nation in self.nations:
+            positions = iter(self.world.generate_spawn_points(quantity=2))
+            nation.add_charactor(next(positions), Founder(nation))
+            nation.add_charactor(next(positions), Warrior(nation))
 
     
     def next_shift(self, event):
@@ -89,10 +90,10 @@ class Logic:
     def point_current_charactor(self):
         position = self.world.get_entity_position(self.shift[1])
         self.ed.post(PointEntity(
-                        self.shift[1],
-                        position,
-                        self.world.get_position(position.get_index())[0]
-                        ))
+            self.shift[1],
+            position,
+            self.world.get_position(position.get_index())[0]
+        ))
 
 
     def cell_interaction(self, event):
