@@ -3,7 +3,8 @@ from src.references import Biome
 
 
 JOB = {
-    'founder':pg.image.load('assets/graphics/charactors/founder.png').convert_alpha()
+    'founder':pg.image.load('assets/graphics/charactors/founder.png').convert_alpha(),
+    'warrior':pg.image.load('assets/graphics/charactors/warrior.png').convert_alpha(),
 }
 
 CHIP = {

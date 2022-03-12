@@ -1,4 +1,3 @@
-from src.model.charactors import Founder
 
 
 class Nation:

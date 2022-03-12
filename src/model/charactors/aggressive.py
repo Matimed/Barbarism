@@ -5,5 +5,5 @@ class Aggressive(Charactor):
     """ Any person or entity that can fight.
     """
     
-    def __init__(self):
-        super.__init__()
+    def __init__(self, nation):
+        super().__init__(nation)
