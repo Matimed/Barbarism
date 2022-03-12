@@ -1,4 +1,3 @@
-from src.model.charactors import Founder
 
 
 class Nation:
@@ -26,7 +25,11 @@ class Nation:
         try: 
             return self.charactors[self.charactors.index(charactor) + 1]
             
-        except IndexError: raise StopIteration
+        except ValueError: 
+            return self.charactors[0]
+            
+        except IndexError:
+            raise StopIteration
 
     def has_charactor(self, charactor):
         """ Given a Position returns if there is a charactor

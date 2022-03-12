@@ -6,10 +6,16 @@ This is a turns-based strategy game made for a high school project.  We put spec
 
 _$ python3 barbarism.py_
 
-### Requeriments
+### Controls
+
+* Left click to set a route for the current character.
+* 'N' to move the next piece.
+*  Mouse wheel to zoom in and out.
+
+### Requirements
 
 * Python 3.10.0
-* See the rest of depencies in the [requeriments](requeriments.txt) file.
+* See the rest of depencies in the [requirements](requirements.txt) file.
 
 ## Authors
 

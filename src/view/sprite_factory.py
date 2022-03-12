@@ -2,7 +2,9 @@ import colorsys
 import pygame as pg
 import random
 from src.model.charactors import Founder
+from src.model.charactors import Warrior
 from src.view.sprites import FounderSprite
+from src.view.sprites import WarriorSprite
 from src.view.sprites import CharactorSprite 
 from src.references import images as img
 from src.references import Layer
@@ -14,7 +16,8 @@ class SpriteFactory:
     """
 
     sprite_equivalences = {
-        Founder: (Layer.CHARACTOR, FounderSprite)
+        Founder: (Layer.CHARACTOR, FounderSprite),
+        Warrior: (Layer.CHARACTOR, WarriorSprite),
     }
 
     hue = random.random()
@@ -25,7 +28,6 @@ class SpriteFactory:
         return pg.Color(tuple(
             round(i * 255) for i in colorsys.hsv_to_rgb(hue, saturation, value)
         ))
-
 
     @classmethod
     def get_new_color(cls):

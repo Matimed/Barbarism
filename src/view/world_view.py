@@ -1,6 +1,6 @@
 import gc
 from lib.abstract_data_types import Matrix
-from lib.abstract_data_types import Graph
+from lib.abstract_data_types import NonDirectionalGraph
 from lib.chunk import Chunk
 from lib.position import Position
 from src.events import Tick
@@ -20,7 +20,7 @@ class WorldView:
         self.max_loaded_chunks = max_loaded_chunks
 
         self.renderized_sprites = dict() # {Position: {Layer: Sprite}}
-        self.renderized_chunks = Graph()
+        self.renderized_chunks = NonDirectionalGraph()
 
         Sprite.set_size(Sprite.get_min_size())
         Sprite.set_event_dispatcher(event_dispatcher)
@@ -313,3 +313,41 @@ class WorldView:
         new_sprites = SpriteFactory.translate_entity_dict(self.world_model.get_entities(positions))
         for position in new_sprites:
             self.renderized_sprites[position] |= new_sprites[position]
+
+
+    def update_entities(self, positions):
+        """ Asks the world again for the entities in the 
+            passed positions.
+        """
+
+        for position in positions:
+            entity = self.world_model.get_entity(position)
+
+            # If the position is not being renderized, it's nothing to do.
+            if not self.is_renderized(position): continue
+
+            cell = self.renderized_sprites[position][Layer.CELL]
+
+            if entity:
+                self.renderized_sprites.update(SpriteFactory.translate_entity_dict(entity))
+                self.renderized_sprites[position] |= {Layer.CELL: cell}
+            
+            else:
+                self.renderized_sprites.pop(position)
+                self.renderized_sprites |= {position: {Layer.CELL: cell}}
+
+        
+    def is_renderized(self, position): 
+        """ Returns true if the position passed is being renderized.
+        """
+        
+        return bool(self.renderized_sprites.get(position))
+
+
+    def get_sprites(self, positions:list):
+        """ Returns the sprites in the position passed by parameter.
+        """
+
+        return {
+            position: self.renderized_sprites[position] for position in positions
+            }

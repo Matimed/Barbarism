@@ -7,6 +7,8 @@ from src.events.world_generated import WorldGenerated
 from src.events.cell_pressed import CellPressed
 from src.events.point_entity import PointEntity
 from src.events.shift_ended import ShiftEnded
+from src.events.move_entity import MoveEntity
+from src.events.world_updated import WorldUpdated
 
 # Pygame events:
 from src.events.pygame_events.tick import Tick

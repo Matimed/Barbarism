@@ -1,7 +1,7 @@
 from typing import Any
 
 
-class Graph:
+class NonDirectionalGraph:
     """ A non-directional graph class that works with objects as node indices.
     """
 

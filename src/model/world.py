@@ -1,18 +1,22 @@
 import random 
-from lib.abstract_data_types import Graph
+from src.events import MoveEntity
+from src.events import WorldUpdated
+from lib.abstract_data_types import NonDirectionalGraph
+from lib.abstract_data_types import DirectionalGraph
 from lib.abstract_data_types import Matrix
 from lib.chunk import Chunk
 from lib.position import Position
 from src.model import BiomesManager
+from src.model.charactors import Charactor
 
 
 class World:
     """ Class that represents the physical space where 
         are all the characters and buildings of the game
     """
-
-    def __init__(self, size:tuple = (128,128), min_size:tuple = (20,30), biomes:int=64):
-        assert biomes <=128, \
+    
+    def __init__(self, event_dispatcher, size:tuple = (128,128), min_size:tuple = (20,30), biomes:int=64):
+        assert biomes <= 128, \
             "So many biomes take a long time to generate the world"
         
         assert size[0]/2 >= biomes, (
@@ -20,11 +24,15 @@ class World:
             "is not very suitable for the size of the map"
         )
 
+        self.ed = event_dispatcher
+
+        self.ed.add(MoveEntity, self.move_charactor)
+
         self.size = size
         self.positions: Matrix = self._generate_positions(size)
         self.chunks= self._generate_chunks(min_size, size, self.positions)
         self.cells = self._generate_cells(self.positions,biomes)
-        self.entities = Graph() # {Position -- Object}
+        self.entities = NonDirectionalGraph() # {Position -- Object}
 
 
     def get_position(self, position_index) -> (Chunk,Position):
@@ -67,7 +75,68 @@ class World:
             to get from the origin to the destination point.
         """
 
-        raise NotImplementedError
+        open_set = dict() # {Position: g}
+        closed_set = set() # {Position}
+        dirty_path = DirectionalGraph()
+        
+        open_set[origin] = 0
+        while open_set:
+            fs = dict()
+            for position in open_set:
+                friction = BiomesManager.get_friction(self.cells[position]) 
+                h =  self.positions.manhattan_distance(destination, position)*friction
+                fs[h + open_set[position]] = position
+            
+            winner = fs[min(fs)]
+
+            open_set.pop(winner)
+            closed_set.add(winner)
+
+            if winner is destination: break
+            
+            positions = self.positions.get_adjacencies_without_diagonals(winner)
+            for position in positions:
+                if position in closed_set: continue
+                if self.avoid_position(position): continue
+
+                g = self.positions.manhattan_distance(winner, position)
+                
+                if position in open_set:
+                    if g > open_set[position]:
+                        continue
+
+                open_set[position] = g
+                dirty_path.add_edge(position, winner)
+
+
+        if dirty_path.has_node(destination):
+            path = list()
+            key = {destination}
+            while key != set():
+                path.append(list(key)[0])
+                key = dirty_path.get_adjacencies(list(key)[0])
+
+            path.pop()
+            return path
+
+        else: return None
+
+
+    def avoid_position(self, position):
+        """ Returns True if it's no problem with pass over a position.
+        """
+        
+        if not BiomesManager.get_passable(self.cells[position]): 
+            return True
+
+        elif self.entities.has_node(position): 
+            for entity in self.entities.get_adjacencies(position):
+                entity
+                if isinstance(entity, Charactor):
+                    return True
+
+
+        else: return False
 
 
     def get_limit(self) -> Position:
@@ -101,6 +170,13 @@ class World:
             }
             
         return entities
+
+
+    def get_entity(self, position):
+        if self.entities.has_node(position):
+            return {position: self.entities.get_adjacencies(position)}
+
+        else: return None
 
 
     def get_entity_position(self, entity):
@@ -195,17 +271,45 @@ class World:
         return {position:seeds[next(zones)] for position in positions}
 
 
-    def generate_spawn_point(self) -> (Chunk, Position):
+    def generate_spawn_points(self, quantity:int=1) -> set[Position]:
         """ Returns a Chunk and a Position on that 
             chunk where to place a charactor.
         """
 
+        positions = set()
         while True:
             chunk = self.chunks.random()
-            position = chunk.get_random_position()
+            positions = set()
+            for _ in range(quantity):
+                position = chunk.get_random_position()
+                
+                if BiomesManager.get_passable(self.cells[position]):
+                    positions.add(position)
             
-            if BiomesManager.get_passable(self.cells[position]):
-                return (chunk, position)
+            if len(positions) == quantity: break
+        
+        return positions
+
+
+    def move_charactor(self, event):
+        """ Moves an entity to another position.
+            Recives an event with an entity and it's destination.
+        """
+        charactor = event.get_entity()
+        
+        # Saves the position of ther charactor.
+        past_position = list(self.entities.get_adjacencies(charactor))[0]
+        
+        # Removes the position of ther charactor and the charactor 
+        # from the entities graph.
+        self.entities.remove_node(charactor)
+        self.entities.remove_empty_nodes()
+
+        # Creates an edge between the charactor and the destination 
+        # position in the graph.
+        self.entities.add_edge((charactor, event.get_destination()))
+        
+        self.ed.post(WorldUpdated([past_position, event.get_destination()]))
 
     
     def get_cells(self, positions:iter):
